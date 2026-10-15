@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Použité automaty</title>
+<meta name="description" content="Použité prodejní automaty pro vaše podnikání. Repasované kávové, nápojové a snackové automaty.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+<link rel="preload" as="image" href="assets/img/hero-bg.webp">
+<link rel="preload" as="image" href="assets/img/hero-fg-before.webp">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<main class="hero" id="hero" data-state="before">
+  <!-- Depth layers: workshop plate (far) and machines + platform (near). Text stays outside, unmoved. -->
+  <div class="scene" id="scene" aria-hidden="true">
+    <div class="layer layer-far">
+      <img class="plate" src="assets/img/hero-bg.webp" alt="" width="1672" height="941" decoding="async">
+      <div class="daylight"></div>
+    </div>
+    <div class="layer layer-near">
+      <div class="floor-shadow"></div>
+      <div class="fg fg-before"><img src="assets/img/hero-fg-before.webp" alt="" width="976" height="546" decoding="async"></div>
+      <div class="fg fg-after">
+        <img src="assets/img/hero-fg-after.webp" alt="" width="976" height="546" decoding="async">
+        <span class="sheen sheen-coffee"></span>
+        <span class="sheen sheen-snack"></span>
+        <span class="sheen sheen-drinks"></span>
+      </div>
+      <div class="plinth-side"></div>
+      <div class="plinth-face"></div>
+      <div class="plinth-edge"></div>
+      <div class="sweep"></div>
+    </div>
+  </div>
+  <p class="visually-hidden" id="sceneLabel" aria-live="polite">Tři prodejní automaty v dílně před opravou.</p>
+
+  <header class="top">
+    <a class="logo" href="#" aria-label="použité automaty, úvod">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M27 4C14 4 5 10 5 20c0 3 1 5.5 2.5 7.5C9 18 15 13 22 10 16 14 11 19 9 28.5 11 29.5 13 30 15 30c9 0 14-8 12-26z" fill="currentColor"/></svg>
+      použité automaty
+    </a>
+    <nav aria-label="Hlavní navigace">
+      <a href="#nabidka">Nabídka</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+  </header>
+
+  <section class="copy">
+    <h1><span>Druhá šance.</span> <span>Prvotřídní výkon.</span></h1>
+    <p class="sub">Použité prodejní automaty pro vaše podnikání.</p>
+    <a class="cta" href="#nabidka">Prohlédnout nabídku
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </section>
+
+  <div class="switch" role="group" aria-label="Stav automatů">
+    <span class="thumb" aria-hidden="true"></span>
+    <button type="button" id="btnBefore" aria-pressed="true">Před opravou</button>
+    <button type="button" id="btnAfter" aria-pressed="false">Po opravě</button>
+  </div>
+</main>
+
+<script src="assets/js/hero.js"></script>
+</body>
+</html>
