@@ -75,7 +75,8 @@
 
 <!-- Servis: scroll-controlled presentation of how machines are prepared.
      Copy is plain HTML; edit freely. data-from / data-to are seconds in the video where each panel shows.
-     The scroll length lives in assets/css/style.css (--scrub-distance). -->
+     Scrolling first folds away the service cover (--cover-distance), then scrubs the video
+     (--scrub-distance); both lengths live in assets/css/style.css. -->
 <section class="scrub" id="servis" aria-labelledby="scrub-title" data-duration="25.17">
   <div class="scrub-sticky">
     <div class="scrub-media" aria-hidden="true">
@@ -130,6 +131,17 @@
         <span class="scrub-marks"><span data-step="1">01</span><span data-step="2">02</span><span data-step="3">03</span></span>
       </div>
       <p class="scrub-note">Ilustrační animace</p>
+    </div>
+
+    <!-- Service cover: folds away as the section is entered (assets/js/scrub.js). Decorative only. -->
+    <div class="scrub-cover" aria-hidden="true">
+      <div class="cover-dim"></div>
+      <div class="cover-leaf cover-top">
+        <span class="cover-mark"><svg viewBox="0 0 32 32"><path d="M27 4C14 4 5 10 5 20c0 3 1 5.5 2.5 7.5C9 18 15 13 22 10 16 14 11 19 9 28.5 11 29.5 13 30 15 30c9 0 14-8 12-26z" fill="currentColor"/></svg></span>
+        <div class="cover-leaf cover-bottom">
+          <span class="cover-handle"></span>
+          </div>
+      </div>
     </div>
   </div>
 </section>

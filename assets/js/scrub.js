@@ -1,7 +1,10 @@
-/* Servis section: scroll position drives the video's currentTime.
-   The page scrolls normally; nothing intercepts wheel or touch input. The sticky
-   frame (CSS) holds the video in view while the tall section scrolls past, and this
-   script seeks the video to match. Runs only when <head> added .js-scrub (video
+/* Servis section: one scroll timeline in two phases.
+   1. Cover: a service cover over the pinned frame lifts and folds away, revealing the
+      video held on its first frame (--cover-distance).
+   2. Scrub: scroll position drives the video's currentTime and the step copy
+      (--scrub-distance).
+   The page scrolls normally; nothing intercepts wheel, keyboard or touch input. The sticky
+   frame (CSS) holds everything in view while the tall section scrolls past. Runs only when <head> added .js-scrub (video
    playable, no reduced motion); otherwise the section stays a static layout. */
 (function () {
   'use strict';
@@ -12,7 +15,7 @@
   if (!section || !video || !root.classList.contains('js-scrub')) return;
 
   var FRAME = 1 / 24;          // footage frame time
-  var EASE = 0.35;             // per-frame smoothing toward the scroll target; higher settles faster
+  var EASE = 0.45;             // per-frame smoothing toward the scroll target; higher settles faster
   var END_GUARD = 0.05;        // stay just inside the last frame, some decoders show black at duration
 
   var panels = Array.prototype.map.call(section.querySelectorAll('.scrub-panel'), function (el) {
@@ -24,13 +27,21 @@
     };
   });
   var fill = section.querySelector('.scrub-fill');
+  var cover = section.querySelector('.scrub-cover');
+  var coverDim = cover && cover.querySelector('.cover-dim');
+  var leafTop = cover && cover.querySelector('.cover-top');
+  var leafBottom = cover && cover.querySelector('.cover-bottom');
   var marks = Array.prototype.slice.call(section.querySelectorAll('.scrub-marks span'));
 
   var duration = parseFloat(section.dataset.duration) || 0;  // replaced by the real value on loadedmetadata
   var ready = false;          // metadata known, seeking allowed
   var loading = false;
-  var target = 0;             // seconds, from scroll
-  var shown = 0;              // seconds, smoothed
+  var target = 0;             // 0..1 through the whole section, from scroll
+  var pos = 0;                // the same, smoothed
+  var shown = 0;              // video seconds derived from pos
+  var coverShare = 0.2;       // share of the timeline used by the cover; read from CSS
+  var travel = 1;             // scrollable px through the section
+  var coverState = -1;
   var lastSeek = -1;
   var pendingSeek = false;
   var raf = 0;
@@ -39,11 +50,41 @@
 
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
+  function measure() {
+    var cs = getComputedStyle(section);
+    var c = parseFloat(cs.getPropertyValue('--cover-distance')) || 0;
+    var v = parseFloat(cs.getPropertyValue('--scrub-distance')) || 0;
+    coverShare = cover && c + v > 0 ? c / (c + v) : 0;
+  }
+
   function progress() {
     var r = section.getBoundingClientRect();
-    var span = r.height - window.innerHeight;
-    if (span <= 0) return 0;
-    return clamp(-r.top / span, 0, 1);
+    travel = r.height - window.innerHeight;
+    if (travel <= 0) return 0;
+    return clamp(-r.top / travel, 0, 1);
+  }
+
+  function smooth(x) { return x * x * (3 - 2 * x); }
+
+  // Cover phase: the top leaf swings up from its top edge while the lower leaf folds
+  // back across the middle crease; the pair then lifts clear of the frame.
+  function renderCover(p) {
+    if (!cover) return;
+    var state = p <= 0 ? 0 : p >= 1 ? 2 : 1;
+    if (state !== coverState) {
+      cover.style.visibility = state === 2 ? 'hidden' : '';
+      cover.style.willChange = state === 1 ? 'transform' : '';
+      coverState = state;
+    }
+    if (state === 2) return;
+    var e = smooth(p);
+    var lift = Math.pow(clamp((p - 0.08) / 0.92, 0, 1), 1.35);
+    var h = window.innerHeight;
+    leafTop.style.transform = p ? 'translate3d(0,' + (-lift * h * 1.1).toFixed(1) + 'px,0) rotateX(' + (58 * e).toFixed(2) + 'deg)' : '';
+    leafBottom.style.transform = p ? 'rotateX(' + (-128 * e).toFixed(2) + 'deg)' : '';
+    leafTop.style.setProperty('--shade', (0.08 * e).toFixed(3));
+    leafBottom.style.setProperty('--shade', (0.34 * e).toFixed(3));
+    coverDim.style.opacity = (Math.sin(Math.PI * Math.min(1, p * 1.15)) * 0.9).toFixed(3);
   }
 
   function seek(t) {
@@ -75,21 +116,34 @@
     }
   }
 
-  function tick() {
-    raf = 0;
-    var d = target - shown;
-    if (Math.abs(d) < FRAME / 2) shown = target;
-    else shown += d * EASE;
+  function apply() {
+    var cp = coverShare ? clamp(pos / coverShare, 0, 1) : 1;
+    var vp = clamp((pos - coverShare) / (1 - coverShare), 0, 1);
+    shown = vp * duration;
+    renderCover(cp);
     render();
     seek(shown);
-    if (shown !== target) raf = requestAnimationFrame(tick);
+  }
+
+  function tick() {
+    raf = 0;
+    var d = target - pos;
+    if (Math.abs(d * travel) < 0.5) pos = target;   // within half a pixel: stop
+    else pos += d * EASE;
+    apply();
+    if (pos !== target) raf = requestAnimationFrame(tick);
   }
 
   function kick() { if (!raf) raf = requestAnimationFrame(tick); }
 
   function onScroll() {
-    target = progress() * duration;
+    target = progress();
     kick();
+  }
+
+  function onResize() {
+    measure();
+    onScroll();
   }
 
   function onSeeked() {
@@ -125,10 +179,9 @@
     var p = video.play();
     if (p && p.then) p.then(function () { video.pause(); lastSeek = -1; seek(shown); }, function () {});
     else video.pause();
-    target = shown = progress() * duration;
+    target = pos = progress();
     lastSeek = -1;
-    render();
-    seek(shown);
+    apply();
   }
 
   function fail() {
@@ -169,7 +222,7 @@
 
   function destroy() {
     window.removeEventListener('scroll', onScroll);
-    window.removeEventListener('resize', onScroll);
+    window.removeEventListener('resize', onResize);
     window.removeEventListener('load', onLoad);
     window.removeEventListener('pagehide', onHide);
     video.removeEventListener('loadedmetadata', onMeta);
@@ -186,12 +239,13 @@
   video.addEventListener('seeked', onSeeked);
   video.addEventListener('error', fail);
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true });
   window.addEventListener('pagehide', onHide);
 
   // Copy works from the first paint, before any video data arrives.
-  target = shown = progress() * duration;
-  render();
+  measure();
+  target = pos = progress();
+  apply();
 
   // Hold the video download until the hero has finished loading.
   if (document.readyState === 'complete') startObserving();

@@ -28,10 +28,18 @@ python3 tools/build_layers.py
 
 ## Servis section
 
-The "Druhá šance začíná důkladnou péčí" section (`#servis` in `index.html`) is driven by scrolling. The section is tall, the video stays pinned to the screen, and scrolling moves the video from its first frame to its last, forwards or backwards. When the video ends, the page carries on to the footer.
+The "Druhá šance začíná důkladnou péčí" section (`#servis` in `index.html`) is driven by scrolling. The section is tall and its frame stays pinned to the screen while one scroll timeline runs in two phases:
+
+1. **Service cover.** A cover panel over the section lifts from its top edge and folds once across the middle, like a vending machine's service hatch, revealing the video still on its first frame. It is a separate layer made with CSS 3D transforms. The video underneath never moves or changes size.
+2. **Video.** Scrolling moves the video from its first frame to its last, forwards or backwards, with the step copy in sync.
+
+When the video ends, the page carries on to the footer.
 
 - **Copy:** plain HTML in `index.html`. Each `.scrub-panel` has `data-from` / `data-to`, the seconds of video during which it shows. Comments there say what the footage shows at each point.
-- **Scroll length:** `--scrub-distance` on `.scrub` in `assets/css/style.css`, in viewport heights (400 by default). Higher means slower scrubbing.
+- **Scroll length:** on `.scrub` in `assets/css/style.css`, in viewport heights. `--cover-distance` is the cover fold (100, or 80 on phones) and `--scrub-distance` the video (400). Higher means slower.
+- **Fold shape:** angles, lift and shading are in `renderCover()` in `assets/js/scrub.js`.
+
+The cover took inspiration from React Bits' PaperCrumple but doesn't use it: that component is a React and Three.js sheet crumpled by pointer drag, and a two-leaf CSS fold is lighter and maps directly onto scroll.
 - **Smoothing:** `EASE` at the top of `assets/js/scrub.js`.
 
 The footage is an exploded-assembly animation, so the section labels it "Ilustrační animace" and the copy describes the process, not what the footage literally shows.
@@ -55,4 +63,4 @@ ffmpeg -i $SRC -an -vf scale=720:-2 -c:v libvpx-vp9 -crf 37 -b:v 0 -g 6 assets/v
 
 If the video length changes, update `data-duration` on the section and the panel timings.
 
-Visitors who prefer reduced motion, browsers that can't play the video, and any failed load get a normal section instead: the poster, then all the copy and steps laid out in order. The script waits for the page to load before fetching video, and plays it from memory if the server doesn't support range requests (which seeking needs).
+Visitors who prefer reduced motion, browsers that can't play the video, and any failed load get a normal section instead, with no cover: the poster, then all the copy and steps laid out in order. The script waits for the page to load before fetching video, and plays it from memory if the server doesn't support range requests (which seeking needs).
