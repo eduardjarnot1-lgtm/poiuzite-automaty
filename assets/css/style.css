@@ -19,7 +19,7 @@
 }
 /* Single deliberate look: a daylight-lit workshop, so colors are set explicitly. */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
+html, body { margin: 0; }
 body { background: var(--wall); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 img { max-width: 100%; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -28,7 +28,7 @@ img { max-width: 100%; }
 
 .hero {
   position: relative; isolation: isolate; overflow: hidden;
-  height: 100%; min-height: 600px;
+  height: 100vh; height: 100svh; min-height: 600px;
   display: flex; flex-direction: column;
   container-type: size;
   background: var(--wall);
@@ -209,4 +209,86 @@ h1 span { display: block; }
   .hero[data-state="after"] .fg-before { opacity: 0; }
   .sweep { display: none; }
   .switch .thumb, .cta, .cta svg { transition: none; }
+}
+
+/* ============================================================
+   Servis: video-backed section on how machines are refurbished.
+   Dark scrim over a light 3D video; copy top-left, steps along the bottom.
+   ============================================================ */
+.service {
+  --scrim: 12, 18, 15;            /* deep green-black, rgb parts for the overlay */
+  --on-dark: #f4f5f2;
+  --on-dark-soft: rgba(244, 245, 242, .78);
+  --accent-on-dark: #8fd1a8;      /* the brand green, lifted for dark backgrounds */
+  --rule: rgba(244, 245, 242, .22);
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: clamp(640px, 100svh, 960px);
+  display: flex; color: var(--on-dark);
+  background: rgb(var(--scrim));
+}
+.service-media { position: absolute; inset: 0; z-index: -1; }
+.service-video {
+  width: 100%; height: 100%; max-width: none; display: block;
+  object-fit: cover; object-position: 62% 50%;   /* keeps the machine right of the copy */
+  background: #d9dcd8 url("../video/servis-automatu-poster.jpg") 62% 50% / cover no-repeat;
+}
+.service-media::after {   /* scrim: strongest behind the copy and the steps, lighter over the machine */
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(var(--scrim), .9) 0%, rgba(var(--scrim), .82) 48%, rgba(var(--scrim), .5) 72%, rgba(var(--scrim), .34) 100%),
+    linear-gradient(0deg, rgba(var(--scrim), .86) 0%, rgba(var(--scrim), .5) 40%, rgba(var(--scrim), 0) 62%);
+}
+.service-inner {
+  width: 100%; max-width: 1280px; margin: 0 auto;
+  display: flex; flex-direction: column; justify-content: space-between; gap: clamp(48px, 9vh, 120px);
+  padding-block: clamp(72px, 11vh, 128px) clamp(48px, 8vh, 96px);
+  padding-left: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-right, 0px));
+}
+.service-head { max-width: 640px; display: flex; flex-direction: column; gap: 18px; }
+.eyebrow {
+  margin: 0; display: inline-flex; align-items: center; gap: 12px;
+  color: var(--accent-on-dark); font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+}
+.eyebrow::before { content: ""; width: 28px; height: 1.5px; background: currentColor; }
+.service h2 {
+  margin: 0; font-weight: 800; letter-spacing: -.03em; line-height: 1.04;
+  font-size: clamp(34px, 4.4vw, 64px); text-wrap: balance;
+}
+.service-intro { margin: 0; max-width: 54ch; color: var(--on-dark-soft); font-size: clamp(16px, 1.25vw, 19px); line-height: 1.6; }
+
+.steps {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 3vw, 48px);
+}
+.step { display: grid; grid-template-rows: auto auto 1fr; gap: 10px; padding-top: 22px; border-top: 1px solid var(--rule); position: relative; min-width: 0; }
+.step::before {   /* green tick on the rule, grows in when the step appears */
+  content: ""; position: absolute; top: -1px; left: 0; height: 2px; width: 44px; background: var(--accent-on-dark);
+  transform-origin: left; transition: transform .8s cubic-bezier(.2,.7,.2,1);
+}
+.step-no { color: var(--accent-on-dark); font-size: 14px; font-weight: 700; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.step h3 { margin: 0; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; letter-spacing: -.01em; }
+.step p { margin: 0; color: var(--on-dark-soft); font-size: 16px; line-height: 1.55; max-width: 38ch; }
+
+/* restrained reveal: only armed by service.js, so the copy is visible without it */
+.service.reveal .service-head,
+.service.reveal .step { opacity: 0; transform: translateY(14px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+.service.reveal .step::before { transform: scaleX(0); }
+.service.reveal.in .service-head,
+.service.reveal.in .step { opacity: 1; transform: none; }
+.service.reveal.in .step::before { transform: scaleX(1); }
+.service.reveal.in .step:nth-child(2), .service.reveal.in .step:nth-child(2)::before { transition-delay: .12s; }
+.service.reveal.in .step:nth-child(3), .service.reveal.in .step:nth-child(3)::before { transition-delay: .24s; }
+
+@media (max-width: 860px) {
+  .steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .service-video { object-position: 50% 50%; }
+  .service-media::after {
+    background:
+      linear-gradient(180deg, rgba(var(--scrim), .86) 0%, rgba(var(--scrim), .8) 45%, rgba(var(--scrim), .86) 70%, rgba(var(--scrim), .92) 100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .service.reveal .service-head, .service.reveal .step { opacity: 1; transform: none; transition: none; }
+  .service.reveal .step::before { transform: none; transition: none; }
 }

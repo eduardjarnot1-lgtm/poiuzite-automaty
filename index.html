@@ -65,6 +65,49 @@
   </div>
 </main>
 
+<!-- Servis: how machines are inspected, serviced and tested. All copy below is plain HTML; edit freely. -->
+<section class="service" id="servis" aria-labelledby="service-title">
+  <div class="service-media" aria-hidden="true">
+    <!-- Video loads only when the section nears the screen (assets/js/service.js).
+         Without motion (prefers-reduced-motion) the poster stays as a still image. -->
+    <video class="service-video" id="serviceVideo" autoplay muted loop playsinline preload="none"
+           disablepictureinpicture disableremoteplayback tabindex="-1"
+           poster="assets/video/servis-automatu-poster.jpg">
+      <source data-src="assets/video/servis-automatu-720.mp4" media="(max-width: 720px)" type="video/mp4">
+      <source data-src="assets/video/servis-automatu-720.webm" media="(max-width: 720px)" type="video/webm">
+      <source data-src="assets/video/servis-automatu-1280.mp4" type="video/mp4">
+      <source data-src="assets/video/servis-automatu-1280.webm" type="video/webm">
+    </video>
+  </div>
+
+  <div class="service-inner">
+    <header class="service-head">
+      <p class="eyebrow">Péče o každý detail</p>
+      <h2 id="service-title">Prověřený. Opravený. Připravený sloužit.</h2>
+      <p class="service-intro">Každý automat pečlivě zkontrolujeme, vyčistíme a podle potřeby opravíme, aby byl připravený na další provoz.</p>
+    </header>
+
+    <ol class="steps">
+      <li class="step">
+        <span class="step-no" aria-hidden="true">01</span>
+        <h3>Důkladná kontrola</h3>
+        <p>Prověříme technický stav, výdejní mechanismus, platební systém a další důležité součásti automatu.</p>
+      </li>
+      <li class="step">
+        <span class="step-no" aria-hidden="true">02</span>
+        <h3>Servis a opravy</h3>
+        <p>Automat vyčistíme, provedeme potřebný servis a podle jeho stavu opravíme nebo vyměníme opotřebené díly.</p>
+      </li>
+      <li class="step">
+        <span class="step-no" aria-hidden="true">03</span>
+        <h3>Závěrečné testování</h3>
+        <p>Před předáním otestujeme funkčnost automatu a ověříme, že je připravený k používání.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
 <script src="assets/js/hero.js"></script>
+<script src="assets/js/service.js"></script>
 </body>
 </html>

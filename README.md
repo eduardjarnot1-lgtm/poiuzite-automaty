@@ -25,3 +25,15 @@ The layers are built from the two flattened mockups in `assets/source/` by `tool
 pip install opencv-python-headless numpy pillow
 python3 tools/build_layers.py
 ```
+
+## Servis section
+
+The "Péče o každý detail" section (`#servis` in `index.html`) runs a looping video behind the copy and the three steps. All text is plain HTML in `index.html`, so edit it there.
+
+Video files live in `assets/video/`:
+
+- `servis-automatu-1280.mp4` / `.webm`: desktop
+- `servis-automatu-720.mp4` / `.webm`: phones (up to 720 px wide)
+- `servis-automatu-poster.jpg`: shown before the video loads, and as the still image for visitors who prefer reduced motion
+
+`assets/js/service.js` attaches the video only after the page has loaded and the section is close to the screen. It plays only while the section is visible. To swap in a new video, replace these files. Encode them without audio, with `-movflags +faststart` for the MP4s.
