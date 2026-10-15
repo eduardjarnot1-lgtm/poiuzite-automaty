@@ -28,12 +28,31 @@ python3 tools/build_layers.py
 
 ## Servis section
 
-The "Péče o každý detail" section (`#servis` in `index.html`) runs a looping video behind the copy and the three steps. All text is plain HTML in `index.html`, so edit it there.
+The "Druhá šance začíná důkladnou péčí" section (`#servis` in `index.html`) is driven by scrolling. The section is tall, the video stays pinned to the screen, and scrolling moves the video from its first frame to its last, forwards or backwards. When the video ends, the page carries on to the footer.
 
-Video files live in `assets/video/`:
+- **Copy:** plain HTML in `index.html`. Each `.scrub-panel` has `data-from` / `data-to`, the seconds of video during which it shows. Comments there say what the footage shows at each point.
+- **Scroll length:** `--scrub-distance` on `.scrub` in `assets/css/style.css`, in viewport heights (400 by default). Higher means slower scrubbing.
+- **Smoothing:** `EASE` at the top of `assets/js/scrub.js`.
 
-- `servis-automatu-1280.mp4` / `.webm`: desktop
-- `servis-automatu-720.mp4` / `.webm`: phones (up to 720 px wide)
-- `servis-automatu-poster.jpg`: shown before the video loads, and as the still image for visitors who prefer reduced motion
+The footage is an exploded-assembly animation, so the section labels it "Ilustrační animace" and the copy describes the process, not what the footage literally shows.
 
-`assets/js/service.js` attaches the video only after the page has loaded and the section is close to the screen. It plays only while the section is visible. To swap in a new video, replace these files. Encode them without audio, with `-movflags +faststart` for the MP4s.
+Video files in `assets/video/`:
+
+- `servis-scrub-1280.mp4` / `.webm`: desktop
+- `servis-scrub-720.mp4` / `.webm`: phones (up to 760 px wide)
+- `servis-scrub-start.jpg`: the first frame, shown until the video is ready
+- `servis-scrub-poster.jpg`: the still used when the video can't run
+
+The original video is kept in `assets/source/servis-automatu-original.mp4`. The scrub files are encoded with a keyframe every 6 frames so seeking stays quick in both directions:
+
+```sh
+SRC=assets/source/servis-automatu-original.mp4
+ffmpeg -i $SRC -an -c:v libx264 -crf 28 -preset slow -g 6 -keyint_min 6 -sc_threshold 0 -bf 0 -pix_fmt yuv420p -movflags +faststart assets/video/servis-scrub-1280.mp4
+ffmpeg -i $SRC -an -vf scale=720:-2 -c:v libx264 -crf 27 -preset slow -g 6 -keyint_min 6 -sc_threshold 0 -bf 0 -pix_fmt yuv420p -movflags +faststart assets/video/servis-scrub-720.mp4
+ffmpeg -i $SRC -an -c:v libvpx-vp9 -crf 39 -b:v 0 -g 6 assets/video/servis-scrub-1280.webm
+ffmpeg -i $SRC -an -vf scale=720:-2 -c:v libvpx-vp9 -crf 37 -b:v 0 -g 6 assets/video/servis-scrub-720.webm
+```
+
+If the video length changes, update `data-duration` on the section and the panel timings.
+
+Visitors who prefer reduced motion, browsers that can't play the video, and any failed load get a normal section instead: the poster, then all the copy and steps laid out in order. The script waits for the page to load before fetching video, and plays it from memory if the server doesn't support range requests (which seeking needs).
