@@ -225,11 +225,11 @@ ${c.page.noindex && '<meta name="robots" content="noindex">\n'}${canonical && ht
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:locale" content="cs_CZ">
-${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="#ffffff">
+${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="#f7f7f4">
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
 ${head}<script>document.documentElement.classList.add('js')</script>
 </head>
