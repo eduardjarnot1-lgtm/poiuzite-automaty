@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "instantni-kavove-automaty",
+    "name": "Instantní kávové automaty",
+    "short": "Automaty na instantní kávu, čokoládu, čaj a další teplé nápoje.",
+    "intro": "Automaty na instantní kávu a teplé nápoje připravují nápoje z instantních surovin, například kávy, mléka, čokolády nebo čaje. Hodí se do kanceláří, výroben, škol a čekáren, kde je potřeba rychlá obsluha a jednoduchá údržba.",
+    "metaDescription": "Použité a repasované automaty na instantní kávu a teplé nápoje. Prohlédněte si dostupné automaty, technické parametry a pošlete nezávaznou poptávku.",
+    "featured": true
+  },
+  {
+    "slug": "automaty-na-zrnkovou-kavu",
+    "name": "Automaty na zrnkovou kávu",
+    "short": "Automaty s mlýnkem, které připravují kávu z čerstvě namletých zrn.",
+    "intro": "Automaty na zrnkovou kávu melou kávu až při přípravě nápoje. Hodí se tam, kde zákazníci očekávají plnější chuť espressa a nápojů s mlékem.",
+    "metaDescription": "Použité a repasované automaty na zrnkovou kávu. Zeptejte se na aktuální nabídku a pošlete nezávaznou poptávku."
+  },
+  {
+    "slug": "snackove-automaty",
+    "name": "Automaty na snacky",
+    "short": "Spirálové automaty na balené snacky, sladkosti a drobné zboží.",
+    "intro": "Spirálové automaty na snacky prodávají balené občerstvení, sladkosti a drobné zboží. Často se kombinují s nápojovým automatem na jednom místě.",
+    "metaDescription": "Použité a repasované automaty na snacky a balené občerstvení. Zeptejte se na aktuální nabídku a pošlete nezávaznou poptávku."
+  },
+  {
+    "slug": "napojove-automaty",
+    "name": "Automaty na chlazené nápoje",
+    "short": "Chlazené automaty na nápoje v lahvích a plechovkách.",
+    "intro": "Chlazené automaty prodávají nápoje v lahvích a plechovkách. Hodí se do míst s vyšším provozem, jako jsou haly, sportoviště nebo vestibuly.",
+    "metaDescription": "Použité a repasované automaty na chlazené nápoje v lahvích a plechovkách. Zeptejte se na aktuální nabídku a pošlete nezávaznou poptávku."
+  },
+  {
+    "slug": "kombinovane-automaty",
+    "name": "Kombinované automaty",
+    "short": "Automaty, které v jedné skříni prodávají snacky i chlazené nápoje.",
+    "intro": "Kombinované automaty prodávají snacky i chlazené nápoje z jedné skříně. Hodí se tam, kde je málo místa na dva samostatné automaty.",
+    "metaDescription": "Použité a repasované kombinované automaty na snacky a nápoje. Zeptejte se na aktuální nabídku a pošlete nezávaznou poptávku."
+  }
+]

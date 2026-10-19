@@ -10,7 +10,7 @@
   'use strict';
 
   var root = document.documentElement;
-  var section = document.getElementById('servis');
+  var section = document.querySelector('.scrub');
   var video = document.getElementById('scrubVideo');
   if (!section || !video || !root.classList.contains('js-scrub')) return;
 

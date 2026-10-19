@@ -1,0 +1,368 @@
+[
+  {
+    "id": "vzor-01",
+    "slug": "vzorovy-instantni-automat-1",
+    "placeholder": true,
+    "category": "instantni-kavove-automaty",
+    "name": "Instantní automat, vzorová položka 1",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "description": [
+      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
+      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [],
+    "dateAdded": "2026-10-19"
+  },
+  {
+    "id": "vzor-02",
+    "slug": "vzorovy-instantni-automat-2",
+    "placeholder": true,
+    "category": "instantni-kavove-automaty",
+    "name": "Instantní automat, vzorová položka 2",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "description": [
+      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
+      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [],
+    "dateAdded": "2026-10-18"
+  },
+  {
+    "id": "vzor-03",
+    "slug": "vzorovy-instantni-automat-3",
+    "placeholder": true,
+    "category": "instantni-kavove-automaty",
+    "name": "Instantní automat, vzorová položka 3",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "description": [
+      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
+      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [],
+    "dateAdded": "2026-10-17"
+  },
+  {
+    "id": "vzor-04",
+    "slug": "vzorovy-instantni-automat-4",
+    "placeholder": true,
+    "category": "instantni-kavove-automaty",
+    "name": "Instantní automat, vzorová položka 4",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "description": [
+      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
+      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [],
+    "dateAdded": "2026-10-16"
+  },
+  {
+    "id": "vzor-05",
+    "slug": "vzorovy-instantni-automat-5",
+    "placeholder": true,
+    "category": "instantni-kavove-automaty",
+    "name": "Instantní automat, vzorová položka 5",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "description": [
+      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
+      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [],
+    "dateAdded": "2026-10-15"
+  },
+  {
+    "id": "vzor-06",
+    "slug": "vzorovy-instantni-automat-6",
+    "placeholder": true,
+    "category": "instantni-kavove-automaty",
+    "name": "Instantní automat, vzorová položka 6",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "description": [
+      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
+      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [],
+    "dateAdded": "2026-10-14"
+  }
+]

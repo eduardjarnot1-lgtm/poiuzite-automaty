@@ -1,0 +1,165 @@
+/* Homepage hero: one workshop photograph split into depth layers, with the headline and buttons
+   as HTML on the bare concrete wall and the machines on the plinth as the focal point.
+   Scene coordinates are percentages of the 1672 x 941 source. Loaded on the homepage only. */
+.hero {
+  --wall: #e3e0db;          /* light concrete, sampled from the photo */
+  --pill: rgba(62, 64, 62, .52);
+  --pill-text: #f3f3f1;
+  --pill-thumb: #ffffff;
+  --scene-ratio: 1.7768;    /* 1672 / 941 */
+  --photo-top: #afa7a1;     /* top and bottom edge tones of the photo, for phone fades */
+  --photo-bottom: #b8afab;
+  --inset: clamp(8px, 1vw, 14px);   /* the hero sits as a rounded panel inside the page */
+  position: relative; isolation: isolate; overflow: hidden;
+  margin: 0 var(--inset); border-radius: var(--radius-xl);
+  height: calc(100vh - var(--header-h) - var(--inset)); height: calc(100svh - var(--header-h) - var(--inset)); min-height: 560px; max-height: 1000px;
+  display: flex; flex-direction: column;
+  container-type: size;
+  background: var(--wall);
+  --px: 0; --py: 0;               /* pointer, -1..1, eased in hero.js */
+  --wipe: -12%;
+  transition: --wipe 1.6s cubic-bezier(.62,.04,.24,1);
+}
+.hero[data-state="after"] { --wipe: 112%; }
+
+@property --wipe { syntax: "<percentage>"; inherits: true; initial-value: -12%; }
+
+/* ---------- Scene: cover the hero, keep the plinth's focal point at 62% height ---------- */
+.scene {
+  position: absolute; z-index: -1; left: 50%; top: 62%;
+  width: max(100cqw, calc(100cqh * var(--scene-ratio)));
+  aspect-ratio: 1672 / 941; max-width: none;
+  transform: translate(-50%, -62%);
+  perspective: 1600px; perspective-origin: 52% 70%;
+  pointer-events: none; user-select: none;
+}
+.layer { position: absolute; inset: 0; will-change: transform; }
+.layer img { display: block; max-width: none; -webkit-user-drag: none; }
+
+/* far: workshop plate, moves least */
+.layer-far { transform: translate3d(calc(var(--px) * -7px), calc(var(--py) * -4px), 0) scale(1.03); }
+.plate { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* near: machines + platform, moves most and tilts very slightly */
+.layer-near {
+  transform-origin: 52% 88%;
+  transform:
+    translate3d(calc(var(--px) * -18px), calc(var(--py) * -9px), 0)
+    rotateY(calc(var(--px) * 1.1deg)) rotateX(calc(var(--py) * -.6deg));
+}
+.fg { position: absolute; inset: 0; }
+.fg img { position: absolute; left: 21.352%; top: 36.132%; width: 58.373%; height: 58.023%; }
+
+/* the before/after change: a feathered wipe across the near layer only */
+.fg-after {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--wipe) - 6%), transparent calc(var(--wipe) + 6%));
+          mask-image: linear-gradient(90deg, #000 calc(var(--wipe) - 6%), transparent calc(var(--wipe) + 6%));
+}
+.fg-before {
+  -webkit-mask-image: linear-gradient(90deg, transparent calc(var(--wipe) - 6%), #000 calc(var(--wipe) + 6%));
+          mask-image: linear-gradient(90deg, transparent calc(var(--wipe) - 6%), #000 calc(var(--wipe) + 6%));
+}
+.sweep {
+  position: absolute; top: 30%; bottom: 4%; width: 2px; left: var(--wipe); pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,.9) 25%, #fff 60%, transparent);
+  box-shadow: 0 0 22px 7px rgba(255,255,255,.5);
+  opacity: 0; transition: opacity .3s;
+}
+.hero.animating .sweep { opacity: 1; }
+
+/* platform volume: shadow on the floor, lit top edge, shaded front and side faces */
+.floor-shadow {
+  position: absolute; left: 25%; width: 56%; top: 90.5%; height: 6%;
+  background: radial-gradient(50% 50% at 50% 40%, rgba(40,36,30,.32), transparent 72%);
+  filter: blur(6px);
+  transform: translate3d(calc(var(--px) * 4px), 0, 0);
+}
+.plinth-face {
+  position: absolute; inset: 0;
+  clip-path: polygon(27.871% 88.204%, 79.426% 87.141%, 79.426% 92.136%, 27.871% 93.624%);
+  background: linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 89%, rgba(30,26,22,.16) 92.5%, rgba(30,26,22,.26) 94%);
+  mix-blend-mode: multiply;
+}
+.plinth-side {
+  position: absolute; inset: 0;
+  clip-path: polygon(24.581% 83.741%, 27.871% 88.204%, 27.871% 93.624%, 24.581% 87.779%);
+  background: rgba(70,62,54,.16); mix-blend-mode: multiply;
+}
+.plinth-edge {   /* the arris catching daylight; brightens as the plinth turns towards the window */
+  position: absolute; inset: 0;
+  clip-path: polygon(24.581% 83.741%, 27.871% 88.204%, 79.426% 87.141%, 79.426% 87.4%, 27.871% 88.5%, 24.581% 84.05%);
+  background: rgba(255,255,255,.75);
+  opacity: calc(.55 - var(--px) * .25);
+}
+
+/* restrained reflections on the glass fronts, following the pointer */
+.sheen {
+  position: absolute; overflow: hidden; mix-blend-mode: screen; opacity: .16;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.9) 44%, rgba(255,255,255,.2) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-position: calc(50% + var(--px) * 40%) 0;
+}
+.sheen-coffee { left: 33.792%; top: 43.252%; width: 5.084%; height: 12.54%; opacity: .1; }
+.sheen-snack  { left: 45.634%; top: 44.315%; width: 8.971%; height: 30.925%; }
+.sheen-drinks { left: 61.603%; top: 44.846%; width: 7.775%; height: 30.606%; }
+
+
+/* ---------- Copy ---------- */
+.hero .copy {
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding-top: clamp(20px, 5vh, 64px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.hero .eyebrow { margin: 0 0 4px; background: rgba(255,255,255,.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.hero h1 { margin: 0; font-weight: 600; letter-spacing: -.045em; line-height: 1; font-size: clamp(38px, 5vw, 80px); text-wrap: balance; }
+.hero h1 span { display: block; }
+.hero .sub { margin: 0; max-width: 42ch; color: var(--ink-soft); font-size: clamp(16px, 1.3vw, 20px); font-weight: 400; text-wrap: balance; }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+
+/* ---------- Before / after pill ---------- */
+.switch {
+  position: absolute; left: 50%; bottom: max(4.5%, calc(env(safe-area-inset-bottom, 0px) + 16px)); transform: translateX(-50%); z-index: 3;
+  display: grid; grid-template-columns: 1fr 1fr; padding: 5px; border-radius: 999px;
+  background: var(--pill); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 8px 24px -10px rgba(0,0,0,.35);
+}
+.switch .thumb {
+  position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px); border-radius: 999px; background: var(--pill-thumb);
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); transition: transform .55s cubic-bezier(.5,0,.15,1);
+}
+.hero[data-state="after"] .switch .thumb { transform: translateX(100%); }
+.switch button {
+  position: relative; z-index: 1; border: 0; background: none; cursor: pointer; white-space: nowrap;
+  font: 500 15px/1 var(--font); color: var(--pill-text); padding: 14px 26px; min-height: 44px; border-radius: 999px; transition: color .35s;
+}
+.switch button[aria-pressed="true"] { color: var(--ink); }
+.switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+
+/* ---------- Phones: whole machines in view, no parallax or tilt ---------- */
+@media (max-width: 720px) {
+  .hero { background: linear-gradient(180deg, var(--photo-top), var(--photo-bottom)); min-height: 620px; border-radius: 22px; }
+  .hero .sub { font-size: 15px; }
+  .hero-actions .btn { padding-inline: 18px; }
+  /* machines start under the buttons; the pill sits on the floor in front of the plinth */
+  .scene {
+    top: auto; bottom: 0; width: calc(66cqh * var(--scene-ratio));
+    transform: translateX(-50%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 93%, transparent);
+            mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 93%, transparent);
+  }
+  .layer-far, .layer-near, .floor-shadow { transform: none; }
+  .sheen { display: none; }
+  .switch button { padding: 13px 18px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero { transition: none; }
+  .layer-far, .layer-near, .floor-shadow { transform: none; }
+  .fg-after { -webkit-mask-image: none; mask-image: none; opacity: 0; transition: opacity .35s; }
+  .fg-before { -webkit-mask-image: none; mask-image: none; opacity: 1; transition: opacity .35s; }
+  .hero[data-state="after"] .fg-after { opacity: 1; }
+  .hero[data-state="after"] .fg-before { opacity: 0; }
+  .sweep { display: none; }
+  .switch .thumb { transition: none; }
+}

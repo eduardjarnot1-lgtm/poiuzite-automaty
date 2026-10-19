@@ -13,8 +13,8 @@
     btnB.setAttribute('aria-pressed', String(next === 'before'));
     btnA.setAttribute('aria-pressed', String(next === 'after'));
     label.textContent = next === 'after'
-      ? 'Tytéž tři prodejní automaty po opravě.'
-      : 'Tři prodejní automaty v dílně před opravou.';
+      ? 'Ilustrace: tytéž tři prodejní automaty po opravě.'
+      : 'Ilustrace: tři prodejní automaty v dílně před opravou.';
     clearTimeout(animTimer);
     animTimer = setTimeout(() => hero.classList.remove('animating'), 1600);
   }
@@ -31,7 +31,7 @@
   const desktop = matchMedia('(min-width: 721px) and (hover: hover) and (pointer: fine)');
   const target = { x: 0, y: 0 };
   const cur = { x: 0, y: 0 };
-  let raf = 0, lastMove = 0, t0 = performance.now();
+  let raf = 0;
 
   const enabled = () => desktop.matches && !reduce.matches;
 
@@ -39,23 +39,18 @@
     const r = hero.getBoundingClientRect();
     target.x = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
     target.y = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
-    lastMove = performance.now();
     start();
   }
-  function onLeave() { target.x = 0; target.y = 0; lastMove = 0; start(); }
+  function onLeave() { target.x = 0; target.y = 0; start(); }
 
-  function tick(now) {
-    // with no pointer for a while, drift very slowly so the scene keeps a little life
-    if (now - lastMove > 2500) {
-      const s = (now - t0) / 1000;
-      target.x = Math.sin(s * 0.42) * 0.22;
-      target.y = Math.sin(s * 0.31 + 1.3) * 0.12;
-    }
+  function tick() {
     cur.x += (target.x - cur.x) * 0.06;
     cur.y += (target.y - cur.y) * 0.06;
     hero.style.setProperty('--px', cur.x.toFixed(4));
     hero.style.setProperty('--py', cur.y.toFixed(4));
-    raf = document.hidden ? 0 : requestAnimationFrame(tick);
+    // the scene only moves with the pointer; stop once it has settled
+    const settled = Math.abs(target.x - cur.x) < 0.001 && Math.abs(target.y - cur.y) < 0.001;
+    raf = document.hidden || settled ? 0 : requestAnimationFrame(tick);
   }
   function start() { if (!raf && enabled()) raf = requestAnimationFrame(tick); }
   function stop() {
