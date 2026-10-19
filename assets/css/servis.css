@@ -41,12 +41,12 @@
 @media (max-width: 760px) { .scrub-panels { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---- scroll-scrub layout ---- */
-.js-scrub .scrub {
-  height: calc(100vh + (var(--cover-distance) + var(--scrub-distance)) * 1vh);
-  height: calc(100svh + (var(--cover-distance) + var(--scrub-distance)) * 1svh);
+.js-scrub .scrub {    /* the frame pins just under the sticky site header */
+  height: calc(100vh - var(--header-h) + (var(--cover-distance) + var(--scrub-distance)) * 1vh);
+  height: calc(100svh - var(--header-h) + (var(--cover-distance) + var(--scrub-distance)) * 1svh);
 }
 .js-scrub .scrub-sticky {
-  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); height: calc(100svh - var(--header-h)); overflow: hidden;
   display: block; max-width: none; margin: 0; padding: 0;
 }
 .js-scrub .scrub-media { position: absolute; inset: 0; background: var(--scrub-bg); }
