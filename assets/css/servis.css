@@ -1,0 +1,187 @@
+/* Refurbishment page: the scroll-controlled servis video with its service-cover fold. */
+/* ============================================================
+   Servis: scroll-controlled video. The section is tall; its inner frame sticks
+   to the viewport while scrolling scrubs the video from first to last frame.
+   Without .js-scrub on <html> (reduced motion, no playable video, no JS, or a
+   failed load) the same markup renders as a normal, fully readable section.
+   ============================================================ */
+.scrub {
+  --cover-distance: 100;          /* scroll length of the service-cover fold, in viewport heights */
+  --scrub-distance: 400;          /* scroll length of the video scrub after it, in viewport heights */
+  --scrub-bg: #e2e2de;            /* the video's light studio background */
+  --scrub-ink: var(--ink);
+  --scrub-soft: #4a4e4d;
+  --scrub-rule: rgba(17, 19, 18, .14);
+  position: relative; background: var(--scrub-bg); color: var(--scrub-ink);
+}
+
+/* ---- static layout (default) ---- */
+.scrub-sticky {
+  display: grid; gap: clamp(28px, 4vw, 56px);
+  padding-block: clamp(64px, 10vh, 112px);
+  padding-left: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-right, 0px));
+  max-width: 1280px; margin: 0 auto;
+}
+.scrub-video { display: none; }
+.scrub-poster { display: block; width: 100%; height: auto; border-radius: 18px; }
+.scrub-content { display: grid; gap: 28px; }
+.scrub-panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 3vw, 44px); }
+.scrub-panel { display: grid; align-content: start; gap: 10px; padding-top: 20px; border-top: 1px solid var(--scrub-rule); min-width: 0; }
+.scrub-intro, .scrub-closing { grid-column: 1 / -1; border-top: 0; padding-top: 0; }
+.scrub-closing { justify-items: start; }
+.scrub h2 { margin: 0; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; font-size: clamp(32px, 4vw, 58px); text-wrap: balance; max-width: 16ch; }
+.scrub h3 { margin: 0; font-weight: 700; letter-spacing: -.015em; font-size: clamp(21px, 1.8vw, 28px); line-height: 1.15; text-wrap: balance; }
+.scrub-closing h3 { font-weight: 800; letter-spacing: -.03em; font-size: clamp(30px, 3.6vw, 52px); }
+.scrub-panel p { margin: 0; color: var(--scrub-soft); font-size: clamp(16px, 1.2vw, 19px); line-height: 1.55; max-width: 40ch; }
+.scrub-no { color: var(--accent); font-size: 14px; font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.scrub-hint, .scrub-progress { display: none; }
+.scrub-note { margin: 0; color: var(--scrub-soft); font-size: 13px; letter-spacing: .02em; }
+.scrub-closing .btn { margin-top: 12px; }
+@media (max-width: 760px) { .scrub-panels { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- scroll-scrub layout ---- */
+.js-scrub .scrub {
+  height: calc(100vh + (var(--cover-distance) + var(--scrub-distance)) * 1vh);
+  height: calc(100svh + (var(--cover-distance) + var(--scrub-distance)) * 1svh);
+}
+.js-scrub .scrub-sticky {
+  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  display: block; max-width: none; margin: 0; padding: 0;
+}
+.js-scrub .scrub-media { position: absolute; inset: 0; background: var(--scrub-bg); }
+.js-scrub .scrub-poster { display: none; }
+.js-scrub .scrub-video {
+  display: block; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
+  object-fit: contain; object-position: 100% 50%;     /* whole frame, never cropped; machine sits right of the copy */
+  background: var(--scrub-bg);
+}
+.js-scrub .scrub-media::after {   /* directional wash behind the copy, plus soft top and bottom edges */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--scrub-bg) 0%, var(--scrub-bg) 30%, rgba(226,226,222,.88) 37%, rgba(226,226,222,0) 54%),
+    linear-gradient(180deg, rgba(226,226,222,.55) 0%, rgba(226,226,222,0) 12%, rgba(226,226,222,0) 86%, rgba(226,226,222,.6) 100%);
+}
+.js-scrub .scrub-content {
+  position: absolute; inset: 0; display: block;
+  padding-left: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-right, 0px));
+}
+.js-scrub .scrub-panels {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: min(460px, 33vw); display: grid; grid-template-columns: minmax(0, 1fr);
+}
+.js-scrub .scrub-panel {
+  grid-area: 1 / 1;             /* all panels share one cell; only the active one is shown */
+  border-top: 0; padding-top: 0;
+  opacity: 0; transform: translateY(12px); visibility: hidden;
+  transition: opacity .45s ease, transform .55s cubic-bezier(.2,.7,.2,1), visibility 0s linear .45s;
+}
+.js-scrub .scrub-panel.is-active {
+  opacity: 1; transform: none; visibility: visible;
+  transition: opacity .45s ease .05s, transform .55s cubic-bezier(.2,.7,.2,1) .05s, visibility 0s;
+}
+.js-scrub .scrub-panel h3 { font-size: clamp(28px, 3vw, 44px); font-weight: 800; letter-spacing: -.03em; }
+.js-scrub .scrub-hint {
+  display: inline-flex; align-items: center; gap: 12px; margin-top: 18px;
+  font-size: 14px; font-weight: 600; color: var(--scrub-soft);
+}
+.js-scrub .scrub-hint::before {
+  content: ""; width: 1.5px; height: 28px; background: linear-gradient(var(--accent), transparent);
+  animation: hint 1.8s ease-in-out infinite;
+}
+@keyframes hint { 0%, 100% { transform: translateY(-4px); opacity: .5; } 50% { transform: translateY(4px); opacity: 1; } }
+
+.js-scrub .scrub-progress {
+  position: absolute; bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 20px));
+  display: flex; align-items: center; gap: 18px;
+}
+.scrub-track { position: relative; width: 168px; height: 2px; border-radius: 2px; background: var(--scrub-rule); overflow: hidden; }
+.scrub-fill { position: absolute; inset: 0; background: var(--accent); transform-origin: left; transform: scaleX(0); }
+.scrub-marks { display: flex; gap: 14px; font-size: 12px; font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; color: rgba(17,19,18,.32); }
+.scrub-marks span { transition: color .3s; }
+.scrub-marks span.is-done { color: var(--scrub-soft); }
+.scrub-marks span.is-current { color: var(--accent); }
+.js-scrub .scrub-note {
+  position: absolute; right: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-right, 0px));
+  bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 20px));
+  font-size: 12px; color: rgba(17,19,18,.5);
+}
+
+@media (max-width: 760px) {
+  /* phones: copy on top, the whole machine below it */
+  .js-scrub .scrub-media::after {
+    background: linear-gradient(180deg, var(--scrub-bg) 0%, var(--scrub-bg) 30%, rgba(226,226,222,0) 46%, rgba(226,226,222,0) 88%, rgba(226,226,222,.7) 100%);
+  }
+  .js-scrub .scrub-video {   /* full frame width so parts that swing out to the sides stay in view */
+    inset: auto; left: 0; bottom: 21%; width: 100%; height: auto; aspect-ratio: 1280 / 944;
+    object-position: 50% 50%;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+  }
+  .js-scrub .scrub-panels { top: max(40px, calc(env(safe-area-inset-top, 0px) + 28px)); transform: none; width: auto; left: 16px; right: 16px; }
+  .js-scrub .scrub-panel h3 { font-size: 28px; }
+  .js-scrub .scrub h2 { font-size: 32px; }
+  .js-scrub .scrub-progress { left: 50%; transform: translateX(-50%); }
+  .js-scrub .scrub-note { display: none; }
+}
+
+/* ---- service cover ----
+   A separate panel over the pinned frame. While the section is entered it lifts away
+   from its top edge and folds once across the middle, like a machine's service hatch,
+   revealing the video (still on its first frame) underneath. scrub.js sets the
+   transforms; nothing here bends the video itself. Hidden in the static layout. */
+.scrub-cover { display: none; }
+.js-scrub .scrub-cover {
+  display: block; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  perspective: 1300px; perspective-origin: 50% 30%;
+}
+.cover-dim {   /* soft shadow the lifting cover throws onto the scene */
+  position: absolute; inset: 0; opacity: 0;
+  background: linear-gradient(180deg, rgba(17,19,18,.26) 0%, rgba(17,19,18,.1) 45%, rgba(17,19,18,0) 80%);
+}
+.cover-leaf {
+  position: absolute; left: 0; right: 0; height: 50%;
+  transform-origin: 50% 0; transform-style: preserve-3d; backface-visibility: visible;
+  --shade: 0;   /* 0..1, set by scrub.js: the leaf darkens as it turns away from the light */
+  background:
+    linear-gradient(rgba(17,19,18,var(--shade)), rgba(17,19,18,var(--shade))),
+    radial-gradient(120% 90% at 30% 0%, rgba(255,255,255,.22), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #dcd8d1, #d3cec6);
+}
+.cover-top { top: 0; }
+.cover-bottom { top: 100%; height: 100%;
+  background:
+    linear-gradient(rgba(17,19,18,var(--shade)), rgba(42,45,43,var(--shade))),
+    repeating-linear-gradient(180deg, rgba(17,19,18,0) 0 13px, rgba(17,19,18,.07) 13px 15px, rgba(255,255,255,.35) 15px 16px, rgba(17,19,18,0) 16px 32px) center 62% / min(420px, 52vw) 96px no-repeat,
+    linear-gradient(180deg, #d3cec6, #cbc6be);
+  border-bottom: 3px solid #b9b3aa;   /* the hatch's edge; no box-shadow, which breaks 3D sorting in Chromium */
+}
+.cover-leaf::before {   /* recessed frame and corner screws */
+  content: ""; position: absolute; inset: clamp(14px, 2.2vw, 28px); border-radius: 6px;
+  border: 1px solid rgba(17,19,18,.1); box-shadow: 0 1px 0 rgba(255,255,255,.5);
+  background:
+    radial-gradient(circle at 10px 10px, #9d978e 0 3px, rgba(0,0,0,0) 3.6px) left top / 20px 20px no-repeat,
+    radial-gradient(circle at 10px 10px, #9d978e 0 3px, rgba(0,0,0,0) 3.6px) right top / 20px 20px no-repeat;
+}
+.cover-top::before { border-bottom: 0; border-radius: 6px 6px 0 0; bottom: 0; }
+.cover-bottom::before { border-top: 0; border-radius: 0 0 6px 6px; top: 0;
+  background:
+    radial-gradient(circle at 10px 10px, #9d978e 0 3px, rgba(0,0,0,0) 3.6px) left bottom / 20px 20px no-repeat,
+    radial-gradient(circle at 10px 10px, #9d978e 0 3px, rgba(0,0,0,0) 3.6px) right bottom / 20px 20px no-repeat;
+}
+.cover-mark {   /* embossed brand leaf on the hatch */
+  position: absolute; left: 50%; top: 50%; width: clamp(56px, 7vw, 84px); aspect-ratio: 1; transform: translate(-50%, -30%);
+  color: #cdc8c0; filter: drop-shadow(0 1px 0 rgba(255,255,255,.6)) drop-shadow(0 -1px 0 rgba(17,19,18,.12));
+}
+.cover-mark svg { display: block; width: 100%; height: 100%; }
+.cover-handle {   /* green pull tab on the hatch's lower edge */
+  position: absolute; left: 50%; bottom: clamp(30px, 5vh, 52px); width: 88px; height: 10px; margin-left: -44px;
+  border-radius: 6px; background: var(--accent); box-shadow: 0 2px 0 rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.25) inset;
+}
+
+@media (max-width: 760px) {
+  .scrub { --cover-distance: 80; }
+  .js-scrub .scrub-cover { perspective: 900px; }
+}
+

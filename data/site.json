@@ -1,0 +1,38 @@
+{
+  "name": "Použité automaty",
+  "logoText": "použité automaty",
+  "tagline": "Použité, repasované a renovované prodejní automaty pro firmy a provozovatele.",
+  "baseUrl": "",
+  "contact": {
+    "phone": null,
+    "email": null,
+    "address": null,
+    "hours": null,
+    "companyId": null
+  },
+  "forms": {
+    "endpoint": ""
+  },
+  "catalogue": {
+    "searchMinProducts": 8,
+    "currency": "CZK",
+    "pricesIncludeVat": false
+  },
+  "conditions": {
+    "pouzity": {
+      "label": "Použitý",
+      "description": "Automat v původním stavu, před prodejem zkontrolovaný.",
+      "verified": false
+    },
+    "repasovany": {
+      "label": "Repasovaný",
+      "description": "Automat vyčištěný, zkontrolovaný a podle potřeby opravený, s vyměněnými opotřebenými díly.",
+      "verified": false
+    },
+    "renovovany": {
+      "label": "Plně renovovaný",
+      "description": "Automat rozebraný a obnovený včetně vnějších dílů, s otestovanou funkčností před předáním.",
+      "verified": false
+    }
+  }
+}

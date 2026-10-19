@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="Fotografie automatu bude doplněna">
+  <rect width="600" height="450" fill="#f3f4f5"/>
+  <g fill="none" stroke="#b9c0c5" stroke-width="4" stroke-linejoin="round">
+    <rect x="232" y="70" width="136" height="270" rx="8"/>
+    <rect x="252" y="92" width="96" height="88" rx="4"/>
+    <path d="M256 204h28M256 222h28M256 240h28M300 204h28M300 222h28M300 240h28"/>
+    <rect x="276" y="276" width="48" height="44" rx="4"/>
+    <path d="M220 340h160"/>
+  </g>
+  <text x="300" y="392" text-anchor="middle" font-family="Figtree, Segoe UI, system-ui, sans-serif" font-size="20" font-weight="600" fill="#646b71">Fotografie bude doplněna</text>
+</svg>
