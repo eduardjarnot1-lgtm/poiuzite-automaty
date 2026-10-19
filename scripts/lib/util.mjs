@@ -22,10 +22,14 @@ export const ph = (text) => `<span class="ph">${esc(text)}</span>`;
 // Relative link from the page being rendered to a site path ("" = home, "kontakt/", "assets/x.css").
 // Relative links keep the build working on Netlify, in a subfolder and in local previews.
 // Pages served at arbitrary depths (404) use root-absolute links instead.
-export function linker(pagePath, absolute) {
+// explicitIndex spells out index.html for hosts without directory indexes (static previews).
+export function linker(pagePath, absolute, explicitIndex = false) {
   const depth = pagePath.split('/').filter(Boolean).length;
   const up = '../'.repeat(depth);
-  return (target = '') => (absolute ? '/' + target : up + target || './');
+  return (target = '') => {
+    if (explicitIndex && (target === '' || target.endsWith('/'))) target += 'index.html';
+    return absolute ? '/' + target : up + target || './';
+  };
 }
 
 export const czk = (price, currency, inclVat) =>

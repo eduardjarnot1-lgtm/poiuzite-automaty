@@ -12,6 +12,8 @@ node scripts/check.mjs     # checks links, anchors, titles, descriptions, headin
 npx http-server dist -p 8080
 ```
 
+For a preview on a host without directory indexes (such as a Claude artifact), add `--explicit-index` so links point at `…/index.html`.
+
 Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish `dist`).
 
 ## Pages
