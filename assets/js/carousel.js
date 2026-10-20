@@ -32,7 +32,7 @@
       next.disabled = end;
       if (i === index) return;
       index = i;
-      current.textContent = String(i + 1);
+      current.textContent = String(i + 1).padStart(Math.max(2, String(slides.length).length), '0');
       bar.style.transform = `scaleX(${(i + 1) / slides.length})`;
     }
 

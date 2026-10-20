@@ -36,6 +36,9 @@
     }
   },
   "home": {
-    "heroProduct": "atlantis-select"
+    "heroProduct": "atlantis-select",
+    "categoryPhotos": {
+      "instantni-kavove-automaty": "necta-brio-alternativni-provedeni"
+    }
   }
 }

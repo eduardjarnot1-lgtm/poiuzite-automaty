@@ -12,6 +12,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
     });
+    nav.addEventListener('click', (e) => { if (e.target.closest('a[href^="#"]')) setOpen(false); });   // in-page links close the menu
     matchMedia('(min-width: 1061px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
   }
 

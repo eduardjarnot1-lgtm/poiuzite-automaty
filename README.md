@@ -20,7 +20,7 @@ Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish
 
 | URL | Page |
 | --- | --- |
-| `/` | Homepage: hero, introduction, categories, latest machines, services, call to action |
+| `/` | Homepage: hero, short introduction, category panels with the machine carousel, how it works, enquiry footer |
 | `/automaty/` | All categories |
 | `/automaty/<category>/` | Category catalogue with filters and sorting |
 | `/automaty/<category>/<product>/` | Product detail with gallery, specs table, enquiry form, related machines |
@@ -39,7 +39,7 @@ Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, produ
 - `data/categories.json`: categories, their intros and meta descriptions.
 - `data/products.json`: the machines. Each has `id`, `slug`, `category`, `name`, `manufacturer`, `model`, `type`, `condition` (`pouzity`, `repasovany` or `renovovany`), `conditionDetails`, `summary`, `description` (paragraphs), `specs` (`label`, `value`, `key: true` to show it on the card), `features`, `paymentSystems`, `warranty`, `price` (number, or `null` for "Cena na dotaz"), `availability`, `images` (`src`, `alt`, optional `width`, `height`, `thumb`, `srcset: [{src, w}]`), `dateAdded` and optional `related` ids.
 - Product photos go in `assets/products/<slug>/` and are referenced as `assets/products/<slug>/1.webp`. A full `https://` URL also works. Mark a photo of a similar model (not the unit for sale) with `"illustrative": true` and `"credit": {"label", "url"}`: it gets an "Ilustrační foto" line with the source, and a photo that fails to load is replaced by the neutral drawing.
-- Homepage: editorial opening (`assets/css/home.css`, `assets/js/home.js`, Instrument Serif from Google Fonts). The machine shown in the opening is set by `home.heroProduct` in `data/site.json`; keep its photo at least twice as large as it is displayed (about 1000 px wide). The earlier 3D before/after hero (`hero.css`, `hero.js`, `assets/img/hero-*`) is no longer used on the homepage.
+- Homepage: editorial layout (`assets/css/home.css`, `assets/js/home.js`; Bodoni Moda from Google Fonts plus the site's Inter). It has its own slim header and footer (`variant: 'home'` in `pages.mjs`). The machine in the hero is set by `home.heroProduct` in `data/site.json`; keep its photo about 1000 px wide on a white background. Each category panel's photo comes from `home.categoryPhotos` (category slug → product id), else the newest machine. Only categories with machines get a panel; the rest are listed as links. Display green `#4c9e8b` is for large type only; small text, states and focus use `#2f7a68`. The earlier 3D before/after hero (`hero.css`, `hero.js`, `assets/img/hero-*`) is no longer used.
 - Browsing: the category cards on the homepage and `/automaty/` reveal that category's machines below in a carousel (`assets/js/browse.js`, `assets/js/carousel.js`); without JS they link to the category pages, which use the same carousel.
 
 The build stops with a clear message if a product has a missing field, an unknown category or condition, a duplicate slug, or an image without alt text.

@@ -29,7 +29,26 @@ const NAV = [
 ];
 const current = (c, path) => (c.page.section === path ? ' aria-current="page"' : '');
 
-export function header(c) {
+// The homepage uses a slimmer header: three anchors into the page and one enquiry action.
+const HOME_NAV = [['#nabidka', 'Nabídka'], ['#jak-to-funguje', 'Jak to funguje'], ['kontakt/', 'Kontakt']];
+const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
+
+export function header(c, variant = '') {
+  if (variant === 'home') return html`<header class="site-header site-header-home">
+  <div class="wrap header-inner">
+    ${logo(c)}
+    <nav class="site-nav" id="site-nav" aria-label="Hlavní navigace">
+      <ul class="nav-list">
+        ${HOME_NAV.map(([path, label]) => html`<li><a href="${path.startsWith('#') ? path : c.url(path)}">${label}</a></li>`)}
+      </ul>
+      ${hasContact(c) && html`<div class="nav-contact">${c.site.contact.phone && phoneLink(c)}${c.site.contact.email && emailLink(c)}</div>`}
+    </nav>
+    <a class="header-cta" href="${c.url('kontakt/')}#formular">Poptat automat</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-bars" aria-hidden="true"></span><span class="visually-hidden">Menu</span>
+    </button>
+  </div>
+</header>`;
   return html`<header class="site-header">
   <div class="wrap header-inner">
     ${logo(c)}
@@ -57,8 +76,28 @@ export function header(c) {
 }
 
 /* ---------- footer ---------- */
-export function footer(c) {
+export function footer(c, variant = '') {
   const ct = c.site.contact;
+  // Homepage footer: a closing line and the enquiry action; contact details only once supplied.
+  if (variant === 'home') return html`<footer class="site-footer home-footer" aria-labelledby="footer-title">
+  <div class="home-footer-main">
+    <p class="home-label">Poptávka</p>
+    <h2 class="home-footer-title" id="footer-title">Najdeme pro vás vhodný automat.</h2>
+    <p class="home-footer-text">Napište nám, jaký automat a pro jaký provoz hledáte. Ozveme se s nabídkou.</p>
+    <div class="home-footer-actions">
+      <a class="home-btn" href="${c.url('kontakt/')}#formular">Napsat poptávku ${ARROW}</a>
+      ${hasContact(c) && html`<p class="home-footer-direct">${ct.phone && phoneLink(c)}${ct.email && emailLink(c)}</p>`}
+    </div>
+  </div>
+  <div class="home-footer-base">
+    <nav aria-label="Odkazy v patičce"><ul>
+      <li><a href="${c.url('automaty/')}">Všechny kategorie</a></li>
+      ${NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}
+      <li><a href="${c.url('kontakt/')}">Kontakt</a></li>
+    </ul></nav>
+    <p>© ${new Date().getFullYear()} ${esc(c.site.name)}${ct.address ? ` · ${esc(ct.address)}` : ''}${ct.companyId ? ` · IČO ${esc(ct.companyId)}` : ''}</p>
+  </div>
+</footer>`;
   return html`<footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
@@ -187,11 +226,14 @@ function machineSlide(c, p, i, n, headingLevel) {
 </li>`;
 }
 
+// "01 / 07": the counter is zero-padded to the width of the total.
+const pad = (i, n) => String(i).padStart(Math.max(2, String(n).length), '0');
+
 export function carousel(c, list, { id, label, headingLevel = 3 } = {}) {
   const n = list.length;
   return html`<div class="carousel" data-carousel role="region" aria-roledescription="karusel" aria-label="${esc(label)}">
   <div class="carousel-bar">
-    <p class="carousel-pos" data-carousel-pos><span class="visually-hidden">Automat </span><span data-carousel-current>1</span> / ${n}</p>
+    <p class="carousel-pos" data-carousel-pos><span class="visually-hidden">Automat </span><span data-carousel-current>${pad(1, n)}</span> / ${pad(n, n)}</p>
     <div class="carousel-progress" aria-hidden="true"><span data-carousel-progress></span></div>
     <div class="carousel-nav" data-carousel-nav hidden>
       <button class="carousel-btn" type="button" data-carousel-prev aria-controls="${id}" aria-label="Předchozí automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -260,7 +302,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
 }
 
 /* ---------- the document ---------- */
-export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage }) {
+export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage, variant = '' }) {
   const fullTitle = c.page.path === '' ? title : `${title} | ${c.site.name}`;
   const canonical = c.absUrl && !c.page.noindex ? c.absUrl(c.page.path) : null;
   const og = ogImage && (/^https?:\/\//.test(ogImage) ? ogImage : c.absUrl ? c.absUrl(ogImage) : null);
@@ -285,11 +327,11 @@ ${head}<script>document.documentElement.classList.add('js')</script>
 </head>
 <body class="${bodyClass}">
 <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
-${header(c)}
+${header(c, variant)}
 <main id="obsah" tabindex="-1">
 ${body}
 </main>
-${footer(c)}
+${footer(c, variant)}
 <script src="${c.url('assets/js/site.js')}" defer></script>
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}</body>
 </html>
