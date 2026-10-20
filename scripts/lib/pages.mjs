@@ -2,7 +2,7 @@
 import { esc, html, ph, plural } from './util.mjs';
 import {
   ARROW, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
-  conditionBadge, specValue, enquiryForm, phoneLink, emailLink,
+  conditionBadge, specValue, enquiryForm, phoneLink, emailLink, carousel, photoNote, mediaUrl,
 } from './components.mjs';
 
 const real = (list) => list.filter((p) => !p.placeholder);
@@ -19,17 +19,55 @@ const ICONS = {
 };
 const catIcon = (slug) => `<svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[slug] || ICONS['kombinovane-automaty']}</svg>`;
 
-function categoryCards(c, { headingLevel = 3 } = {}) {
+function categoryCards(c, { headingLevel = 3, browse = false } = {}) {
   const h = `h${headingLevel}`;
   return html`<ul class="cat-grid">${c.categories.map((cat) => {
     const n = real(c.products.filter((p) => p.category === cat.slug)).length;
+    const pick = browse ? ` data-browse-cat="${esc(cat.slug)}" aria-controls="nabidka-${esc(cat.slug)}"` : '';
     return html`<li class="cat-card">
       ${catIcon(cat.slug)}
-      <${h}><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></${h}>
+      <${h}><a href="${c.url(`automaty/${cat.slug}/`)}"${pick}>${esc(cat.name)}</a></${h}>
       <p>${esc(cat.short)}</p>
-      <span class="cat-count">${n ? countLabel(n) + ' v nabídce' : 'Nabídka na dotaz'}</span>
+      <span class="cat-count">${n ? countLabel(n) : 'Nabídka na dotaz'}</span>
     </li>`;
   })}</ul>`;
+}
+
+const photoNotice = (list) =>
+  list.some((p) => p.images.some((i) => i.illustrative)) &&
+  html`<p class="notice" role="note"><strong>Ilustrační fotografie.</strong> Snímky ukazují podobné modely, ne konkrétní kusy. Technické parametry, stav a ceny doplníme.</p>`;
+
+const emptyCategory = (c, cat, h = 'h3') => html`<div class="empty-state">
+  ${catIcon(cat.slug)}
+  <${h}>Aktuálně nemáme zveřejněné žádné automaty v této kategorii</${h}>
+  <p>Nabídka se průběžně mění. Napište nám, jaký automat hledáte, a ozveme se, jakmile bude k dispozici.</p>
+  <a class="btn btn-primary" href="${c.url(`automaty/${cat.slug}/`)}#poptavka">Poptat automat</a>
+</div>`;
+
+/* ---------- two-level browsing: pick a category, its machines appear below ----------
+   Without JS every category card is a plain link to the category page and the panels stay hidden.
+   assets/js/browse.js turns the cards into selectors and reveals the chosen panel in place. */
+function categoryBrowser(c, { headingLevel = 3 } = {}) {
+  const h = `h${headingLevel}`;
+  return html`<div class="browse" data-browse>
+  ${categoryCards(c, { headingLevel, browse: true })}
+  <p class="browse-hint" data-browse-hint hidden>Vyberte kategorii a níže se zobrazí automaty, které v ní nabízíme.</p>
+  ${c.categories.map((cat) => {
+    const list = c.products.filter((p) => p.category === cat.slug).sort(byNewest);
+    return html`<section class="browse-panel" id="nabidka-${esc(cat.slug)}" aria-labelledby="nabidka-${esc(cat.slug)}-title" tabindex="-1" hidden>
+    <div class="browse-head">
+      <div>
+        <p class="eyebrow">Vybraná kategorie</p>
+        <${h} id="nabidka-${esc(cat.slug)}-title">${esc(cat.name)}</${h}>
+      </div>
+      <a class="text-link" href="${c.url(`automaty/${cat.slug}/`)}">Celá kategorie ${ARROW}</a>
+    </div>
+    ${list.length
+      ? html`${photoNotice(list)}${carousel(c, list, { id: `carousel-${cat.slug}`, label: cat.name, headingLevel: headingLevel + 1 })}`
+      : emptyCategory(c, cat, `h${headingLevel + 1}`)}
+  </section>`;
+  })}
+</div>`;
 }
 
 const placeholderNotice = (list) =>
@@ -87,7 +125,6 @@ function catalogue(c, list, { headingLevel = 2, label = 'Automaty' } = {}) {
 
 export function home(c) {
   const main = c.categories.find((x) => x.featured) || c.categories[0];
-  const featured = c.products.filter((p) => p.category === main.slug).sort(byNewest).slice(0, 3);
   return {
     title: `${c.site.name} | Použité a repasované prodejní automaty`,
     description: 'Prodej použitých, repasovaných a renovovaných prodejních automatů se zaměřením na automaty na instantní kávu a teplé nápoje. Prohlédněte si nabídku a pošlete poptávku.',
@@ -95,7 +132,7 @@ export function home(c) {
 <link rel="preload" as="image" href="${c.url('assets/img/hero-fg-before.webp')}">
 <link rel="stylesheet" href="${c.url('assets/css/hero.css')}">
 `,
-    scripts: ['assets/js/hero.js'],
+    scripts: ['assets/js/hero.js', 'assets/js/carousel.js', 'assets/js/browse.js'],
     ogImage: 'assets/img/hero-bg.webp',
     body: html`
 <section class="hero" id="hero" data-state="before" aria-labelledby="hero-title">
@@ -155,21 +192,10 @@ export function home(c) {
 <section class="section section-alt" aria-labelledby="cats-title">
   <div class="wrap">
     <div class="section-head">
-      <h2 id="cats-title">Kategorie automatů</h2>
+      <h2 id="cats-title">Vyberte kategorii automatů</h2>
       <a class="text-link" href="${c.url('automaty/')}">Všechny kategorie ${ARROW}</a>
     </div>
-    ${categoryCards(c)}
-  </div>
-</section>
-
-<section class="section" aria-labelledby="latest-title">
-  <div class="wrap">
-    <div class="section-head">
-      <h2 id="latest-title">${esc(main.name)} v nabídce</h2>
-      <a class="text-link" href="${c.url(`automaty/${main.slug}/`)}">Prohlédnout celou nabídku ${ARROW}</a>
-    </div>
-    ${placeholderNotice(featured)}
-    <ul class="card-grid">${featured.map((p) => productCard(c, p, { headingLevel: 3 }))}</ul>
+    ${categoryBrowser(c)}
   </div>
 </section>
 
@@ -211,16 +237,17 @@ export function home(c) {
 export function categoriesIndex(c) {
   return {
     title: 'Kategorie prodejních automatů',
+    scripts: ['assets/js/carousel.js', 'assets/js/browse.js'],
     description: 'Všechny kategorie použitých a repasovaných prodejních automatů: instantní a zrnkové kávové automaty, automaty na snacky, chlazené nápoje a kombinované automaty.',
     body: html`
 <div class="page-head">
   <div class="wrap">
     ${breadcrumbs(c, [['automaty/', 'Automaty']])}
     <h1>Kategorie prodejních automatů</h1>
-    <p class="lead">Vyberte kategorii. Pokud hledaný automat v nabídce nevidíte, napište nám a zjistíme, co je k dispozici.</p>
+    <p class="lead">Vyberte kategorii a zobrazí se automaty, které v ní nabízíme. Pokud hledaný automat nevidíte, napište nám a zjistíme, co je k dispozici.</p>
   </div>
 </div>
-<section class="section"><div class="wrap">${categoryCards(c, { headingLevel: 2 })}</div></section>`,
+<section class="section"><div class="wrap">${categoryBrowser(c, { headingLevel: 2 })}</div></section>`,
   };
 }
 
@@ -230,25 +257,21 @@ export function category(c, cat) {
   return {
     title: cat.name,
     description: cat.metaDescription,
-    scripts: list.length > 1 ? ['assets/js/catalogue.js'] : [],
+    scripts: list.length ? ['assets/js/carousel.js'] : [],
     body: html`
 <div class="page-head">
   <div class="wrap">
     ${breadcrumbs(c, [['automaty/', 'Automaty'], [`automaty/${cat.slug}/`, cat.name]])}
     <h1>${esc(cat.name)}</h1>
     <p class="lead">${esc(cat.intro)}</p>
-    ${n > 0 && html`<p class="page-count">${countLabel(n)} v nabídce</p>`}
+    ${n > 0 && html`<p class="page-count">${countLabel(n)}</p>`}
   </div>
 </div>
 <section class="section section-tight">
   <div class="wrap">
     ${list.length
-      ? html`${placeholderNotice(list)}${catalogue(c, list, { label: cat.name })}`
-      : html`<div class="empty-state">
-          ${catIcon(cat.slug)}
-          <h2>Aktuálně nemáme zveřejněné žádné automaty v této kategorii</h2>
-          <p>Nabídka se průběžně mění. Napište nám, jaký automat hledáte, a ozveme se, jakmile bude k dispozici.</p>
-        </div>`}
+      ? html`${placeholderNotice(list)}${photoNotice(list)}${carousel(c, [...list].sort(byNewest), { id: 'carousel', label: cat.name, headingLevel: 2 })}`
+      : emptyCategory(c, cat, 'h2')}
   </div>
 </section>
 <div class="section section-alt"><div class="wrap">
@@ -268,7 +291,7 @@ export function product(c, p) {
   const related = (p.related?.length
     ? p.related.map((id) => c.products.find((x) => x.id === id)).filter(Boolean)
     : c.products.filter((x) => x.category === p.category && x.id !== p.id).sort(byNewest)
-  ).slice(0, 3);
+  ).slice(0, 12);
   const maker = makerLine(p);
   const ld = c.absUrl && !p.placeholder && {
     '@context': 'https://schema.org',
@@ -277,7 +300,7 @@ export function product(c, p) {
     description: p.summary,
     ...(p.manufacturer && { brand: { '@type': 'Brand', name: p.manufacturer } }),
     ...(p.model && { model: p.model }),
-    ...(p.images[0] && { image: p.images.map((i) => c.absUrl(i.src)) }),
+    ...(p.images.some((i) => !i.illustrative) && { image: p.images.filter((i) => !i.illustrative).map((i) => mediaUrl({ url: c.absUrl }, i.src)) }),
     ...(p.price != null && {
       offers: { '@type': 'Offer', price: p.price, priceCurrency: c.site.catalogue.currency, url: c.absUrl(productPath(p)), itemCondition: p.condition === 'pouzity' ? 'https://schema.org/UsedCondition' : 'https://schema.org/RefurbishedCondition' },
     }),
@@ -291,7 +314,7 @@ export function product(c, p) {
   return {
     title: [p.name, maker].filter(Boolean).join(' – '),
     description: (p.placeholder ? 'Vzorová položka katalogu. ' : '') + `${p.name}${maker ? ` (${maker})` : ''}: ${p.summary} Technické parametry, stav a poptávka.`.slice(0, 300),
-    scripts: p.images.length > 1 ? ['assets/js/gallery.js'] : [],
+    scripts: [...(p.images.length > 1 ? ['assets/js/gallery.js'] : []), ...(related.length ? ['assets/js/carousel.js'] : [])],
     ogImage: p.images[0]?.src,
     body: html`
 <div class="wrap">
@@ -301,9 +324,10 @@ export function product(c, p) {
   <div class="wrap product-top">
     <div class="gallery" data-gallery>
       <figure class="gallery-main">${productImage(c, p, { eager: true, sizes: '(max-width: 900px) 100vw, 640px' })}</figure>
+      ${photoNote(p)}
       ${p.images.length > 1 && html`<ul class="gallery-thumbs" aria-label="Další fotografie">
-        ${p.images.map((img, i) => html`<li><a href="${c.url(img.src)}" data-full="${c.url(img.src)}" data-alt="${esc(img.alt || p.name)}"${i === 0 ? ' aria-current="true"' : ''}>
-          <img src="${c.url(img.thumb || img.src)}" alt="${esc(`Fotografie ${i + 1}: ${img.alt || p.name}`)}" width="120" height="90" loading="lazy" decoding="async"></a></li>`)}
+        ${p.images.map((img, i) => html`<li><a href="${mediaUrl(c, img.src)}" data-full="${mediaUrl(c, img.src)}" data-alt="${esc(img.alt || p.name)}"${i === 0 ? ' aria-current="true"' : ''}>
+          <img src="${mediaUrl(c, img.thumb || img.src)}" alt="${esc(`Fotografie ${i + 1}: ${img.alt || p.name}`)}" width="120" height="90" loading="lazy" decoding="async"></a></li>`)}
       </ul>`}
     </div>
     <div class="product-summary">
@@ -367,7 +391,7 @@ export function product(c, p) {
     <div class="wrap">
       <div class="section-head"><h2 id="related-title">Podobné automaty</h2>
         <a class="text-link" href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} ${ARROW}</a></div>
-      <ul class="card-grid">${related.map((x) => productCard(c, x, { headingLevel: 3 }))}</ul>
+      ${carousel(c, related, { id: 'carousel-related', label: 'Podobné automaty', headingLevel: 3 })}
     </div>
   </section>`}
 </article>

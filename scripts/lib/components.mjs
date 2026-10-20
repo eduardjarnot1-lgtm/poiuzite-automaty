@@ -119,13 +119,17 @@ export function conditionBadge(c, p) {
   return html`${p.placeholder && '<span class="badge badge-ph">Vzorová položka</span>'}${cond && html`<span class="badge badge-${esc(p.condition)}">${esc(cond.label)}</span>`}`;
 }
 
-// First image, or a neutral drawing that says the photo is still to come.
+// Photos may be local (assets/products/...) or full URLs to another site.
+export const mediaUrl = (c, src) => (/^https?:\/\//.test(src) ? src : c.url(src));
+
+// First image, or a neutral drawing that says the photo is still to come. data-fallback lets
+// site.js swap in that drawing when a remote photo fails to load.
 export function productImage(c, p, { index = 0, eager = false, sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 360px' } = {}) {
   const img = p.images[index];
   if (!img) {
     return html`<img src="${c.url('assets/img/placeholder-automat.svg')}" alt="Fotografie automatu bude doplněna" width="600" height="450" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
-  return html`<img src="${c.url(img.src)}"${img.srcset?.length > 0 && html` srcset="${img.srcset.map((s) => `${c.url(s.src)} ${s.w}w`).join(', ')}" sizes="${sizes}"`} alt="${esc(img.alt || p.name)}" width="${img.width || 800}" height="${img.height || 600}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+  return html`<img src="${mediaUrl(c, img.src)}"${img.srcset?.length > 0 && html` srcset="${img.srcset.map((s) => `${mediaUrl(c, s.src)} ${s.w}w`).join(', ')}" sizes="${sizes}"`} data-fallback="${c.url('assets/img/placeholder-automat.svg')}" alt="${esc(img.alt || p.name)}" width="${img.width || 800}" height="${img.height || 600}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
 
 const specValue = (v) => (v == null || v === '' ? ph('doplní se') : esc(v));
@@ -153,6 +157,53 @@ export function productCard(c, p, { headingLevel = 2 } = {}) {
 }
 
 export { specValue };
+
+// Small credit line for photos that show a similar model rather than the unit for sale.
+export const photoNote = (p, img = p.images[0]) =>
+  img?.illustrative &&
+  html`<p class="photo-note">Ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
+
+/* ---------- machine carousel ----------
+   A horizontally scrolling list: native scroll-snap gives swipe on touch and keeps working without
+   JS. assets/js/carousel.js adds the arrows, the position indicator and arrow-key navigation. */
+function machineSlide(c, p, i, n, headingLevel) {
+  const href = c.url(productPath(p));
+  const h = `h${headingLevel}`;
+  const keySpecs = p.specs.filter((s) => s.key).slice(0, 4);
+  return html`<li class="slide" aria-roledescription="snímek" aria-label="${i + 1} z ${n}: ${esc(p.name)}">
+  <a class="slide-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p, { sizes: '(max-width: 640px) 84vw, (max-width: 1100px) 46vw, 380px' })}</a>
+  ${photoNote(p)}
+  <div class="slide-body">
+    ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
+    <${h} class="slide-title"><a href="${href}">${esc(p.name)}</a></${h}>
+    <p class="slide-summary">${esc(p.summary)}</p>
+    ${keySpecs.some((s) => s.value != null && s.value !== '')
+      ? html`<dl class="slide-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${specValue(s.value)}</dd></div>`)}</dl>`
+      : html`<p class="slide-missing">${ph('Technické parametry doplníme')}</p>`}
+    <div class="slide-foot">
+      <p class="slide-price${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p>
+      <a class="btn btn-primary" href="${href}#poptavka">Poptat tento automat</a>
+    </div>
+  </div>
+</li>`;
+}
+
+export function carousel(c, list, { id, label, headingLevel = 3 } = {}) {
+  const n = list.length;
+  return html`<div class="carousel" data-carousel role="region" aria-roledescription="karusel" aria-label="${esc(label)}">
+  <div class="carousel-bar">
+    <p class="carousel-pos" data-carousel-pos><span class="visually-hidden">Automat </span><span data-carousel-current>1</span> / ${n}</p>
+    <div class="carousel-progress" aria-hidden="true"><span data-carousel-progress></span></div>
+    <div class="carousel-nav" data-carousel-nav hidden>
+      <button class="carousel-btn" type="button" data-carousel-prev aria-controls="${id}" aria-label="Předchozí automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="carousel-btn" type="button" data-carousel-next aria-controls="${id}" aria-label="Další automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+  <ul class="carousel-track" id="${id}" tabindex="0" aria-label="${esc(label)}: ${n} ${n === 1 ? 'automat' : n < 5 ? 'automaty' : 'automatů'}, posouvejte šipkami doleva a doprava">
+    ${list.map((p, i) => machineSlide(c, p, i, n, headingLevel))}
+  </ul>
+</div>`;
+}
 
 /* ---------- enquiry form ----------
    Netlify detects the form from the built HTML (data-netlify). When site.forms.endpoint is set
@@ -213,7 +264,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
 export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage }) {
   const fullTitle = c.page.path === '' ? title : `${title} | ${c.site.name}`;
   const canonical = c.absUrl && !c.page.noindex ? c.absUrl(c.page.path) : null;
-  const og = ogImage && c.absUrl ? c.absUrl(ogImage) : null;
+  const og = ogImage && (/^https?:\/\//.test(ogImage) ? ogImage : c.absUrl ? c.absUrl(ogImage) : null);
   return html`<!doctype html>
 <html lang="cs">
 <head>
