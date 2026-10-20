@@ -337,7 +337,7 @@ input, select, textarea { font: inherit; color: var(--ink); }
 .slide:hover .slide-media img { transform: scale(1.025); }
 .photo-note { margin: 8px 0 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
 .photo-note a { color: inherit; }
-.has-missing-photo .photo-note { display: none; }
+.has-missing-photo .photo-note { visibility: hidden; }
 .slide-body { display: flex; flex-direction: column; flex: 1; padding: 18px 2px 0; }
 .slide-title { margin: 0 0 6px; font-size: clamp(20px, 1.7vw, 24px); font-weight: 400; letter-spacing: -.02em; line-height: 1.2; }
 .slide-title a { color: var(--ink); text-decoration: none; }
@@ -348,7 +348,6 @@ input, select, textarea { font: inherit; color: var(--ink); }
 .slide-specs div:nth-child(even) { padding-left: 10px; border-left: 1px solid var(--line); }
 .slide-specs dt { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .slide-specs dd { margin: 2px 0 0; color: var(--ink); overflow-wrap: anywhere; }
-.slide-missing { margin: 0 0 20px; font-size: 14px; }
 .slide-foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
 .slide-price { margin: 0; font-size: 17px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .slide-foot .btn { font-size: 14px; }

@@ -136,7 +136,9 @@
         "credit": {
           "label": "3stechnologies.in",
           "url": "https://www.3stechnologies.in/products/select/10083"
-        }
+        },
+        "width": 1000,
+        "height": 1000
       }
     ],
     "dateAdded": "2026-10-19"
@@ -207,7 +209,9 @@
         "credit": {
           "label": "ebay.co.uk",
           "url": "https://www.ebay.co.uk/itm/326679664537"
-        }
+        },
+        "width": 1200,
+        "height": 1200
       }
     ],
     "dateAdded": "2026-10-18"
@@ -278,7 +282,9 @@
         "credit": {
           "label": "quickservice.mi.it",
           "url": "https://www.quickservice.mi.it/macchine.html"
-        }
+        },
+        "width": 585,
+        "height": 585
       }
     ],
     "dateAdded": "2026-10-17"
@@ -349,7 +355,9 @@
         "credit": {
           "label": "gumtree.com",
           "url": "https://www.gumtree.com/p/other-miscellaneous-goods/darenthmjs-refresh-700-auto-freevend-hot-drinks-vending-machine-/1485327509"
-        }
+        },
+        "width": 768,
+        "height": 1024
       }
     ],
     "dateAdded": "2026-10-16"
@@ -420,7 +428,9 @@
         "credit": {
           "label": "kafemati.com.mk",
           "url": "https://kafemati.com.mk/shop/products?categories=vending-reparirani-kafemati"
-        }
+        },
+        "width": 540,
+        "height": 540
       }
     ],
     "dateAdded": "2026-10-15"
@@ -491,7 +501,9 @@
         "credit": {
           "label": "baumgarten-automatenservice.de",
           "url": "https://www.baumgarten-automatenservice.de/produkte/tischger%C3%A4te/wittenborg-5100/"
-        }
+        },
+        "width": 558,
+        "height": 984
       }
     ],
     "dateAdded": "2026-10-14"

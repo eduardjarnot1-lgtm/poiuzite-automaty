@@ -169,7 +169,8 @@ export const photoNote = (p, img = p.images[0]) =>
 function machineSlide(c, p, i, n, headingLevel) {
   const href = c.url(productPath(p));
   const h = `h${headingLevel}`;
-  const keySpecs = p.specs.filter((s) => s.key).slice(0, 4);
+  // Cards show only what was supplied: filled-in key specs, and a price when there is one.
+  const keySpecs = p.specs.filter((s) => s.key && s.value != null && s.value !== '').slice(0, 4);
   return html`<li class="slide" aria-roledescription="snímek" aria-label="${i + 1} z ${n}: ${esc(p.name)}">
   <a class="slide-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p, { sizes: '(max-width: 640px) 84vw, (max-width: 1100px) 46vw, 380px' })}</a>
   ${photoNote(p)}
@@ -177,12 +178,10 @@ function machineSlide(c, p, i, n, headingLevel) {
     ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
     <${h} class="slide-title"><a href="${href}">${esc(p.name)}</a></${h}>
     <p class="slide-summary">${esc(p.summary)}</p>
-    ${keySpecs.some((s) => s.value != null && s.value !== '')
-      ? html`<dl class="slide-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${specValue(s.value)}</dd></div>`)}</dl>`
-      : html`<p class="slide-missing">${ph('Technické parametry doplníme')}</p>`}
+    ${keySpecs.length > 0 && html`<dl class="slide-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
     <div class="slide-foot">
-      <p class="slide-price${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p>
-      <a class="btn btn-primary" href="${href}#poptavka">Poptat tento automat</a>
+      ${p.price != null && html`<p class="slide-price">${esc(priceText(c, p))}</p>`}
+      <a class="btn btn-primary" href="${href}#poptavka">Mám zájem<span class="visually-hidden">: ${esc(p.name)}</span></a>
     </div>
   </div>
 </li>`;

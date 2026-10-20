@@ -14,7 +14,7 @@
     links.forEach((a) => {
       const on = a.dataset.browseCat === slug;
       a.setAttribute('aria-expanded', String(on));
-      a.closest('.cat-card').classList.toggle('is-selected', on);
+      a.closest('li').classList.toggle('is-selected', on);
     });
     panels.forEach((p) => { p.hidden = p !== panel; });
     hint.hidden = true;

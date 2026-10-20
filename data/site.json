@@ -34,5 +34,8 @@
       "description": "Automat rozebraný a obnovený včetně vnějších dílů, s otestovanou funkčností před předáním.",
       "verified": false
     }
+  },
+  "home": {
+    "heroProduct": "atlantis-select"
   }
 }
