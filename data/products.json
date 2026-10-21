@@ -57,17 +57,7 @@
     "warranty": null,
     "price": null,
     "availability": null,
-    "images": [
-      {
-        "src": "https://www.kapadokyaotomat.com.tr/UploadedFiles/shopproduct/4/1bce683f813b475f941fc60d40a3f2ec.jpg",
-        "alt": "Necta Brio 3, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "kapadokyaotomat.com.tr",
-          "url": "https://www.kapadokyaotomat.com.tr/tr/urun/brio-3_4"
-        }
-      }
-    ],
+    "images": [],
     "dateAdded": "2026-10-20"
   },
   {
@@ -130,7 +120,7 @@
     "availability": null,
     "images": [
       {
-        "src": "https://www.3stechno.hexcart.com/shop/images/10083/Atlantis-4-Lane-Vending-Machine-1-614bbb71b0db51a6ac745634187b3ed6.jpg",
+        "src": "assets/products/atlantis-select/1.jpg",
         "alt": "Atlantis Select, ilustrační fotografie podobného modelu",
         "illustrative": true,
         "credit": {
@@ -203,15 +193,15 @@
     "availability": null,
     "images": [
       {
-        "src": "https://i.ebayimg.com/images/g/zG0AAeSwt4Nob1xm/s-l1200.png",
+        "src": "assets/products/crane-voce/1.jpg",
         "alt": "Crane Voce, ilustrační fotografie podobného modelu",
         "illustrative": true,
         "credit": {
           "label": "ebay.co.uk",
           "url": "https://www.ebay.co.uk/itm/326679664537"
         },
-        "width": 1200,
-        "height": 1200
+        "width": 1000,
+        "height": 1000
       }
     ],
     "dateAdded": "2026-10-18"
@@ -276,7 +266,7 @@
     "availability": null,
     "images": [
       {
-        "src": "https://www.quickservice.mi.it/img/machine/jpg/machine-7.jpg",
+        "src": "assets/products/necta-brio-alternativni-provedeni/1.jpg",
         "alt": "Necta Brio – alternativní provedení, ilustrační fotografie podobného modelu",
         "illustrative": true,
         "credit": {
@@ -349,15 +339,15 @@
     "availability": null,
     "images": [
       {
-        "src": "https://img.gumtree.com/ePR8PyKf84wPHx7_RYmEag/22033758-df2b-4c6f-e7f8-f1e22089a400/86",
+        "src": "assets/products/nescafe-freshers-700-auto/1.jpg",
         "alt": "Nescafé Freshers 700 Auto, ilustrační fotografie podobného modelu",
         "illustrative": true,
         "credit": {
           "label": "gumtree.com",
           "url": "https://www.gumtree.com/p/other-miscellaneous-goods/darenthmjs-refresh-700-auto-freevend-hot-drinks-vending-machine-/1485327509"
         },
-        "width": 768,
-        "height": 1024
+        "width": 750,
+        "height": 1000
       }
     ],
     "dateAdded": "2026-10-16"
@@ -422,7 +412,7 @@
     "availability": null,
     "images": [
       {
-        "src": "https://cdn.vendor.com.mk/dffc41ea-e80d-4d54-8def-ada3a821680e/images/540-540/aad0e159650d7e4f9ae7c43388a004ba.jpg",
+        "src": "assets/products/colibri-c5/1.jpg",
         "alt": "Colibri C5, ilustrační fotografie podobného modelu",
         "illustrative": true,
         "credit": {
@@ -495,7 +485,7 @@
     "availability": null,
     "images": [
       {
-        "src": "https://image.jimcdn.com/app/cms/image/transf/none/path/sa6134e3165fbfca4/image/i3e0eb13b74f17286/version/1438608787/image.jpg",
+        "src": "assets/products/wittenborg-5100/1.jpg",
         "alt": "Wittenborg 5100, ilustrační fotografie podobného modelu",
         "illustrative": true,
         "credit": {

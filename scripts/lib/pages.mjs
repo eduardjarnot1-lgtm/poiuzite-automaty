@@ -7,6 +7,8 @@ import {
 
 const real = (list) => list.filter((p) => !p.placeholder);
 const byNewest = (a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || '');
+// Carousels lead with photographed machines; ones still waiting for a photo go last.
+const byShowcase = (a, b) => (b.images.length > 0) - (a.images.length > 0) || byNewest(a, b);
 const countLabel = (n) => `${n} ${plural(n, 'automat', 'automaty', 'automatů')}`;
 
 /* ---------- category icons (line drawings, no fake photos) ---------- */
@@ -93,7 +95,7 @@ function categoryBrowser(c, { headingLevel = 3, layout = 'cards' } = {}) {
   ${selector ? selector(c, { headingLevel }) : categoryCards(c, { headingLevel, browse: true })}
   <p class="browse-hint" data-browse-hint hidden>Vyberte kategorii a níže se zobrazí automaty, které v ní nabízíme.</p>
   ${c.categories.map((cat) => {
-    const list = c.products.filter((p) => p.category === cat.slug).sort(byNewest);
+    const list = c.products.filter((p) => p.category === cat.slug).sort(byShowcase);
     return html`<section class="browse-panel" id="nabidka-${esc(cat.slug)}" aria-labelledby="nabidka-${esc(cat.slug)}-title" tabindex="-1" hidden>
     <div class="browse-head">
       <div>
@@ -279,7 +281,7 @@ export function category(c, cat) {
 <section class="section section-tight">
   <div class="wrap">
     ${list.length
-      ? html`${placeholderNotice(list)}${photoNotice(list)}${carousel(c, [...list].sort(byNewest), { id: 'carousel', label: cat.name, headingLevel: 2 })}`
+      ? html`${placeholderNotice(list)}${photoNotice(list)}${carousel(c, [...list].sort(byShowcase), { id: 'carousel', label: cat.name, headingLevel: 2 })}`
       : emptyCategory(c, cat, 'h2')}
   </div>
 </section>
