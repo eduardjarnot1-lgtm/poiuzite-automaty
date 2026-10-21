@@ -147,7 +147,7 @@
 .kinds-more a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .kinds-more a:hover { color: var(--green-ink); }
 
-/* revealed panel + carousel: open layout, no boxes, no shadows, no rounding */
+/* revealed panel + machine gallery: open layout, no boxes, no shadows, no rounding */
 .page-home .browse-hint { margin: 24px 0 0; font: italic 400 20px/1.35 var(--display); color: var(--ink-soft); }
 .page-home .browse-panel { border-top: 0; margin-top: clamp(40px, 5vw, 72px); padding-top: 0; scroll-margin-top: 24px; }
 .page-home .browse-head { margin-bottom: 20px; }
@@ -157,35 +157,42 @@
 .page-home .notice { margin: 0 0 28px; background: none; border: 0; border-left: 2px solid var(--line-strong); border-radius: 0; padding: 2px 0 2px 14px; color: var(--ink-soft); font-size: 14px; }
 .page-home .notice strong { color: var(--ink); font-weight: 500; }
 
-.page-home .carousel { --gap: clamp(16px, 2vw, 28px); }
-.page-home .slide { flex-basis: 84%; }
-@container (min-width: 640px) { .page-home .slide { flex-basis: calc((100cqw - var(--gap)) / 1.7); } }
-@container (min-width: 1000px) { .page-home .slide { flex-basis: calc((100cqw - 2 * var(--gap)) / 2.6); } }
-.page-home .slide-media { aspect-ratio: 1; background: var(--stone); border: 0; border-radius: 0; transition: none; }
-.page-home .slide:hover .slide-media { box-shadow: none; }
-/* common baseline: every machine stands on the bottom of its well, over a faint ground shadow */
-.page-home .slide-media img { inset: 8% 10% 7%; width: 80%; height: 85%; object-position: center bottom; transition: transform 250ms ease; }
-.page-home .slide-media::after { content: ""; position: absolute; left: 30%; right: 30%; bottom: 5%; height: 4%; background: radial-gradient(closest-side, rgba(23,26,24,.14), transparent); }
-.page-home .slide:hover .slide-media img { transform: translateY(-4px); }
-.page-home .photo-note { font-size: 12px; color: var(--ink-soft); }
-.page-home .slide-body { padding-top: 20px; }
-.page-home .slide-title { margin-bottom: 10px; font: 400 clamp(28px, 2.6vw, 40px)/1.02 var(--display); letter-spacing: -.02em; }
-.page-home .slide-title a:hover { color: var(--green-ink); text-decoration: none; }
-.page-home .slide-summary { font-size: 16px; color: var(--ink-soft); max-width: 44ch; margin-bottom: 20px; }
-.page-home .slide-specs { border-top-color: var(--rule); }
-.page-home .slide-foot { justify-content: flex-start; gap: 12px 24px; }
-.page-home .slide-price { font: 400 24px/1 var(--display); }
-.page-home .slide-foot .btn { min-height: 48px; padding: 0 22px; background: var(--ink); color: #fff; border: 0; border-radius: 2px; box-shadow: none; font: 500 15px/1 var(--font); transition: background-color var(--hover) ease; }
-.page-home .slide-foot .btn:hover { background: var(--green-ink); }
-
-.page-home .carousel-bar { gap: 24px; margin-top: 8px; }
-.page-home .carousel-pos { min-width: 0; font: 400 30px/1 var(--display); letter-spacing: 0; color: var(--ink-soft); }
-.page-home [data-carousel-current] { color: var(--ink); }
-.page-home .carousel-progress { background: var(--rule); }
-.page-home .carousel-progress span { background: var(--green-ink); transition-duration: 450ms; }
-.page-home .carousel-btn { width: 52px; height: 52px; border-radius: 0; border: 1px solid var(--ink); background: transparent; color: var(--ink); box-shadow: none; }
-.page-home .carousel-btn:hover:not(:disabled) { background: var(--ink); color: #fff; }
-.page-home .carousel-btn:disabled { opacity: .3; }
+/* machine gallery: one quiet stone stage, every machine in an identical well standing on its
+   bottom edge over a faint ground shadow, the text directly beneath. No cards, borders or rounding. */
+.showcase {
+  list-style: none; margin: 0; padding: clamp(24px, 3vw, 40px) clamp(20px, 3.4vw, 56px) clamp(36px, 4.4vw, 64px);
+  background: var(--stone); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(48px, 5vw, 80px) clamp(24px, 3vw, 48px);
+}
+.showcase-item { display: flex; flex-direction: column; min-width: 0; }
+.showcase-media { position: relative; display: block; aspect-ratio: 6 / 7; border-bottom: 1px solid #d9ded9; }
+.showcase-media img {
+  position: absolute; left: 6%; right: 6%; bottom: 5%; width: 88%; height: 91%;
+  object-fit: contain; object-position: center bottom;   /* whole silhouette, true proportions, common baseline */
+  mix-blend-mode: multiply; transition: transform var(--hover) ease;
+}
+.showcase-media::before { content: ""; position: absolute; left: 24%; right: 24%; bottom: 3%; height: 5%; background: radial-gradient(closest-side, rgba(23,26,24,.18), transparent); }   /* painted before the photo, so it sits under the machine's feet */
+.showcase-item:hover .showcase-media img { transform: translateY(-4px); }
+.showcase .photo-note { margin: 10px 0 0; font-size: 12px; color: var(--ink-soft); }
+.showcase-body { display: flex; flex-direction: column; flex: 1; padding-top: 18px; }
+.showcase-maker { margin: 0 0 6px; font: 500 12px/1.4 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.showcase-title { margin: 0 0 8px; font: 400 clamp(26px, 2.3vw, 36px)/1.04 var(--display); letter-spacing: -.02em; }
+.showcase-title a { color: var(--ink); text-decoration: none; }
+.showcase-title a:hover { color: var(--green-ink); }
+.showcase-summary { margin: 0 0 20px; max-width: 40ch; font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+.showcase-specs { margin: 0 0 20px; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #d9ded9; font-size: 13px; }
+.showcase-specs div { padding: 8px 10px 8px 0; border-bottom: 1px solid #d9ded9; }
+.showcase-specs dt { color: var(--ink-soft); font-size: 12px; }
+.showcase-specs dd { margin: 2px 0 0; color: var(--ink); }
+.showcase-foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.showcase-price { margin: 0; font: 400 24px/1 var(--display); color: var(--ink); }
+.showcase-btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; background: var(--ink); color: #fff; border-radius: 2px; text-decoration: none; font: 500 15px/1 var(--font); transition: background-color var(--hover) ease; }
+.showcase-btn:hover { background: var(--green-ink); color: #fff; }
+@media (max-width: 1099px) { .showcase { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .showcase { grid-template-columns: minmax(0, 1fr); gap: 48px; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
+  .showcase-media { aspect-ratio: 1; }
+  .showcase-btn { width: 100%; justify-content: center; }
+}
 
 /* ---------- how it works ---------- */
 .steps { padding: clamp(72px, 9vw, 136px) 0; border-top: 1px solid var(--rule); }
@@ -255,7 +262,6 @@
   .kind-text { grid-column: 1; grid-row: 3; }
   .kind-arrow { grid-column: 2; grid-row: 2 / 4; align-self: end; width: 48px; height: 48px; }
   .kind.is-selected::before { width: 48px; top: auto; bottom: -1px; }
-  .page-home .carousel-pos { font-size: 24px; }
   .steps-list { grid-template-columns: minmax(0, 1fr); }
   .steps-no { margin-bottom: 14px; }
   .home-footer-actions .home-btn { width: 100%; }

@@ -88,7 +88,32 @@ function categoryPanels(c, { headingLevel = 3 } = {}) {
   ${others.length > 0 && html`<p class="kinds-more"><span class="home-label">Další druhy automatů na dotaz</span> ${others.map((cat) => html`<a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a>`).join('<span aria-hidden="true"> · </span>')}</p>`}`;
 }
 
-function categoryBrowser(c, { headingLevel = 3, layout = 'cards' } = {}) {
+/* Homepage offer: the machines of a category as an open gallery. Every machine gets the same image
+   well, standing on its bottom edge over a faint ground shadow, with its name, description, any
+   supplied specs or price and the "Mám zájem" action directly underneath. */
+function machineGallery(c, list, { headingLevel = 4, label } = {}) {
+  const h = `h${headingLevel}`;
+  return html`<ul class="showcase" aria-label="${esc(label)}">${list.map((p) => {
+    const href = c.url(productPath(p));
+    const keySpecs = p.specs.filter((s) => s.key && s.value != null && s.value !== '').slice(0, 4);
+    return html`<li class="showcase-item">
+      <a class="showcase-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p, { sizes: '(max-width: 600px) 92vw, (max-width: 1099px) 46vw, 420px' })}</a>
+      ${photoNote(p)}
+      <div class="showcase-body">
+        ${makerLine(p) && html`<p class="showcase-maker">${esc(makerLine(p))}</p>`}
+        <${h} class="showcase-title"><a href="${href}">${esc(p.name)}</a></${h}>
+        <p class="showcase-summary">${esc(p.summary)}</p>
+        ${keySpecs.length > 0 && html`<dl class="showcase-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
+        <div class="showcase-foot">
+          ${p.price != null && html`<p class="showcase-price">${esc(priceText(c, p))}</p>`}
+          <a class="showcase-btn" href="${href}#poptavka">Mám zájem<span class="visually-hidden">: ${esc(p.name)}</span></a>
+        </div>
+      </div>
+    </li>`;
+  })}</ul>`;
+}
+
+function categoryBrowser(c, { headingLevel = 3, layout = 'cards', gallery = false } = {}) {
   const h = `h${headingLevel}`;
   const selector = { index: categoryIndex, panels: categoryPanels }[layout];
   return html`<div class="browse browse-${layout}" data-browse>
@@ -105,7 +130,9 @@ function categoryBrowser(c, { headingLevel = 3, layout = 'cards' } = {}) {
       <a class="text-link" href="${c.url(`automaty/${cat.slug}/`)}">Celá kategorie ${ARROW}</a>
     </div>
     ${list.length
-      ? html`${photoNotice(list)}${carousel(c, list, { id: `carousel-${cat.slug}`, label: cat.name, headingLevel: headingLevel + 1 })}`
+      ? html`${photoNotice(list)}${gallery
+        ? machineGallery(c, list, { label: cat.name, headingLevel: headingLevel + 1 })
+        : carousel(c, list, { id: `carousel-${cat.slug}`, label: cat.name, headingLevel: headingLevel + 1 })}`
       : emptyCategory(c, cat, `h${headingLevel + 1}`)}
   </section>`;
   })}
@@ -180,7 +207,7 @@ export function home(c) {
 <link rel="stylesheet" href="${c.url('assets/css/home.css')}">
 ${img && html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">`}
 `,
-    scripts: ['assets/js/home.js', 'assets/js/carousel.js', 'assets/js/browse.js'],
+    scripts: ['assets/js/home.js', 'assets/js/browse.js'],
     body: html`
 <section class="hero" aria-labelledby="hero-title">
   <div class="home-wrap hero-inner">
@@ -224,7 +251,7 @@ ${img && html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">`}
       <h2 class="offer-title" id="offer-title">Vyberte si druh automatu</h2>
       <p class="offer-lead">Po výběru se níže zobrazí automaty, které v dané kategorii nabízíme.</p>
     </div>
-    ${categoryBrowser(c, { headingLevel: 3, layout: 'panels' })}
+    ${categoryBrowser(c, { headingLevel: 3, layout: 'panels', gallery: true })}
   </div>
 </section>
 
