@@ -1,19 +1,19 @@
 [
   {
-    "id": "vzor-01",
-    "slug": "vzorovy-instantni-automat-1",
-    "placeholder": true,
+    "id": "necta-brio-3",
+    "slug": "necta-brio-3",
+    "placeholder": false,
     "category": "instantni-kavove-automaty",
-    "name": "Instantní automat, vzorová položka 1",
+    "name": "Necta Brio 3",
     "manufacturer": null,
     "model": null,
     "type": null,
     "condition": null,
     "conditionDetails": null,
-    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "summary": "Kompaktní automat na teplé nápoje.",
     "description": [
-      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
-      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+      "Kompaktní automat na teplé nápoje.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
     ],
     "specs": [
       {
@@ -58,23 +58,96 @@
     "price": null,
     "availability": null,
     "images": [],
+    "dateAdded": "2026-10-20"
+  },
+  {
+    "id": "atlantis-select",
+    "slug": "atlantis-select",
+    "placeholder": false,
+    "category": "instantni-kavove-automaty",
+    "name": "Atlantis Select",
+    "manufacturer": null,
+    "model": null,
+    "type": null,
+    "condition": null,
+    "conditionDetails": null,
+    "summary": "Instantní automat na kávu a další teplé nápoje.",
+    "description": [
+      "Instantní automat na kávu a další teplé nápoje.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Napájení",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Počet nápojových voleb",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobníky instantních surovin",
+        "value": null,
+        "key": true
+      },
+      {
+        "label": "Zásobník kelímků",
+        "value": null,
+        "key": false
+      },
+      {
+        "label": "Připojení vody",
+        "value": null,
+        "key": false
+      }
+    ],
+    "features": [],
+    "paymentSystems": [],
+    "warranty": null,
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/atlantis-select/1.jpg",
+        "alt": "Atlantis Select, ilustrační fotografie podobného modelu",
+        "illustrative": true,
+        "credit": {
+          "label": "3stechnologies.in",
+          "url": "https://www.3stechnologies.in/products/select/10083"
+        },
+        "width": 1000,
+        "height": 1000
+      }
+    ],
     "dateAdded": "2026-10-19"
   },
   {
-    "id": "vzor-02",
-    "slug": "vzorovy-instantni-automat-2",
-    "placeholder": true,
+    "id": "crane-voce",
+    "slug": "crane-voce",
+    "placeholder": false,
     "category": "instantni-kavove-automaty",
-    "name": "Instantní automat, vzorová položka 2",
+    "name": "Crane Voce",
     "manufacturer": null,
     "model": null,
     "type": null,
     "condition": null,
     "conditionDetails": null,
-    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "summary": "Větší automat na teplé nápoje.",
     "description": [
-      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
-      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+      "Větší automat na teplé nápoje.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
     ],
     "specs": [
       {
@@ -118,24 +191,36 @@
     "warranty": null,
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/crane-voce/1.jpg",
+        "alt": "Crane Voce, ilustrační fotografie podobného modelu",
+        "illustrative": true,
+        "credit": {
+          "label": "ebay.co.uk",
+          "url": "https://www.ebay.co.uk/itm/326679664537"
+        },
+        "width": 1000,
+        "height": 1000
+      }
+    ],
     "dateAdded": "2026-10-18"
   },
   {
-    "id": "vzor-03",
-    "slug": "vzorovy-instantni-automat-3",
-    "placeholder": true,
+    "id": "necta-brio-alternativni-provedeni",
+    "slug": "necta-brio-alternativni-provedeni",
+    "placeholder": false,
     "category": "instantni-kavove-automaty",
-    "name": "Instantní automat, vzorová položka 3",
+    "name": "Necta Brio – alternativní provedení",
     "manufacturer": null,
     "model": null,
     "type": null,
     "condition": null,
     "conditionDetails": null,
-    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "summary": "Automat s výběrem více druhů kávy a teplých nápojů.",
     "description": [
-      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
-      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+      "Automat s výběrem více druhů kávy a teplých nápojů.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
     ],
     "specs": [
       {
@@ -179,24 +264,36 @@
     "warranty": null,
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/necta-brio-alternativni-provedeni/1.jpg",
+        "alt": "Necta Brio – alternativní provedení, ilustrační fotografie podobného modelu",
+        "illustrative": true,
+        "credit": {
+          "label": "quickservice.mi.it",
+          "url": "https://www.quickservice.mi.it/macchine.html"
+        },
+        "width": 585,
+        "height": 585
+      }
+    ],
     "dateAdded": "2026-10-17"
   },
   {
-    "id": "vzor-04",
-    "slug": "vzorovy-instantni-automat-4",
-    "placeholder": true,
+    "id": "nescafe-freshers-700-auto",
+    "slug": "nescafe-freshers-700-auto",
+    "placeholder": false,
     "category": "instantni-kavove-automaty",
-    "name": "Instantní automat, vzorová položka 4",
+    "name": "Nescafé Freshers 700 Auto",
     "manufacturer": null,
     "model": null,
     "type": null,
     "condition": null,
     "conditionDetails": null,
-    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "summary": "Starší typ instantního automatu s tlačítkovým panelem.",
     "description": [
-      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
-      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+      "Starší typ instantního automatu s tlačítkovým panelem.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
     ],
     "specs": [
       {
@@ -240,24 +337,36 @@
     "warranty": null,
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/nescafe-freshers-700-auto/1.jpg",
+        "alt": "Nescafé Freshers 700 Auto, ilustrační fotografie podobného modelu",
+        "illustrative": true,
+        "credit": {
+          "label": "gumtree.com",
+          "url": "https://www.gumtree.com/p/other-miscellaneous-goods/darenthmjs-refresh-700-auto-freevend-hot-drinks-vending-machine-/1485327509"
+        },
+        "width": 750,
+        "height": 1000
+      }
+    ],
     "dateAdded": "2026-10-16"
   },
   {
-    "id": "vzor-05",
-    "slug": "vzorovy-instantni-automat-5",
-    "placeholder": true,
+    "id": "colibri-c5",
+    "slug": "colibri-c5",
+    "placeholder": false,
     "category": "instantni-kavove-automaty",
-    "name": "Instantní automat, vzorová položka 5",
+    "name": "Colibri C5",
     "manufacturer": null,
     "model": null,
     "type": null,
     "condition": null,
     "conditionDetails": null,
-    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "summary": "Úzký automat na kávu a teplé nápoje.",
     "description": [
-      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
-      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+      "Úzký automat na kávu a teplé nápoje.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
     ],
     "specs": [
       {
@@ -301,24 +410,36 @@
     "warranty": null,
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/colibri-c5/1.jpg",
+        "alt": "Colibri C5, ilustrační fotografie podobného modelu",
+        "illustrative": true,
+        "credit": {
+          "label": "kafemati.com.mk",
+          "url": "https://kafemati.com.mk/shop/products?categories=vending-reparirani-kafemati"
+        },
+        "width": 540,
+        "height": 540
+      }
+    ],
     "dateAdded": "2026-10-15"
   },
   {
-    "id": "vzor-06",
-    "slug": "vzorovy-instantni-automat-6",
-    "placeholder": true,
+    "id": "wittenborg-5100",
+    "slug": "wittenborg-5100",
+    "placeholder": false,
     "category": "instantni-kavove-automaty",
-    "name": "Instantní automat, vzorová položka 6",
+    "name": "Wittenborg 5100",
     "manufacturer": null,
     "model": null,
     "type": null,
     "condition": null,
     "conditionDetails": null,
-    "summary": "Vzorová položka pro ukázku rozvržení katalogu. Nahraďte ji skutečným automatem.",
+    "summary": "Stolní automat na horké nápoje.",
     "description": [
-      "Vzorový popis. Sem patří skutečný popis automatu: výrobce, model, rok výroby a pro jaký provoz se hodí.",
-      "Uveďte jen ověřené údaje a skutečné fotografie konkrétního kusu."
+      "Stolní automat na horké nápoje.",
+      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
     ],
     "specs": [
       {
@@ -362,7 +483,19 @@
     "warranty": null,
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/wittenborg-5100/1.jpg",
+        "alt": "Wittenborg 5100, ilustrační fotografie podobného modelu",
+        "illustrative": true,
+        "credit": {
+          "label": "baumgarten-automatenservice.de",
+          "url": "https://www.baumgarten-automatenservice.de/produkte/tischger%C3%A4te/wittenborg-5100/"
+        },
+        "width": 558,
+        "height": 984
+      }
+    ],
     "dateAdded": "2026-10-14"
   }
 ]

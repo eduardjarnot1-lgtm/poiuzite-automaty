@@ -1,5 +1,6 @@
 // Builds the static site into dist/ from the data files in data/.
-// No dependencies: `node scripts/build.mjs [--data data] [--out dist]`.
+// No dependencies: `node scripts/build.mjs [--data data] [--out dist] [--explicit-index]`.
+// --explicit-index writes links as .../index.html, for previews on hosts without directory indexes.
 import { readFile, writeFile, mkdir, rm, cp } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +15,7 @@ const arg = (name, fallback) => {
 };
 const dataDir = arg('data', 'data');
 const out = arg('out', 'dist');
+const explicitIndex = process.argv.includes('--explicit-index');
 
 const load = async (f) => JSON.parse(await readFile(join(dataDir, f), 'utf8'));
 const site = await load('site.json');
@@ -65,7 +67,7 @@ const routes = [
 
 await rm(out, { recursive: true, force: true });
 for (const route of routes) {
-  const c = { site, categories, products, page: route, url: linker(route.path, route.absolute), absUrl };
+  const c = { site, categories, products, page: route, url: linker(route.path, route.absolute, explicitIndex), absUrl };
   const file = join(out, route.file || join(route.path, 'index.html'));
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, layout(c, route.render(c)));

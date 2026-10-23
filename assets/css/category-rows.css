@@ -1,0 +1,54 @@
+/* /automaty/: the machine types as a vertical sequence of editorial rows. Photo and text sit side by
+   side and swap sides from row to row; on phones each row stacks, photo first. Loaded only on this
+   page, and every rule is scoped to .type-rows, so nothing else on the site changes. */
+.type-rows { list-style: none; margin: 0; padding: 0; }
+.type-row {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center;
+  gap: clamp(28px, 6vw, 96px); padding: clamp(36px, 6vw, 88px) 0;
+}
+.type-row:nth-child(even) { background: var(--bg-alt); box-shadow: 0 0 0 100vmax var(--bg-alt); clip-path: inset(0 -100vmax); }   /* every other row sits on a soft full-width band */
+.type-row:nth-child(even) .type-media { background: var(--bg); }
+.type-row:nth-child(even) .type-media { order: 2; }             /* alternate: photo left, then right */
+
+.type-media {
+  position: relative; aspect-ratio: 5 / 4; background: var(--bg-alt); overflow: hidden;
+  display: grid; place-items: center;
+}
+.type-media img {
+  position: absolute; left: 8%; right: 8%; bottom: 7%; width: 84%; height: 86%;
+  object-fit: contain; object-position: center bottom;          /* whole machine, true proportions, standing on the floor */
+  mix-blend-mode: multiply; transition: transform .25s var(--ease);
+}
+.type-media::before { content: ""; position: absolute; left: 30%; right: 30%; bottom: 5%; height: 5%; background: radial-gradient(closest-side, rgba(0,0,0,.16), transparent); }   /* ground shadow, painted under the photo */
+.type-media.is-empty { gap: 14px; align-content: center; }
+.type-media.is-empty::before { display: none; }
+.type-media .cat-icon { width: clamp(72px, 9vw, 112px); height: auto; padding: 0; background: none; box-shadow: none; color: var(--line-strong); }
+.type-media-note { font-size: 13px; color: var(--muted); }
+
+.type-text { max-width: 30rem; }
+.type-no { display: block; margin-bottom: 18px; font: 500 12px/1 var(--mono); letter-spacing: .06em; color: var(--muted); }
+.type-name { margin: 0 0 14px; font-size: clamp(30px, 3.4vw, 48px); font-weight: 300; letter-spacing: -.025em; line-height: 1.08; }
+.type-name a { color: var(--ink); text-decoration: none; }
+.type-name a::after { content: ""; position: absolute; inset: 0; }   /* the whole row is the link target */
+.type-short { margin: 0 0 22px; font-size: 17px; line-height: 1.55; color: var(--ink-soft); }
+.type-count { margin: 0; padding-top: 14px; border-top: 1px solid var(--line); font: 500 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+
+.type-go { display: inline-flex; align-items: center; gap: 10px; margin-top: 26px; min-height: 44px; padding: 0 20px; background: var(--ink); color: #fff; border-radius: var(--round); font-size: 14px; font-weight: 500; transition: background-color .2s; }   /* visual cue only: the whole row is the link */
+.type-go .icon { width: 16px; height: 16px; transition: transform .2s var(--ease); }
+.type-row:hover .type-go { background: var(--accent-hover); }
+.type-row:hover .type-go .icon { transform: translateX(3px); }
+.browse.is-enhanced .type-go .icon { transform: rotate(90deg); }   /* with JS the machines open below, so the arrow points down */
+.type-row:hover .type-media img { transform: translateY(-4px); }
+.type-row:hover .type-name a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.type-row:has(a:focus-visible) { outline: 2px solid var(--accent); outline-offset: 6px; }
+.type-row a:focus-visible { outline: none; }
+.type-row.is-selected .type-count { color: var(--ink); border-top-color: var(--ink); }
+.type-row.is-selected .type-count::after { content: " · vybráno"; }
+
+@media (max-width: 760px) {
+  .type-row { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 36px 0; }
+  .type-row:nth-child(even) .type-media { order: 0; }           /* phones: always photo first */
+  .type-media { aspect-ratio: 4 / 3; }
+  .type-text { max-width: none; }
+  .type-no { margin-bottom: 10px; }
+}

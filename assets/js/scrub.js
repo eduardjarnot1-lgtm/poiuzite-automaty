@@ -57,11 +57,14 @@
     coverShare = cover && c + v > 0 ? c / (c + v) : 0;
   }
 
+  // The frame pins below the sticky site header, so measure against the frame, not the window.
+  var frame = section.querySelector('.scrub-sticky');
   function progress() {
     var r = section.getBoundingClientRect();
-    travel = r.height - window.innerHeight;
+    var pinTop = parseFloat(getComputedStyle(frame).top) || 0;
+    travel = r.height - frame.offsetHeight;
     if (travel <= 0) return 0;
-    return clamp(-r.top / travel, 0, 1);
+    return clamp((pinTop - r.top) / travel, 0, 1);
   }
 
   function smooth(x) { return x * x * (3 - 2 * x); }
@@ -79,7 +82,7 @@
     if (state === 2) return;
     var e = smooth(p);
     var lift = Math.pow(clamp((p - 0.08) / 0.92, 0, 1), 1.35);
-    var h = window.innerHeight;
+    var h = frame.offsetHeight;
     leafTop.style.transform = p ? 'translate3d(0,' + (-lift * h * 1.1).toFixed(1) + 'px,0) rotateX(' + (58 * e).toFixed(2) + 'deg)' : '';
     leafBottom.style.transform = p ? 'rotateX(' + (-128 * e).toFixed(2) + 'deg)' : '';
     leafTop.style.setProperty('--shade', (0.08 * e).toFixed(3));

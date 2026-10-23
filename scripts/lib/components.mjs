@@ -29,7 +29,26 @@ const NAV = [
 ];
 const current = (c, path) => (c.page.section === path ? ' aria-current="page"' : '');
 
-export function header(c) {
+// The homepage uses a slimmer header: three anchors into the page and one enquiry action.
+const HOME_NAV = [['#nabidka', 'Nabídka'], ['#jak-to-funguje', 'Jak to funguje'], ['kontakt/', 'Kontakt']];
+const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
+
+export function header(c, variant = '') {
+  if (variant === 'home') return html`<header class="site-header site-header-home">
+  <div class="wrap header-inner">
+    ${logo(c)}
+    <nav class="site-nav" id="site-nav" aria-label="Hlavní navigace">
+      <ul class="nav-list">
+        ${HOME_NAV.map(([path, label]) => html`<li><a href="${path.startsWith('#') ? path : c.url(path)}">${label}</a></li>`)}
+      </ul>
+      ${hasContact(c) && html`<div class="nav-contact">${c.site.contact.phone && phoneLink(c)}${c.site.contact.email && emailLink(c)}</div>`}
+    </nav>
+    <a class="header-cta" href="${c.url('kontakt/')}#formular">Poptat automat</a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-bars" aria-hidden="true"></span><span class="visually-hidden">Menu</span>
+    </button>
+  </div>
+</header>`;
   return html`<header class="site-header">
   <div class="wrap header-inner">
     ${logo(c)}
@@ -57,8 +76,28 @@ export function header(c) {
 }
 
 /* ---------- footer ---------- */
-export function footer(c) {
+export function footer(c, variant = '') {
   const ct = c.site.contact;
+  // Homepage footer: a closing line and the enquiry action; contact details only once supplied.
+  if (variant === 'home') return html`<footer class="site-footer home-footer" aria-labelledby="footer-title">
+  <div class="home-footer-main">
+    <p class="home-label">Poptávka</p>
+    <h2 class="home-footer-title" id="footer-title">Najdeme pro vás vhodný automat.</h2>
+    <p class="home-footer-text">Napište nám, jaký automat a pro jaký provoz hledáte. Ozveme se s nabídkou.</p>
+    <div class="home-footer-actions">
+      <a class="home-btn" href="${c.url('kontakt/')}#formular">Napsat poptávku ${ARROW}</a>
+      ${hasContact(c) && html`<p class="home-footer-direct">${ct.phone && phoneLink(c)}${ct.email && emailLink(c)}</p>`}
+    </div>
+  </div>
+  <div class="home-footer-base">
+    <nav aria-label="Odkazy v patičce"><ul>
+      <li><a href="${c.url('automaty/')}">Všechny kategorie</a></li>
+      ${NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}
+      <li><a href="${c.url('kontakt/')}">Kontakt</a></li>
+    </ul></nav>
+    <p>© ${new Date().getFullYear()} ${esc(c.site.name)}${ct.address ? ` · ${esc(ct.address)}` : ''}${ct.companyId ? ` · IČO ${esc(ct.companyId)}` : ''}</p>
+  </div>
+</footer>`;
   return html`<footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
@@ -119,13 +158,17 @@ export function conditionBadge(c, p) {
   return html`${p.placeholder && '<span class="badge badge-ph">Vzorová položka</span>'}${cond && html`<span class="badge badge-${esc(p.condition)}">${esc(cond.label)}</span>`}`;
 }
 
-// First image, or a neutral drawing that says the photo is still to come.
+// Photos may be local (assets/products/...) or full URLs to another site.
+export const mediaUrl = (c, src) => (/^https?:\/\//.test(src) ? src : c.url(src));
+
+// First image, or a neutral drawing that says the photo is still to come. data-fallback lets
+// site.js swap in that drawing when a remote photo fails to load.
 export function productImage(c, p, { index = 0, eager = false, sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 360px' } = {}) {
   const img = p.images[index];
   if (!img) {
     return html`<img src="${c.url('assets/img/placeholder-automat.svg')}" alt="Fotografie automatu bude doplněna" width="600" height="450" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
-  return html`<img src="${c.url(img.src)}"${img.srcset?.length > 0 && html` srcset="${img.srcset.map((s) => `${c.url(s.src)} ${s.w}w`).join(', ')}" sizes="${sizes}"`} alt="${esc(img.alt || p.name)}" width="${img.width || 800}" height="${img.height || 600}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+  return html`<img src="${mediaUrl(c, img.src)}"${img.srcset?.length > 0 && html` srcset="${img.srcset.map((s) => `${mediaUrl(c, s.src)} ${s.w}w`).join(', ')}" sizes="${sizes}"`} data-fallback="${c.url('assets/img/placeholder-automat.svg')}" alt="${esc(img.alt || p.name)}" width="${img.width || 800}" height="${img.height || 600}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
 
 const specValue = (v) => (v == null || v === '' ? ph('doplní se') : esc(v));
@@ -153,6 +196,55 @@ export function productCard(c, p, { headingLevel = 2 } = {}) {
 }
 
 export { specValue };
+
+// Small credit line for photos that show a similar model rather than the unit for sale.
+export const photoNote = (p, img = p.images[0]) =>
+  img?.illustrative &&
+  html`<p class="photo-note">Ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
+
+/* ---------- machine carousel ----------
+   A horizontally scrolling list: native scroll-snap gives swipe on touch and keeps working without
+   JS. assets/js/carousel.js adds the arrows, the position indicator and arrow-key navigation. */
+function machineSlide(c, p, i, n, headingLevel) {
+  const href = c.url(productPath(p));
+  const h = `h${headingLevel}`;
+  // Cards show only what was supplied: filled-in key specs, and a price when there is one.
+  const keySpecs = p.specs.filter((s) => s.key && s.value != null && s.value !== '').slice(0, 4);
+  return html`<li class="slide" aria-roledescription="snímek" aria-label="${i + 1} z ${n}: ${esc(p.name)}">
+  <a class="slide-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p, { sizes: '(max-width: 640px) 84vw, (max-width: 1100px) 46vw, 380px' })}</a>
+  ${photoNote(p)}
+  <div class="slide-body">
+    ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
+    <${h} class="slide-title"><a href="${href}">${esc(p.name)}</a></${h}>
+    <p class="slide-summary">${esc(p.summary)}</p>
+    ${keySpecs.length > 0 && html`<dl class="slide-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
+    <div class="slide-foot">
+      ${p.price != null && html`<p class="slide-price">${esc(priceText(c, p))}</p>`}
+      <a class="btn btn-primary" href="${href}#poptavka">Mám zájem<span class="visually-hidden">: ${esc(p.name)}</span></a>
+    </div>
+  </div>
+</li>`;
+}
+
+// "01 / 07": the counter is zero-padded to the width of the total.
+const pad = (i, n) => String(i).padStart(Math.max(2, String(n).length), '0');
+
+export function carousel(c, list, { id, label, headingLevel = 3 } = {}) {
+  const n = list.length;
+  return html`<div class="carousel" data-carousel role="region" aria-roledescription="karusel" aria-label="${esc(label)}">
+  <div class="carousel-bar">
+    <p class="carousel-pos" data-carousel-pos><span class="visually-hidden">Automat </span><span data-carousel-current>${pad(1, n)}</span> / ${pad(n, n)}</p>
+    <div class="carousel-progress" aria-hidden="true"><span data-carousel-progress></span></div>
+    <div class="carousel-nav" data-carousel-nav hidden>
+      <button class="carousel-btn" type="button" data-carousel-prev aria-controls="${id}" aria-label="Předchozí automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="carousel-btn" type="button" data-carousel-next aria-controls="${id}" aria-label="Další automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+  <ul class="carousel-track" id="${id}" tabindex="0" aria-label="${esc(label)}: ${n} ${n === 1 ? 'automat' : n < 5 ? 'automaty' : 'automatů'}, posouvejte šipkami doleva a doprava">
+    ${list.map((p, i) => machineSlide(c, p, i, n, headingLevel))}
+  </ul>
+</div>`;
+}
 
 /* ---------- enquiry form ----------
    Netlify detects the form from the built HTML (data-netlify). When site.forms.endpoint is set
@@ -210,10 +302,10 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
 }
 
 /* ---------- the document ---------- */
-export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage }) {
+export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage, variant = '' }) {
   const fullTitle = c.page.path === '' ? title : `${title} | ${c.site.name}`;
   const canonical = c.absUrl && !c.page.noindex ? c.absUrl(c.page.path) : null;
-  const og = ogImage && c.absUrl ? c.absUrl(ogImage) : null;
+  const og = ogImage && (/^https?:\/\//.test(ogImage) ? ogImage : c.absUrl ? c.absUrl(ogImage) : null);
   return html`<!doctype html>
 <html lang="cs">
 <head>
@@ -225,21 +317,21 @@ ${c.page.noindex && '<meta name="robots" content="noindex">\n'}${canonical && ht
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:locale" content="cs_CZ">
-${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="#f7f7f4">
+${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="#ffffff">
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Code+Pro:wght@500&display=swap">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
 ${head}<script>document.documentElement.classList.add('js')</script>
 </head>
 <body class="${bodyClass}">
 <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
-${header(c)}
+${header(c, variant)}
 <main id="obsah" tabindex="-1">
 ${body}
 </main>
-${footer(c)}
+${footer(c, variant)}
 <script src="${c.url('assets/js/site.js')}" defer></script>
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}</body>
 </html>
