@@ -62,6 +62,32 @@ function categoryIndex(c, { headingLevel = 3 } = {}) {
   })}</ol>`;
 }
 
+/* /automaty/: the machine types as alternating editorial rows, a representative photo beside the
+   name, description and count. A category without a supplied photo keeps its line drawing in the
+   image area instead of borrowing another machine's picture. */
+function categoryRows(c, { headingLevel = 2 } = {}) {
+  const h = `h${headingLevel}`;
+  const picks = c.site.home?.categoryPhotos || {};
+  return html`<ol class="type-rows">${c.categories.map((cat, i) => {
+    const list = real(c.products.filter((p) => p.category === cat.slug)).sort(byNewest);
+    const rep = list.find((p) => p.id === picks[cat.slug]) || list.find((p) => p.images[0]);
+    const img = rep?.images[0];
+    return html`<li class="type-row">
+      <div class="type-media${img ? '' : ' is-empty'}" aria-hidden="true">
+        ${img
+          ? html`<img src="${mediaUrl(c, img.src)}" data-fallback="${c.url('assets/img/placeholder-automat.svg')}" alt="" width="${img.width || 600}" height="${img.height || 600}" loading="${i ? 'lazy' : 'eager'}" decoding="async">`
+          : html`${catIcon(cat.slug)}<span class="type-media-note">Fotografie bude doplněna</span>`}
+      </div>
+      <div class="type-text">
+        <span class="type-no" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
+        <${h} class="type-name"><a href="${c.url(`automaty/${cat.slug}/`)}" data-browse-cat="${esc(cat.slug)}" aria-controls="nabidka-${esc(cat.slug)}">${esc(cat.name)}</a></${h}>
+        <p class="type-short">${esc(cat.short)}</p>
+        <p class="type-count">${list.length ? countLabel(list.length) : 'Nabídka na dotaz'}</p>
+      </div>
+    </li>`;
+  })}</ol>`;
+}
+
 /* Homepage: one editorial panel per category that actually has machines, with a representative
    photo (site.home.categoryPhotos picks it, else the newest machine's). Empty categories are listed
    in one quiet line below, as plain links to their pages. */
@@ -115,7 +141,7 @@ function machineGallery(c, list, { headingLevel = 4, label } = {}) {
 
 function categoryBrowser(c, { headingLevel = 3, layout = 'cards', gallery = false } = {}) {
   const h = `h${headingLevel}`;
-  const selector = { index: categoryIndex, panels: categoryPanels }[layout];
+  const selector = { index: categoryIndex, panels: categoryPanels, rows: categoryRows }[layout];
   return html`<div class="browse browse-${layout}" data-browse>
   ${selector ? selector(c, { headingLevel }) : categoryCards(c, { headingLevel, browse: true })}
   <p class="browse-hint" data-browse-hint hidden>Vyberte kategorii a níže se zobrazí automaty, které v ní nabízíme.</p>
@@ -275,6 +301,8 @@ ${img && html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">`}
 export function categoriesIndex(c) {
   return {
     title: 'Kategorie prodejních automatů',
+    head: html`<link rel="stylesheet" href="${c.url('assets/css/category-rows.css')}">
+`,
     scripts: ['assets/js/carousel.js', 'assets/js/browse.js'],
     description: 'Všechny kategorie použitých a repasovaných prodejních automatů: instantní a zrnkové kávové automaty, automaty na snacky, chlazené nápoje a kombinované automaty.',
     body: html`
@@ -285,7 +313,7 @@ export function categoriesIndex(c) {
     <p class="lead">Vyberte kategorii a zobrazí se automaty, které v ní nabízíme. Pokud hledaný automat nevidíte, napište nám a zjistíme, co je k dispozici.</p>
   </div>
 </div>
-<section class="section"><div class="wrap">${categoryBrowser(c, { headingLevel: 2 })}</div></section>`,
+<section class="section"><div class="wrap">${categoryBrowser(c, { headingLevel: 2, layout: 'rows' })}</div></section>`,
   };
 }
 
