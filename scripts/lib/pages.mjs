@@ -83,6 +83,7 @@ function categoryRows(c, { headingLevel = 2 } = {}) {
         <${h} class="type-name"><a href="${c.url(`automaty/${cat.slug}/`)}" data-browse-cat="${esc(cat.slug)}" aria-controls="nabidka-${esc(cat.slug)}">${esc(cat.name)}</a></${h}>
         <p class="type-short">${esc(cat.short)}</p>
         <p class="type-count">${list.length ? countLabel(list.length) : 'Nabídka na dotaz'}</p>
+        <span class="type-go" aria-hidden="true">Zobrazit kategorii ${ARROW}</span>
       </div>
     </li>`;
   })}</ol>`;

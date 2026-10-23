@@ -6,7 +6,8 @@
   position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center;
   gap: clamp(28px, 6vw, 96px); padding: clamp(36px, 6vw, 88px) 0;
 }
-.type-row + .type-row { border-top: 1px solid var(--line); }
+.type-row:nth-child(even) { background: var(--bg-alt); box-shadow: 0 0 0 100vmax var(--bg-alt); clip-path: inset(0 -100vmax); }   /* every other row sits on a soft full-width band */
+.type-row:nth-child(even) .type-media { background: var(--bg); }
 .type-row:nth-child(even) .type-media { order: 2; }             /* alternate: photo left, then right */
 
 .type-media {
@@ -32,6 +33,11 @@
 .type-short { margin: 0 0 22px; font-size: 17px; line-height: 1.55; color: var(--ink-soft); }
 .type-count { margin: 0; padding-top: 14px; border-top: 1px solid var(--line); font: 500 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 
+.type-go { display: inline-flex; align-items: center; gap: 10px; margin-top: 26px; min-height: 44px; padding: 0 20px; background: var(--ink); color: #fff; border-radius: var(--round); font-size: 14px; font-weight: 500; transition: background-color .2s; }   /* visual cue only: the whole row is the link */
+.type-go .icon { width: 16px; height: 16px; transition: transform .2s var(--ease); }
+.type-row:hover .type-go { background: var(--accent-hover); }
+.type-row:hover .type-go .icon { transform: translateX(3px); }
+.browse.is-enhanced .type-go .icon { transform: rotate(90deg); }   /* with JS the machines open below, so the arrow points down */
 .type-row:hover .type-media img { transform: translateY(-4px); }
 .type-row:hover .type-name a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
 .type-row:has(a:focus-visible) { outline: 2px solid var(--accent); outline-offset: 6px; }
@@ -40,7 +46,7 @@
 .type-row.is-selected .type-count::after { content: " · vybráno"; }
 
 @media (max-width: 760px) {
-  .type-row { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 32px 0; }
+  .type-row { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 36px 0; }
   .type-row:nth-child(even) .type-media { order: 0; }           /* phones: always photo first */
   .type-media { aspect-ratio: 4 / 3; }
   .type-text { max-width: none; }
