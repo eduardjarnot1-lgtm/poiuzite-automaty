@@ -30,9 +30,9 @@
 .scrub-panel { display: grid; align-content: start; gap: 10px; padding-top: 20px; border-top: 1px solid var(--scrub-rule); min-width: 0; }
 .scrub-intro, .scrub-closing { grid-column: 1 / -1; border-top: 0; padding-top: 0; }
 .scrub-closing { justify-items: start; }
-.scrub h2 { margin: 0; font-weight: 600; letter-spacing: -.04em; line-height: 1.05; font-size: clamp(32px, 4vw, 58px); text-wrap: balance; max-width: 16ch; }
+.scrub h2 { margin: 0; font-weight: 300; letter-spacing: -.03em; line-height: 1.05; font-size: clamp(32px, 4vw, 58px); text-wrap: balance; max-width: 16ch; }
 .scrub h3 { margin: 0; font-weight: 600; letter-spacing: -.015em; font-size: clamp(21px, 1.8vw, 28px); line-height: 1.15; text-wrap: balance; }
-.scrub-closing h3 { font-weight: 600; letter-spacing: -.04em; font-size: clamp(30px, 3.6vw, 52px); }
+.scrub-closing h3 { font-weight: 300; letter-spacing: -.03em; font-size: clamp(30px, 3.6vw, 52px); }
 .scrub-panel p { margin: 0; color: var(--scrub-soft); font-size: clamp(16px, 1.2vw, 19px); line-height: 1.55; max-width: 40ch; }
 .scrub-no { color: var(--accent); font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
 .scrub-hint, .scrub-progress { display: none; }
@@ -42,11 +42,14 @@
 
 /* ---- scroll-scrub layout ---- */
 .js-scrub .scrub {
-  height: calc(100vh + (var(--cover-distance) + var(--scrub-distance)) * 1vh);
-  height: calc(100svh + (var(--cover-distance) + var(--scrub-distance)) * 1svh);
+  /* where the frame pins: 0 while the site header scrolls away on this page (site.css);
+     set it to var(--header-h) if the header is ever made sticky here */
+  --scrub-pin: 0px;
+  height: calc(100vh - var(--scrub-pin) + (var(--cover-distance) + var(--scrub-distance)) * 1vh);
+  height: calc(100svh - var(--scrub-pin) + (var(--cover-distance) + var(--scrub-distance)) * 1svh);
 }
 .js-scrub .scrub-sticky {
-  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  position: sticky; top: var(--scrub-pin); height: calc(100vh - var(--scrub-pin)); height: calc(100svh - var(--scrub-pin)); overflow: hidden;
   display: block; max-width: none; margin: 0; padding: 0;
 }
 .js-scrub .scrub-media { position: absolute; inset: 0; background: var(--scrub-bg); }
@@ -81,7 +84,7 @@
   opacity: 1; transform: none; visibility: visible;
   transition: opacity .45s ease .05s, transform .55s cubic-bezier(.2,.7,.2,1) .05s, visibility 0s;
 }
-.js-scrub .scrub-panel h3 { font-size: clamp(28px, 3vw, 44px); font-weight: 600; letter-spacing: -.04em; }
+.js-scrub .scrub-panel h3 { font-size: clamp(28px, 3vw, 44px); font-weight: 300; letter-spacing: -.03em; }
 .js-scrub .scrub-hint {
   display: inline-flex; align-items: center; gap: 12px; margin-top: 18px;
   font-size: 14px; font-weight: 600; color: var(--scrub-soft);
@@ -175,7 +178,7 @@
   color: #cdc8c0; filter: drop-shadow(0 1px 0 rgba(255,255,255,.6)) drop-shadow(0 -1px 0 rgba(17,19,18,.12));
 }
 .cover-mark svg { display: block; width: 100%; height: 100%; }
-.cover-handle {   /* green pull tab on the hatch's lower edge */
+.cover-handle {   /* accent pull tab on the hatch's lower edge */
   position: absolute; left: 50%; bottom: clamp(30px, 5vh, 52px); width: 88px; height: 10px; margin-left: -44px;
   border-radius: 6px; background: var(--accent); box-shadow: 0 2px 0 rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.25) inset;
 }

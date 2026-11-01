@@ -111,8 +111,8 @@
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-.hero .eyebrow { margin: 0 0 4px; background: rgba(255,255,255,.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.hero h1 { margin: 0; font-weight: 600; letter-spacing: -.045em; line-height: 1; font-size: clamp(38px, 5vw, 80px); text-wrap: balance; }
+.hero .eyebrow { margin: 0 0 4px; padding: 6px 12px; border-radius: var(--round); background: rgba(255,255,255,.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.hero h1 { margin: 0; font-weight: 300; letter-spacing: -.035em; line-height: 1.02; font-size: clamp(38px, 5vw, 80px); text-wrap: balance; }
 .hero h1 span { display: block; }
 .hero .sub { margin: 0; max-width: 42ch; color: var(--ink-soft); font-size: clamp(16px, 1.3vw, 20px); font-weight: 400; text-wrap: balance; }
 .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }

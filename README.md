@@ -12,13 +12,15 @@ node scripts/check.mjs     # checks links, anchors, titles, descriptions, headin
 npx http-server dist -p 8080
 ```
 
+For a preview on a host without directory indexes (such as a Claude artifact), add `--explicit-index` so links point at `…/index.html`.
+
 Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish `dist`).
 
 ## Pages
 
 | URL | Page |
 | --- | --- |
-| `/` | Homepage: hero, introduction, categories, latest machines, services, call to action |
+| `/` | Homepage: hero, short introduction, category panels with the machine carousel, how it works, enquiry footer |
 | `/automaty/` | All categories |
 | `/automaty/<category>/` | Category catalogue with filters and sorting |
 | `/automaty/<category>/<product>/` | Product detail with gallery, specs table, enquiry form, related machines |
@@ -36,11 +38,13 @@ Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, produ
 - `data/site.json`: company name, contact details, `baseUrl` (needed for canonical links and the sitemap; Netlify's own URL is used if empty), form endpoint, price settings and the wording of the condition grades.
 - `data/categories.json`: categories, their intros and meta descriptions.
 - `data/products.json`: the machines. Each has `id`, `slug`, `category`, `name`, `manufacturer`, `model`, `type`, `condition` (`pouzity`, `repasovany` or `renovovany`), `conditionDetails`, `summary`, `description` (paragraphs), `specs` (`label`, `value`, `key: true` to show it on the card), `features`, `paymentSystems`, `warranty`, `price` (number, or `null` for "Cena na dotaz"), `availability`, `images` (`src`, `alt`, optional `width`, `height`, `thumb`, `srcset: [{src, w}]`), `dateAdded` and optional `related` ids.
-- Product photos go in `assets/products/<slug>/` and are referenced as `assets/products/<slug>/1.webp`.
+- Product photos go in `assets/products/<slug>/` and are referenced as `assets/products/<slug>/1.webp`. A full `https://` URL also works. Mark a photo of a similar model (not the unit for sale) with `"illustrative": true` and `"credit": {"label", "url"}`: it gets an "Ilustrační foto" line with the source, and a photo that fails to load is replaced by the neutral drawing.
+- Homepage: editorial layout (`assets/css/home.css`, `assets/js/home.js`; Bodoni Moda from Google Fonts plus the site's Inter). It has its own slim header and footer (`variant: 'home'` in `pages.mjs`). The machine in the hero is set by `home.heroProduct` in `data/site.json`; keep its photo about 1000 px wide on a white background. Each category panel's photo comes from `home.categoryPhotos` (category slug → product id), else the newest machine. Only categories with machines get a panel; the rest are listed as links. Display green `#4c9e8b` is for large type only; small text, states and focus use `#2f7a68`. The earlier 3D before/after hero (`hero.css`, `hero.js`, `assets/img/hero-*`) is no longer used.
+- Browsing: the category cards on the homepage and `/automaty/` reveal that category's machines below in a carousel (`assets/js/browse.js`, `assets/js/carousel.js`); without JS they link to the category pages, which use the same carousel.
 
 The build stops with a clear message if a product has a missing field, an unknown category or condition, a duplicate slug, or an image without alt text.
 
-**Placeholders.** No real product data, photos, prices or contact details were supplied yet, so the catalogue holds six sample items (`"placeholder": true`) and missing facts are shown as dashed yellow "doplníme / doplní se" labels. Sample products are marked "Vzorová položka", carry a notice on the catalogue and are `noindex`. Replace them with real machines, fill in `site.json`, and set each condition's `verified` to `true` once the wording is confirmed.
+**Placeholders.** The catalogue holds the 7 instant hot-drink machines supplied so far, with only their name, a one-line description and a reference photo of a similar model (check the photo licences before going live, or replace them with your own photos). Missing facts are shown as dashed yellow "doplníme / doplní se" labels. Products marked `"placeholder": true` show "Vzorová položka" and are `noindex`. Replace them with real machines, fill in `site.json`, and set each condition's `verified` to `true` once the wording is confirmed.
 
 **Catalogue controls follow the data.** A filter appears only when at least two machines differ in that field (manufacturer, condition, type), price filtering and sorting appear once two machines have prices, and search appears from `catalogue.searchMinProducts` machines (8). Without JavaScript the full list still shows.
 

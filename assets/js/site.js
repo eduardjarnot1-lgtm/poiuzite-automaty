@@ -12,6 +12,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
     });
+    nav.addEventListener('click', (e) => { if (e.target.closest('a[href^="#"]')) setOpen(false); });   // in-page links close the menu
     matchMedia('(min-width: 1061px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
   }
 
@@ -106,4 +107,16 @@
       }
     });
   });
+})();
+
+/* ---------- photos from other sites: show the neutral drawing if one fails to load ---------- */
+(() => {
+  const swap = (img) => {
+    if (!img.dataset.fallback || img.src.endsWith(img.dataset.fallback.replace(/^(\.\.\/)+/, ''))) return;
+    img.removeAttribute('srcset');
+    img.src = img.dataset.fallback;
+    img.closest('.slide, .gallery, .card')?.classList.add('has-missing-photo');
+  };
+  document.addEventListener('error', (e) => { if (e.target.tagName === 'IMG') swap(e.target); }, true);
+  document.querySelectorAll('img[data-fallback]').forEach((img) => { if (img.complete && img.naturalWidth === 0 && img.currentSrc) swap(img); });
 })();
