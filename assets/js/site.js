@@ -13,7 +13,7 @@
       if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
     });
     nav.addEventListener('click', (e) => { if (e.target.closest('a[href^="#"]')) setOpen(false); });   // in-page links close the menu
-    matchMedia('(min-width: 1061px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
+    matchMedia('(min-width: 961px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
   }
 
   /* ---------- category submenu (desktop: also opens on hover / focus) ---------- */

@@ -20,10 +20,10 @@ Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish
 
 | URL | Page |
 | --- | --- |
-| `/` | Homepage: hero, short introduction, category panels with the machine carousel, how it works, enquiry footer |
-| `/automaty/` | All categories |
-| `/automaty/<category>/` | Category catalogue with filters and sorting |
-| `/automaty/<category>/<product>/` | Product detail with gallery, specs table, enquiry form, related machines |
+| `/` | Homepage: two-column hero, every published machine in a grid, categories available on enquiry, how enquiries work, refurbishment and service, contact call to action |
+| `/automaty/` | Nabídka automatů: published machines per category, then the categories available on enquiry |
+| `/automaty/<category>/` | Category page: its machines in the product grid, or an "on enquiry" explanation with the form when it has none |
+| `/automaty/<category>/<product>/` | Product detail: photo beside the summary, specifications (missing ones listed in one line), condition, enquiry form with the product filled in, other machines |
 | `/repasovane-automaty/` | Refurbished and renovated machines, condition grades, the scroll-controlled video |
 | `/nahradni-dily/` | Spare parts enquiry |
 | `/servis/` | Repairs, servicing and maintenance |
@@ -31,7 +31,7 @@ Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish
 | `/kontakt/` | Phone, e-mail, address and contact form |
 | `/dekujeme/` | Thank-you page after a form is sent without JavaScript |
 
-Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, product card, enquiry form) and `pages.mjs` (one function per page).
+Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, product card, contact call to action, enquiry form) and `pages.mjs` (one function per page).
 
 ## Editing content
 
@@ -39,8 +39,10 @@ Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, produ
 - `data/categories.json`: categories, their intros and meta descriptions.
 - `data/products.json`: the machines. Each has `id`, `slug`, `category`, `name`, `manufacturer`, `model`, `type`, `condition` (`pouzity`, `repasovany` or `renovovany`), `conditionDetails`, `summary`, `description` (paragraphs), `specs` (`label`, `value`, `key: true` to show it on the card), `features`, `paymentSystems`, `warranty`, `price` (number, or `null` for "Cena na dotaz"), `availability`, `images` (`src`, `alt`, optional `width`, `height`, `thumb`, `srcset: [{src, w}]`), `dateAdded` and optional `related` ids.
 - Product photos go in `assets/products/<slug>/` and are referenced as `assets/products/<slug>/1.webp`. A full `https://` URL also works. Mark a photo of a similar model (not the unit for sale) with `"illustrative": true` and `"credit": {"label", "url"}`: it gets an "Ilustrační foto" line with the source, and a photo that fails to load is replaced by the neutral drawing.
-- Homepage: editorial layout (`assets/css/home.css`, `assets/js/home.js`; Bodoni Moda from Google Fonts plus the site's Inter). It has its own slim header and footer (`variant: 'home'` in `pages.mjs`). The machine in the hero is set by `home.heroProduct` in `data/site.json`; keep its photo about 1000 px wide on a white background. Each category panel's photo comes from `home.categoryPhotos` (category slug → product id), else the newest machine. Only categories with machines get a panel; the rest are listed as links. Display green `#4c9e8b` is for large type only; small text, states and focus use `#2f7a68`. The earlier 3D before/after hero (`hero.css`, `hero.js`, `assets/img/hero-*`) is no longer used.
-- Browsing: the category cards on the homepage and `/automaty/` reveal that category's machines below in a carousel (`assets/js/browse.js`, `assets/js/carousel.js`); without JS they link to the category pages, which use the same carousel.
+- Design: one stylesheet, `assets/css/site.css`, for every page (Inter, white and warm light grey, charcoal text, deep green `#1d5c43` for actions, 8–12px corners, 1200px content width, 8px spacing scale). The refurbishment page adds `servis.css` for its video section. Change the look through the tokens at the top of `site.css`.
+- Header: "Nabídka automatů" (with a submenu of all machine types), "Repase a servis" (the refurbishment, service and spare-parts pages, linked to each other by a sub-navigation), "O nás", "Kontakt" and the "Poptat automat" button. The list is `NAV` in `components.mjs`.
+- Homepage: the hero machine is set by `home.heroProduct` in `data/site.json`. All published machines show immediately in a 3/2/1-column grid (desktop/tablet/phone); categories without published machines are listed separately as "na dotaz". Nothing on the page depends on JavaScript.
+- Product cards: every card has the same 4:3 image well (`object-fit: contain`, so photos are never cropped), the photo credit line, name, one-line summary, the price or "Cena na dotaz" and the "Detail automatu" link.
 
 The build stops with a clear message if a product has a missing field, an unknown category or condition, a duplicate slug, or an image without alt text.
 

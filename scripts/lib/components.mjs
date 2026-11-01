@@ -1,6 +1,9 @@
 // Reusable page parts: layout, header, footer, breadcrumbs, product cards, enquiry form.
 import { esc, html, ph, czk } from './util.mjs';
 
+const INFO = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>';
+export const CHECK = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+export { INFO };
 const LEAF = '<path d="M27 4C14 4 5 10 5 20c0 3 1 5.5 2.5 7.5C9 18 15 13 22 10 16 14 11 19 9 28.5 11 29.5 13 30 15 30c9 0 14-8 12-26z" fill="currentColor"/>';
 export const ARROW = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const PHONE = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
@@ -20,63 +23,53 @@ export const emailLink = (c, cls = '') =>
     ? html`<a class="${cls}" href="mailto:${esc(c.site.contact.email)}">${MAIL}${esc(c.site.contact.email)}</a>`
     : html`<span class="${cls}">${MAIL}${ph('E-mail doplníme')}</span>`;
 
-/* ---------- header ---------- */
-const NAV = [
-  ['repasovane-automaty/', 'Repasované automaty'],
-  ['nahradni-dily/', 'Náhradní díly'],
-  ['servis/', 'Servis'],
-  ['o-nas/', 'O nás'],
+/* ---------- header ----------
+   One compact header on every page: four sections and the enquiry action. "Nabídka automatů" keeps
+   the machine-type submenu (added in the homepage menu round) so every category is one step away. */
+export const NAV = [
+  ['automaty/', 'Nabídka automatů', ['automaty/']],
+  ['repasovane-automaty/', 'Repase a servis', ['repasovane-automaty/', 'servis/', 'nahradni-dily/']],
+  ['o-nas/', 'O nás', ['o-nas/']],
+  ['kontakt/', 'Kontakt', ['kontakt/']],
 ];
-const current = (c, path) => (c.page.section === path ? ' aria-current="page"' : '');
-
-// The homepage uses a slimmer header: three anchors into the page and one enquiry action.
-const HOME_NAV = [['#nabidka', 'Nabídka'], ['#jak-to-funguje', 'Jak to funguje'], ['kontakt/', 'Kontakt']];
-// "Automaty" with the machine types, placed right after "Nabídka" so the types are reachable from the top.
-const homeTypesItem = (c) => html`<li class="has-sub">
-          <a href="${c.url('automaty/')}">Automaty</a>
-          <button class="sub-toggle" type="button" aria-expanded="false" aria-controls="nav-sub"><span class="visually-hidden">Druhy automatů</span></button>
-          <ul class="nav-sub" id="nav-sub">
-            ${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
-            <li class="nav-sub-all"><a href="${c.url('automaty/')}">Všechny druhy automatů</a></li>
-          </ul>
-        </li>`;
+// Pages reached from "Repase a servis", shown as a sub-navigation on each of them.
+export const SERVICE_NAV = [
+  ['repasovane-automaty/', 'Repasované automaty'],
+  ['servis/', 'Servis a opravy'],
+  ['nahradni-dily/', 'Náhradní díly'],
+];
+const isCurrent = (c, sections) => sections.includes(c.page.section);
 const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
+const published = (c, slug) => c.products.filter((p) => p.category === slug && !p.placeholder).length;
 
-export function header(c, variant = '') {
-  if (variant === 'home') return html`<header class="site-header site-header-home">
-  <div class="wrap header-inner">
-    ${logo(c)}
-    <nav class="site-nav" id="site-nav" aria-label="Hlavní navigace">
-      <ul class="nav-list">
-        ${HOME_NAV.map(([path, label]) => html`<li><a href="${path.startsWith('#') ? path : c.url(path)}">${label}</a></li>${path === '#nabidka' ? homeTypesItem(c) : ''}`)}
-      </ul>
-      ${hasContact(c) && html`<div class="nav-contact">${c.site.contact.phone && phoneLink(c)}${c.site.contact.email && emailLink(c)}</div>`}
-    </nav>
-    <a class="header-cta" href="${c.url('kontakt/')}#formular">Poptat automat</a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-      <span class="nav-toggle-bars" aria-hidden="true"></span><span class="visually-hidden">Menu</span>
-    </button>
-  </div>
-</header>`;
+export function header(c) {
+  const home = c.page.path === '';
   return html`<header class="site-header">
   <div class="wrap header-inner">
     ${logo(c)}
     <nav class="site-nav" id="site-nav" aria-label="Hlavní navigace">
       <ul class="nav-list">
-        <li class="has-sub">
-          <a href="${c.url('automaty/')}"${current(c, 'automaty/')}>Automaty</a>
-          <button class="sub-toggle" type="button" aria-expanded="false" aria-controls="nav-sub"><span class="visually-hidden">Kategorie automatů</span></button>
+        ${NAV.map(([path, label, sections], i) => {
+          const cur = isCurrent(c, sections) ? ' aria-current="page"' : '';
+          // On the homepage the catalogue is on the page itself, so the first item jumps to it.
+          const href = i === 0 && home ? '#nabidka' : c.url(path);
+          if (i > 0) return html`<li><a href="${href}"${cur}>${label}</a></li>`;
+          return html`<li class="has-sub">
+          <a href="${href}"${cur}>${label}</a>
+          <button class="sub-toggle" type="button" aria-expanded="false" aria-controls="nav-sub"><span class="visually-hidden">Druhy automatů</span></button>
           <ul class="nav-sub" id="nav-sub">
-            ${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
-            <li class="nav-sub-all"><a href="${c.url('automaty/')}">Všechny kategorie</a></li>
+            ${c.categories.map((cat) => {
+              const n = published(c, cat.slug);
+              return html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} <small>${n ? `${n} v nabídce` : 'na dotaz'}</small></a></li>`;
+            })}
+            <li class="nav-sub-all"><a href="${c.url('automaty/')}">Celá nabídka automatů</a></li>
           </ul>
-        </li>
-        ${NAV.map(([path, label]) => html`<li><a href="${c.url(path)}"${current(c, path)}>${label}</a></li>`)}
-        <li class="nav-mobile-only"><a href="${c.url('kontakt/')}"${current(c, 'kontakt/')}>Kontakt</a></li>
+        </li>`;
+        })}
+        <li class="nav-mobile-only"><a class="btn btn-primary" href="${c.url('kontakt/')}#formular">Poptat automat</a></li>
       </ul>
-      <div class="nav-contact">${phoneLink(c)}${emailLink(c)}</div>
     </nav>
-    <a class="btn btn-primary header-cta" href="${c.url('kontakt/')}"${current(c, 'kontakt/')}>Kontaktujte nás</a>
+    <a class="btn btn-primary btn-sm header-cta" href="${c.url('kontakt/')}#formular">Poptat automat</a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
       <span class="nav-toggle-bars" aria-hidden="true"></span><span class="visually-hidden">Menu</span>
     </button>
@@ -85,42 +78,23 @@ export function header(c, variant = '') {
 }
 
 /* ---------- footer ---------- */
-export function footer(c, variant = '') {
+export function footer(c) {
   const ct = c.site.contact;
-  // Homepage footer: a closing line and the enquiry action; contact details only once supplied.
-  if (variant === 'home') return html`<footer class="site-footer home-footer" aria-labelledby="footer-title">
-  <div class="home-footer-main">
-    <p class="home-label">Poptávka</p>
-    <h2 class="home-footer-title" id="footer-title">Najdeme pro vás vhodný automat.</h2>
-    <p class="home-footer-text">Napište nám, jaký automat a pro jaký provoz hledáte. Ozveme se s nabídkou.</p>
-    <div class="home-footer-actions">
-      <a class="home-btn" href="${c.url('kontakt/')}#formular">Napsat poptávku ${ARROW}</a>
-      ${hasContact(c) && html`<p class="home-footer-direct">${ct.phone && phoneLink(c)}${ct.email && emailLink(c)}</p>`}
-    </div>
-  </div>
-  <div class="home-footer-base">
-    <nav aria-label="Odkazy v patičce"><ul>
-      <li><a href="${c.url('automaty/')}">Všechny kategorie</a></li>
-      ${NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}
-      <li><a href="${c.url('kontakt/')}">Kontakt</a></li>
-    </ul></nav>
-    <p>© ${new Date().getFullYear()} ${esc(c.site.name)}${ct.address ? ` · ${esc(ct.address)}` : ''}${ct.companyId ? ` · IČO ${esc(ct.companyId)}` : ''}</p>
-  </div>
-</footer>`;
   return html`<footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
       ${logo(c)}
       <p>${esc(c.site.tagline)}</p>
     </div>
-    <nav aria-label="Kategorie automatů">
-      <h2 class="footer-title">Automaty</h2>
+    <nav aria-label="Druhy automatů">
+      <h2 class="footer-title">Nabídka automatů</h2>
       <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}</ul>
     </nav>
     <nav aria-label="Služby a firma">
       <h2 class="footer-title">Služby a firma</h2>
       <ul>
-        ${NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}
+        ${SERVICE_NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}
+        <li><a href="${c.url('o-nas/')}">O nás</a></li>
         <li><a href="${c.url('kontakt/')}">Kontakt</a></li>
       </ul>
     </nav>
@@ -136,6 +110,24 @@ export function footer(c, variant = '') {
   </div>
   <div class="wrap footer-base">© ${new Date().getFullYear()} ${esc(c.site.name)}</div>
 </footer>`;
+}
+
+/* ---------- contact call to action (pages without their own enquiry form) ---------- */
+export function ctaBand(c, { title = 'Hledáte konkrétní automat?', text = 'Napište nám, jaký automat a pro jaký provoz hledáte. Ozveme se s nabídkou.' } = {}) {
+  const ct = c.site.contact;
+  return html`<section class="section" aria-labelledby="cta-title"><div class="wrap">
+  <div class="cta-band">
+    <div>
+      <h2 id="cta-title">${esc(title)}</h2>
+      <p>${esc(text)}</p>
+      ${hasContact(c) && html`<p class="cta-band-direct">${ct.phone && phoneLink(c)}${ct.email && emailLink(c)}</p>`}
+    </div>
+    <div class="cta-band-actions">
+      <a class="btn btn-light btn-lg" href="${c.url('kontakt/')}#formular">Poptat automat</a>
+      <a class="btn btn-outline btn-lg" href="${c.url('kontakt/')}">Kontakt</a>
+    </div>
+  </div>
+</div></section>`;
 }
 
 /* ---------- breadcrumbs (visible + structured data) ---------- */
@@ -181,79 +173,40 @@ export function productImage(c, p, { index = 0, eager = false, sizes = '(max-wid
 }
 
 const specValue = (v) => (v == null || v === '' ? ph('doplní se') : esc(v));
+export const filledSpecs = (p) => p.specs.filter((s) => s.value != null && s.value !== '');
 
-export function productCard(c, p, { headingLevel = 2 } = {}) {
+// Small credit line for photos that show a similar model rather than the unit for sale.
+export const photoNote = (p, img = p.images[0], cls = 'photo-note') =>
+  img?.illustrative &&
+  html`<p class="${cls}">Ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
+
+/* A published machine: same image well, name, one-line description, price (or "Cena na dotaz")
+   and the detail link on every card, with the actions aligned along the bottom. The line under the
+   photo always takes the same height, so cards with and without a credit line stay aligned. */
+export function productCard(c, p, { headingLevel = 3 } = {}) {
   const href = c.url(productPath(p));
   const h = `h${headingLevel}`;
-  const keySpecs = p.specs.filter((s) => s.key).slice(0, 4);
+  const img = p.images[0];
+  const keySpecs = filledSpecs(p).filter((s) => s.key).slice(0, 3);
   const search = [p.name, p.manufacturer, p.model, p.summary].filter(Boolean).join(' ').toLowerCase();
   return html`<li class="card" data-name="${esc(p.name.toLowerCase())}" data-manufacturer="${esc(p.manufacturer || '')}" data-condition="${esc(p.condition || '')}" data-type="${esc(p.type || '')}" data-price="${p.price ?? ''}" data-date="${esc(p.dateAdded || '')}" data-search="${esc(search)}">
   <a class="card-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p)}</a>
+  ${img?.illustrative ? photoNote(p, img, 'card-note') : html`<p class="card-note">${img ? 'Fotografie automatu' : 'Fotografie bude doplněna'}</p>`}
   <div class="card-body">
     <div class="card-badges">${conditionBadge(c, p)}</div>
-    <p class="card-maker">${makerLine(p) ? esc(makerLine(p)) : ph('Výrobce a model doplníme')}</p>
+    ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
     <${h} class="card-title"><a href="${href}">${esc(p.name)}</a></${h}>
     <p class="card-summary">${esc(p.summary)}</p>
-    ${keySpecs.length > 0 && html`<dl class="card-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${specValue(s.value)}</dd></div>`)}</dl>`}
-    <p class="card-price${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p>
-    <div class="card-actions">
-      <a class="btn btn-primary" href="${href}">Zobrazit detail</a>
-      <a class="btn btn-ghost" href="${href}#poptavka">Zeptat se na automat</a>
+    ${keySpecs.length > 0 && html`<dl class="card-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
+    <div class="card-foot">
+      <p class="card-price${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p>
+      <a class="text-link" href="${href}">Detail automatu${ARROW}<span class="visually-hidden">: ${esc(p.name)}</span></a>
     </div>
   </div>
 </li>`;
 }
 
 export { specValue };
-
-// Small credit line for photos that show a similar model rather than the unit for sale.
-export const photoNote = (p, img = p.images[0]) =>
-  img?.illustrative &&
-  html`<p class="photo-note">Ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
-
-/* ---------- machine carousel ----------
-   A horizontally scrolling list: native scroll-snap gives swipe on touch and keeps working without
-   JS. assets/js/carousel.js adds the arrows, the position indicator and arrow-key navigation. */
-function machineSlide(c, p, i, n, headingLevel) {
-  const href = c.url(productPath(p));
-  const h = `h${headingLevel}`;
-  // Cards show only what was supplied: filled-in key specs, and a price when there is one.
-  const keySpecs = p.specs.filter((s) => s.key && s.value != null && s.value !== '').slice(0, 4);
-  return html`<li class="slide" aria-roledescription="snímek" aria-label="${i + 1} z ${n}: ${esc(p.name)}">
-  <a class="slide-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p, { sizes: '(max-width: 640px) 84vw, (max-width: 1100px) 46vw, 380px' })}</a>
-  ${photoNote(p)}
-  <div class="slide-body">
-    ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
-    <${h} class="slide-title"><a href="${href}">${esc(p.name)}</a></${h}>
-    <p class="slide-summary">${esc(p.summary)}</p>
-    ${keySpecs.length > 0 && html`<dl class="slide-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
-    <div class="slide-foot">
-      ${p.price != null && html`<p class="slide-price">${esc(priceText(c, p))}</p>`}
-      <a class="btn btn-primary" href="${href}#poptavka">Mám zájem<span class="visually-hidden">: ${esc(p.name)}</span></a>
-    </div>
-  </div>
-</li>`;
-}
-
-// "01 / 07": the counter is zero-padded to the width of the total.
-const pad = (i, n) => String(i).padStart(Math.max(2, String(n).length), '0');
-
-export function carousel(c, list, { id, label, headingLevel = 3 } = {}) {
-  const n = list.length;
-  return html`<div class="carousel" data-carousel role="region" aria-roledescription="karusel" aria-label="${esc(label)}">
-  <div class="carousel-bar">
-    <p class="carousel-pos" data-carousel-pos><span class="visually-hidden">Automat </span><span data-carousel-current>${pad(1, n)}</span> / ${pad(n, n)}</p>
-    <div class="carousel-progress" aria-hidden="true"><span data-carousel-progress></span></div>
-    <div class="carousel-nav" data-carousel-nav hidden>
-      <button class="carousel-btn" type="button" data-carousel-prev aria-controls="${id}" aria-label="Předchozí automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <button class="carousel-btn" type="button" data-carousel-next aria-controls="${id}" aria-label="Další automat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-    </div>
-  </div>
-  <ul class="carousel-track" id="${id}" tabindex="0" aria-label="${esc(label)}: ${n} ${n === 1 ? 'automat' : n < 5 ? 'automaty' : 'automatů'}, posouvejte šipkami doleva a doprava">
-    ${list.map((p, i) => machineSlide(c, p, i, n, headingLevel))}
-  </ul>
-</div>`;
-}
 
 /* ---------- enquiry form ----------
    Netlify detects the form from the built HTML (data-netlify). When site.forms.endpoint is set
@@ -311,7 +264,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
 }
 
 /* ---------- the document ---------- */
-export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage, variant = '' }) {
+export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage }) {
   const fullTitle = c.page.path === '' ? title : `${title} | ${c.site.name}`;
   const canonical = c.absUrl && !c.page.noindex ? c.absUrl(c.page.path) : null;
   const og = ogImage && (/^https?:\/\//.test(ogImage) ? ogImage : c.absUrl ? c.absUrl(ogImage) : null);
@@ -330,17 +283,17 @@ ${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && h
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Code+Pro:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
 ${head}<script>document.documentElement.classList.add('js')</script>
 </head>
-<body class="${bodyClass}">
+<body${bodyClass ? ` class="${bodyClass}"` : ''}>
 <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
-${header(c, variant)}
+${header(c)}
 <main id="obsah" tabindex="-1">
 ${body}
 </main>
-${footer(c, variant)}
+${footer(c)}
 <script src="${c.url('assets/js/site.js')}" defer></script>
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}</body>
 </html>
