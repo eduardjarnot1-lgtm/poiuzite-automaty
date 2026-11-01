@@ -31,6 +31,15 @@ const current = (c, path) => (c.page.section === path ? ' aria-current="page"' :
 
 // The homepage uses a slimmer header: three anchors into the page and one enquiry action.
 const HOME_NAV = [['#nabidka', 'Nabídka'], ['#jak-to-funguje', 'Jak to funguje'], ['kontakt/', 'Kontakt']];
+// "Automaty" with the machine types, placed right after "Nabídka" so the types are reachable from the top.
+const homeTypesItem = (c) => html`<li class="has-sub">
+          <a href="${c.url('automaty/')}">Automaty</a>
+          <button class="sub-toggle" type="button" aria-expanded="false" aria-controls="nav-sub"><span class="visually-hidden">Druhy automatů</span></button>
+          <ul class="nav-sub" id="nav-sub">
+            ${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
+            <li class="nav-sub-all"><a href="${c.url('automaty/')}">Všechny druhy automatů</a></li>
+          </ul>
+        </li>`;
 const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
 
 export function header(c, variant = '') {
@@ -39,7 +48,7 @@ export function header(c, variant = '') {
     ${logo(c)}
     <nav class="site-nav" id="site-nav" aria-label="Hlavní navigace">
       <ul class="nav-list">
-        ${HOME_NAV.map(([path, label]) => html`<li><a href="${path.startsWith('#') ? path : c.url(path)}">${label}</a></li>`)}
+        ${HOME_NAV.map(([path, label]) => html`<li><a href="${path.startsWith('#') ? path : c.url(path)}">${label}</a></li>${path === '#nabidka' ? homeTypesItem(c) : ''}`)}
       </ul>
       ${hasContact(c) && html`<div class="nav-contact">${c.site.contact.phone && phoneLink(c)}${c.site.contact.email && emailLink(c)}</div>`}
     </nav>
