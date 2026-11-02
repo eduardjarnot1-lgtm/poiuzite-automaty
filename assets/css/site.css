@@ -3,9 +3,9 @@
    restrained borders and shadows, an 8px spacing scale and a 1200px content width.
    The refurbishment page adds its scroll-driven video section from servis.css. */
 :root {
-  --bg: #ffffff;
-  --bg-alt: #f6f5f2;          /* warm light grey: page heads, alternate sections */
-  --bg-well: #f2f0eb;         /* image wells behind product photos */
+  --bg: #faf9f6;              /* warm white canvas */
+  --bg-alt: #f3f2ee;          /* warm light grey: page heads, alternate sections */
+  --bg-well: #eeeeeb;         /* pale grey image areas behind product photos */
   --surface: #ffffff;
   --line: #e4e1db;
   --line-strong: #cbc6bd;
@@ -101,7 +101,7 @@ main:focus { outline: none; }
 .lead { font-size: 18px; line-height: 1.6; color: var(--ink-soft); max-width: 68ch; }
 
 /* ---------- header ---------- */
-.site-header { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, .97); border-bottom: 1px solid var(--line); }
+.site-header { position: sticky; top: 0; z-index: 50; background: rgba(250, 249, 246, .97); border-bottom: 1px solid var(--line); }
 body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven section pins its own frame to the top */
 .header-inner { display: flex; align-items: center; gap: var(--s3); min-height: var(--header-h); }
 .logo { display: inline-flex; align-items: center; gap: 10px; flex: none; color: var(--ink); font-weight: 700; font-size: 17px; letter-spacing: -.01em; text-decoration: none; }
@@ -207,8 +207,8 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 .notice strong { color: var(--ink); }
 
 /* ---------- homepage hero ---------- */
-.hero { padding: var(--s5) 0 var(--s6); background: var(--bg-alt); border-bottom: 1px solid var(--line); }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s6); align-items: center; }
+.hero { padding: var(--s5) 0 var(--s3); background: var(--bg); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s6); align-items: center; }
 .hero h1 { font-size: clamp(32px, 4vw, 46px); margin-bottom: var(--s3); max-width: 18ch; }
 .hero-lead { font-size: 18px; max-width: 56ch; margin-bottom: var(--s4); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -216,8 +216,8 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 .hero-points li { display: inline-flex; align-items: center; gap: var(--s1); }
 .hero-points .icon { width: 18px; height: 18px; color: var(--accent); }
 .hero-media { margin: 0; }
-.hero-well { position: relative; aspect-ratio: 1 / 1; max-height: 420px; margin-inline: auto; --pad: var(--s3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
-.hero-well img { position: absolute; inset: var(--pad); width: calc(100% - 2 * var(--pad)); height: calc(100% - 2 * var(--pad)); object-fit: contain; }
+.hero-well { position: relative; aspect-ratio: 1 / 1; max-height: 460px; margin-inline: auto; --pad: var(--s4); background: var(--bg-well); border-radius: var(--radius-lg); }
+.hero-well img { mix-blend-mode: multiply; position: absolute; inset: var(--pad); width: calc(100% - 2 * var(--pad)); height: calc(100% - 2 * var(--pad)); object-fit: contain; }
 .hero-media figcaption { margin-top: 10px; font-size: 13px; line-height: 1.5; color: var(--muted); text-align: center; }
 .hero-media figcaption a { color: inherit; }
 @media (max-width: 899px) {
@@ -237,7 +237,7 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 @media (max-width: 1023px) { .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 599px) { .card-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s2); } }
 .card { display: flex; flex-direction: column; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: border-color .15s, box-shadow .15s; }
-.card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); }
 .card[hidden] { display: none; }
 .card-media { position: relative; display: block; aspect-ratio: 4 / 3; background: var(--bg-well); }
 .card-media img { position: absolute; inset: var(--s3); width: calc(100% - 2 * var(--s3)); height: calc(100% - 2 * var(--s3)); object-fit: contain; mix-blend-mode: multiply; }   /* whole machine, true proportions; white photo backgrounds blend into the well */
