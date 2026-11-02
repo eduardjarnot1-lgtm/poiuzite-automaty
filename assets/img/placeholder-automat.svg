@@ -7,5 +7,5 @@
     <rect x="276" y="276" width="48" height="44" rx="4"/>
     <path d="M220 340h160"/>
   </g>
-  <text x="300" y="392" text-anchor="middle" font-family="Figtree, Segoe UI, system-ui, sans-serif" font-size="20" font-weight="600" fill="#646b71">Fotografie bude doplněna</text>
+  <text x="300" y="392" text-anchor="middle" font-family="Source Sans 3, Segoe UI, system-ui, sans-serif" font-size="20" font-weight="600" fill="#646b71">Fotografie bude doplněna</text>
 </svg>
