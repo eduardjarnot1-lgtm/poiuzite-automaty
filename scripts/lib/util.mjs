@@ -27,7 +27,11 @@ export function linker(pagePath, absolute, explicitIndex = false) {
   const depth = pagePath.split('/').filter(Boolean).length;
   const up = '../'.repeat(depth);
   return (target = '') => {
-    if (explicitIndex && (target === '' || target.endsWith('/'))) target += 'index.html';
+    // A query or fragment stays after the index.html, e.g. automaty/nahled/?id=x.
+    const cut = target.search(/[?#]/);
+    let [path, rest] = cut > -1 ? [target.slice(0, cut), target.slice(cut)] : [target, ''];
+    if (explicitIndex && (path === '' || path.endsWith('/'))) path += 'index.html';
+    target = path + rest;
     return absolute ? '/' + target : up + target || './';
   };
 }

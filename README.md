@@ -110,3 +110,13 @@ ffmpeg -i $SRC -an -vf scale=720:-2 -c:v libvpx-vp9 -crf 37 -b:v 0 -g 6 assets/v
 If the video length changes, update `data-duration` on the section and the panel timings.
 
 Visitors who prefer reduced motion, browsers that can't play the video, and any failed load get a normal section instead, with no cover: the poster, then all the copy and steps laid out in order. The script waits for the page to load before fetching video, and plays it from memory if the server doesn't support range requests (which seeking needs).
+
+## Admin prototype (preview only)
+
+`node scripts/build.mjs --out preview --explicit-index --prototype` adds a local prototype for
+managing the catalogue: a "Pohled zákazníka / Správa nabídky" switch, the page `sprava-nabidky/`
+(list, add and edit) and `automaty/nahled/` for machines added there. Changes are kept only in
+the browser's localStorage and are rendered with the same templates as the build, so other
+visitors never see them. It is not authentication. The Netlify build does not pass
+`--prototype`, so none of this reaches the public site. Production would need protected admin
+access and shared storage (a CMS or a small backend) before going live.

@@ -147,7 +147,8 @@ export function breadcrumbs(c, trail) {
 }
 
 /* ---------- product bits ---------- */
-export const productPath = (p) => `automaty/${p.category}/${p.slug}/`;
+// previewPath is set only by the local admin prototype, for machines that have no built page.
+export const productPath = (p) => p.previewPath || `automaty/${p.category}/${p.slug}/`;
 
 export const priceText = (c, p) =>
   p.price != null ? czk(p.price, c.site.catalogue.currency, c.site.catalogue.pricesIncludeVat) : 'Cena na dotaz';
@@ -159,8 +160,9 @@ export function conditionBadge(c, p) {
   return html`${p.placeholder && '<span class="badge badge-ph">Vzorová položka</span>'}${cond && html`<span class="badge badge-${esc(p.condition)}">${esc(cond.label)}</span>`}`;
 }
 
-// Photos may be local (assets/products/...) or full URLs to another site.
-export const mediaUrl = (c, src) => (/^https?:\/\//.test(src) ? src : c.url(src));
+// Photos may be local (assets/products/...), full URLs to another site, or (in the local admin
+// prototype) data: URLs of photos saved in the browser.
+export const mediaUrl = (c, src) => (/^(https?:\/\/|data:|blob:)/.test(src) ? src : c.url(src));
 
 // First image, or a neutral drawing that says the photo is still to come. data-fallback lets
 // site.js swap in that drawing when a remote photo fails to load.
@@ -285,7 +287,7 @@ ${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && h
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
-${head}<script>document.documentElement.classList.add('js')</script>
+${head}<script>document.documentElement.classList.add('js')</script>${c.proto && '\n' + c.proto.head(c)}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}>
 <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
@@ -294,7 +296,7 @@ ${header(c)}
 ${body}
 </main>
 ${footer(c)}
-<script src="${c.url('assets/js/site.js')}" defer></script>
+${c.proto && c.proto.foot(c)}<script src="${c.url('assets/js/site.js')}" defer></script>
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}</body>
 </html>
 `;
