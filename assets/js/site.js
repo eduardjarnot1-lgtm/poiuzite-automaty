@@ -120,3 +120,59 @@
   document.addEventListener('error', (e) => { if (e.target.tagName === 'IMG') swap(e.target); }, true);
   document.querySelectorAll('img[data-fallback]').forEach((img) => { if (img.complete && img.naturalWidth === 0 && img.currentSrc) swap(img); });
 })();
+
+/* ---------- animated wave backgrounds ----------
+   A muted looping video behind the homepage hero and the enquiry sections. The section's CSS
+   background is the video's first frame, so nothing changes if this never runs. Skipped with
+   reduced motion; loaded only when the section comes near the viewport; paused when it is off
+   screen or the tab is hidden. */
+(() => {
+  const script = document.currentScript;
+  if (!script || !('IntersectionObserver' in window)) return;
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (motion.matches) return;
+  const asset = (f) => new URL(`../video/${f}`, script.src).href;
+  const ext = document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4';
+  const poster = (f) => new URL(`../img/bg/${f}`, script.src).href;
+  const targets = [];
+  const hero = document.querySelector('.hero');
+  if (hero) targets.push([hero, 'bg-hero']);
+  document.querySelectorAll('.section-alt > .wrap > .enquiry').forEach((el) => targets.push([el.parentElement.parentElement, 'bg-enquiry']));
+  if (!targets.length) return;
+
+  const videos = [];
+  for (const [section, name] of targets) {
+    const layer = document.createElement('div');
+    layer.className = 'bg-video';
+    layer.setAttribute('aria-hidden', 'true');
+    const v = document.createElement('video');
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('tabindex', '-1');
+    v.disablePictureInPicture = true;
+    v.poster = poster(`video-${name.slice(3)}-poster.webp`);
+    v.dataset.src = asset(`${name}.${ext}`);
+    v.addEventListener('playing', () => v.classList.add('is-playing'));
+    v.addEventListener('error', () => layer.remove());   // the poster background stays
+    layer.append(v);
+    section.classList.add('has-bg-video');
+    section.prepend(layer);
+    videos.push(v);
+  }
+
+  const visible = new Set();
+  const play = (v) => {
+    if (document.hidden || motion.matches || !visible.has(v)) return;
+    if (!v.src) v.src = v.dataset.src;
+    v.play().catch(() => {});   // autoplay blocked: the poster stays
+  };
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const v = e.target.querySelector('.bg-video video');
+      if (!v) continue;
+      if (e.isIntersecting) { visible.add(v); play(v); } else { visible.delete(v); v.pause(); }
+    }
+  }, { rootMargin: '200px 0px' });
+  videos.forEach((v) => io.observe(v.closest('.has-bg-video')));
+  document.addEventListener('visibilitychange', () => videos.forEach((v) => (document.hidden ? v.pause() : play(v))));
+  motion.addEventListener?.('change', () => { if (motion.matches) videos.forEach((v) => v.pause()); });
+})();
