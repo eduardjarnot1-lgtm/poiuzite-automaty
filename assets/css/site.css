@@ -3,21 +3,24 @@
    restrained borders and shadows, an 8px spacing scale and a 1200px content width.
    The refurbishment page adds its scroll-driven video section from servis.css. */
 :root {
-  --bg: #faf9f6;              /* warm white canvas */
-  --bg-alt: #f3f2ee;          /* warm light grey: page heads, alternate sections */
-  --bg-well: #eeeeeb;         /* pale grey image areas behind product photos */
+  --bg: #ffffff;              /* white canvas: most sections stay clean */
+  --bg-alt: #f4f7f3;          /* soft sage-white surface: alternate sections */
+  --bg-well: #f1f3f1;         /* near-neutral grey behind product photos (no green cast on the machines) */
   --surface: #ffffff;
-  --line: #e4e1db;
-  --line-strong: #cbc6bd;
-  --ink: #1d211f;             /* charcoal: headings and strong text */
-  --ink-soft: #3f4542;        /* body copy */
-  --muted: #5b625e;           /* secondary text (4.5:1+ on --bg-alt) */
-  --accent: #1d5c43;          /* deep green: actions, links, focus */
-  --accent-hover: #164a36;
-  --accent-soft: #eaf2ed;
-  --accent-line: #bcd5c8;
+  --line: #dce5de;
+  --line-strong: #bfcdc3;
+  --ink: #1d2924;             /* green-black: headings and strong text */
+  --ink-soft: #384740;        /* body copy */
+  --muted: #58675f;           /* secondary text (5:1+ on --bg-alt and the pale backgrounds) */
+  --accent: #28554b;          /* deep muted green: actions, links, selected states, focus */
+  --accent-hover: #1e443b;
+  --accent-soft: #e3eee7;     /* pale mint */
+  --accent-line: #b8ccb7;     /* sage */
+  --teal: #719e98;            /* muted teal: decoration and large marks only, never small text */
+  --ivory: #faf8f2;           /* warm ivory surface */
+  --focus-ring: rgba(40, 85, 75, .25);
   --on-accent: #ffffff;
-  --dark: #1d211f;            /* footer */
+  --dark: #1d2924;            /* footer */
   --dark-ink: #c9cdca;
   --ph-bg: #fbf6e9;           /* marked gaps for facts the business still has to supply */
   --ph-ink: #6b4d0e;
@@ -29,8 +32,8 @@
   --radius: 10px;             /* cards, boxes */
   --radius-lg: 12px;          /* large panels */
   --round: 8px;               /* kept for servis.css */
-  --shadow-sm: 0 1px 2px rgba(29, 33, 31, .06);
-  --shadow: 0 1px 2px rgba(29, 33, 31, .05), 0 6px 16px -6px rgba(29, 33, 31, .12);
+  --shadow-sm: 0 1px 2px rgba(29, 41, 36, .06);
+  --shadow: 0 1px 2px rgba(29, 41, 36, .05), 0 6px 16px -6px rgba(29, 41, 36, .12);
   --ease: cubic-bezier(.2, .7, .2, 1);
   --header-h: 64px;
   --wrap: 1200px;
@@ -116,7 +119,7 @@ main:focus { outline: none; }
 .lead { font-size: var(--fs-lead); line-height: var(--lh-body); color: var(--ink-soft); max-width: var(--measure); }
 
 /* ---------- header ---------- */
-.site-header { position: sticky; top: 0; z-index: 50; background: rgba(250, 249, 246, .97); border-bottom: 1px solid var(--line); }
+.site-header { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, .96); border-bottom: 1px solid var(--line); }
 body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven section pins its own frame to the top */
 .header-inner { display: flex; align-items: center; gap: var(--s3); min-height: var(--header-h); }
 .logo { display: inline-flex; align-items: center; gap: 10px; flex: none; color: var(--ink); font-weight: 600; font-size: 1.1875rem; letter-spacing: 0; text-decoration: none; }
@@ -393,7 +396,7 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
   transition: border-color .15s, box-shadow .15s;
 }
 .tool input:hover, .tool select:hover, .field input:hover, .field textarea:hover { border-color: var(--muted); }
-.tool input:focus, .tool select:focus, .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(29, 92, 67, .25); }
+.tool input:focus, .tool select:focus, .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
 
 /* ---------- product detail ---------- */
 .product-crumbs { padding-top: var(--s3); }
@@ -494,3 +497,79 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* ==========================================================================
+   Sage wave backgrounds (2026-11-03)
+   Five decorative images in assets/img/bg, each used where its empty area
+   suits the content. They are CSS backgrounds only: they never take clicks or
+   change layout. Sections in between stay white. Each image keeps its own
+   proportions (cover / fixed width, never stretched); the background colour
+   under it matches the image's quiet centre so there is no seam.
+   ========================================================================== */
+
+/* Homepage intro: the original background, with a white veil on the text side. */
+.hero {
+  padding: var(--s6) 0 var(--s5);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .82) 0%, rgba(255, 255, 255, .55) 42%, rgba(255, 255, 255, 0) 70%),
+    #eef5f2 url("../img/bg/waves-hero.webp") center / cover no-repeat;
+}
+.hero-well { background: rgba(255, 255, 255, .9); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+.hero-media figcaption { color: var(--ink-soft); }
+
+/* Inner page heads: the lightest variant behind breadcrumbs, headings and counts. */
+.page-head {
+  background: #f9fafa url("../img/bg/waves-light.webp") center / cover no-repeat;
+  border-bottom-color: var(--line);
+}
+
+/* "Na dotaz" categories: the opposite-corner variant frames the cards. */
+#na-dotaz, section[aria-labelledby="ask-title"] {
+  background: #f0f6f5 url("../img/bg/waves-corners.webp") center / cover no-repeat;
+}
+
+/* Enquiry areas: the right-edge variant behind the left-aligned intro, form on white. */
+.section-alt:has(> .wrap > .enquiry) {
+  background: #f6f9f8 url("../img/bg/waves-right.webp") right center / cover no-repeat;
+}
+
+/* Closing call to action: a light panel on the bottom-wave variant. */
+.cta-band {
+  position: relative; overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, .35) 55%, rgba(255, 255, 255, 0) 80%),
+    #eff5f3 url("../img/bg/waves-bottom.webp") center 70% / cover no-repeat;
+  border: 1px solid var(--line); color: var(--ink-soft);
+}
+.cta-band h2 { color: var(--ink); }
+.cta-band .btn-light { background: var(--accent); color: var(--on-accent); }
+.cta-band .btn-light:hover { background: var(--accent-hover); color: var(--on-accent); }
+.cta-band .btn-outline { background: rgba(255, 255, 255, .92); color: var(--accent); border-color: var(--accent-line); }
+.cta-band .btn-outline:hover { background: #fff; border-color: var(--accent); color: var(--accent-hover); }
+.cta-band-direct a { color: var(--accent); }
+.cta-band :focus-visible { outline-color: var(--accent); }
+
+/* Phones: smaller files, and the waves pinned to a corner rather than zoomed. */
+@media (max-width: 760px) {
+  .hero {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, .45) 55%, rgba(255, 255, 255, .2) 100%),
+      #eef5f2 url("../img/bg/waves-hero-900.webp") center top / cover no-repeat;
+  }
+  .page-head { background-image: url("../img/bg/waves-light-900.webp"); background-position: right top; }
+  #na-dotaz, section[aria-labelledby="ask-title"] { background-image: url("../img/bg/waves-corners-900.webp"); background-size: 900px auto; background-position: right top; }
+  .section-alt:has(> .wrap > .enquiry) { background-image: url("../img/bg/waves-right-900.webp"); background-size: 900px auto; background-position: right bottom; }
+  .cta-band { background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .2)), #eff5f3 url("../img/bg/waves-bottom-900.webp") center bottom / 900px auto no-repeat; }
+}
+
+/* Selected and interactive states in the sage palette. */
+.subnav a:hover { border-color: var(--accent); color: var(--accent); }
+.subnav a[aria-current="page"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); }
+.btn-secondary { border-color: var(--accent-line); color: var(--accent); }
+.btn-secondary:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+.card:hover { border-color: var(--accent-line); }
+.ask-card .cat-icon, .empty-state .cat-icon { background: var(--accent-soft); color: var(--accent); }
+.ask-card { background: rgba(255, 255, 255, .94); }
+.how li::before { background: var(--accent-soft); color: var(--accent); }
+.tool select:disabled, .tool input:disabled, .field input:disabled, .field textarea:disabled, .btn[disabled] { opacity: .6; cursor: not-allowed; }
+.nav-sub a:hover { background: var(--accent-soft); }
