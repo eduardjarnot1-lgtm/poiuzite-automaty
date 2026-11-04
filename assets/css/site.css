@@ -668,3 +668,24 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
   .is-home .section-head, .is-home .service-split > div:first-child, .is-home .inside-text, .is-home .cta-band { padding: var(--s3); }
   .is-home .section { padding: var(--s4) 0; }
 }
+
+/* ---------- homepage header: transparent over the fixed backdrop (2026-11-04) ----------
+   No fill, divider, shadow or blur. It scrolls away with the page instead of sticking, so
+   the transparent navigation never sits on top of passing content. Hover and current
+   states are underlines; keyboard focus keeps the site's green outline. */
+.is-home .site-header { position: relative; background: transparent; border-bottom: 0; }
+html:has(body.is-home) { scroll-padding-top: var(--s2); }
+.is-home .nav-list > li > a:hover { background: transparent; color: var(--accent); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.is-home .nav-list > li > a.btn:hover { text-decoration: none; color: var(--on-accent); background: var(--accent-hover); }
+.is-home .sub-toggle:hover { background: transparent; color: var(--accent); }
+.is-home .nav-toggle { background: transparent; border-color: var(--ink-soft); }
+.is-home .nav-toggle:hover { border-color: var(--accent); }
+@media (max-width: 960px) {
+  /* the open menu gets a solid ivory panel for readability */
+  .js .is-home .site-nav { border-top: 0; }
+  .is-home .site-nav.is-open {
+    margin: 0 0 var(--s2); padding: var(--s1) var(--s2) var(--s2);
+    background: var(--ivory); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  }
+  .is-home .nav-list > li > a:hover { text-decoration-thickness: 1px; }
+}
