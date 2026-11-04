@@ -592,3 +592,30 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
   .section-alt .bg-video video { object-position: 70% bottom; }
 }
 @media (prefers-reduced-motion: reduce) { .bg-video { display: none; } }
+
+/* ---------- "Podívejte se dovnitř automatu" (homepage) ----------
+   A static wave background (no second moving layer), a neutral surface matching the
+   animation's own light grey, the full frame always visible (contain, 1280 × 944). */
+.inside { background: #f9fafa url("../img/bg/waves-light.webp") center / cover no-repeat; border-top: 1px solid var(--line); }
+.inside-grid { display: grid; grid-template-columns: minmax(0, 42fr) minmax(0, 58fr); gap: var(--s6); align-items: center; }
+.inside-text h2 { font-size: var(--fs-h2); margin-bottom: var(--s2); }
+.inside-text .lead { margin-bottom: var(--s4); max-width: 44ch; }
+.inside-media { margin: 0; }
+.inside-frame { position: relative; aspect-ratio: 1280 / 944; background: #e6e6e2; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); overflow: hidden; }
+.inside-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #e6e6e2; }
+.inside-media figcaption { margin-top: 10px; font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--muted); }
+.inside-bar { display: flex; align-items: center; gap: var(--s2); margin-top: 12px; }
+.inside-bar figcaption { margin: 0; }
+.inside-control {
+  flex: none; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 16px 0 12px; border: 1px solid var(--accent-line); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--accent); font-size: var(--fs-ui); font-weight: 600; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.inside-control:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+.inside-control:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.inside-control .icon { width: 18px; height: 18px; }
+@media (max-width: 900px) {
+  .inside-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+  .inside { background-image: url("../img/bg/waves-light-900.webp"); background-position: right top; }
+}

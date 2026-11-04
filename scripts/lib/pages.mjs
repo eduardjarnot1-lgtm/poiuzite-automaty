@@ -207,8 +207,38 @@ ${onRequest.length > 0 && html`<section class="section section-alt" id="na-dotaz
   </div>
 </section>
 
+${insideLook(c)}
+
 ${ctaBand(c)}`,
+    scripts: ['assets/js/inside.js'],
   };
+}
+
+/* An illustrative 3D animation of a machine opening into an exploded view. Labelled as a
+   visualisation, not footage of a real inspection. assets/js/inside.js plays it once when half of
+   it is in view and adds the play / pause / replay control; without JS the native controls show. */
+function insideLook(c) {
+  return html`<section class="section inside" id="pohled-dovnitr" aria-labelledby="inside-title">
+  <div class="wrap inside-grid">
+    <div class="inside-text">
+      <p class="eyebrow">Technický pohled</p>
+      <h2 id="inside-title">Podívejte se dovnitř automatu.</h2>
+      <p class="lead">Nahlédněte do konstrukce nápojového automatu a prohlédněte si jeho hlavní součásti v přehledné animaci.</p>
+      <a class="btn btn-primary btn-lg" href="${c.url('kontakt/')}#formular">Zeptat se na konkrétní automat</a>
+    </div>
+    <figure class="inside-media">
+      <div class="inside-frame" data-inside>
+        <video controls muted playsinline preload="none" width="1280" height="944"
+          poster="${c.url('assets/img/automat-zevnitr-poster.webp')}"
+          aria-label="Animace: automat se otevírá a ukazuje své hlavní součásti">
+          <source src="${c.url('assets/video/automat-zevnitr.webm')}" type="video/webm">
+          <source src="${c.url('assets/video/automat-zevnitr.mp4')}" type="video/mp4">
+        </video>
+      </div>
+      <figcaption>Ilustrační 3D vizualizace. Konstrukce jednotlivých modelů se může lišit.</figcaption>
+    </figure>
+  </div>
+</section>`;
 }
 
 export function categoriesIndex(c) {
