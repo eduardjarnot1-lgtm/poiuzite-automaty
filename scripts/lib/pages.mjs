@@ -131,7 +131,9 @@ export function home(c) {
     title: `${c.site.name} | Použité a repasované prodejní automaty`,
     description: 'Prodej použitých, repasovaných a renovovaných prodejních automatů se zaměřením na automaty na instantní kávu a teplé nápoje. Vyberte si druh automatu a prohlédněte si nabídku.',
     head: img ? html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">\n` : '',
+    bodyClass: 'is-home',
     body: html`
+<div class="home-backdrop" aria-hidden="true"></div>
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-text">

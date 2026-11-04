@@ -135,7 +135,8 @@
   const ext = document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4';
   const poster = (f) => new URL(`../img/bg/${f}`, script.src).href;
   const targets = [];
-  const hero = document.querySelector('.hero');
+  // On the homepage the hero animation is one fixed backdrop behind the whole page.
+  const hero = document.querySelector('.home-backdrop') || document.querySelector('.hero');
   if (hero) targets.push([hero, 'bg-hero']);
   document.querySelectorAll('.section-alt > .wrap > .enquiry').forEach((el) => targets.push([el.parentElement.parentElement, 'bg-enquiry']));
   if (!targets.length) return;
