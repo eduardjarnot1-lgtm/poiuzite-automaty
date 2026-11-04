@@ -2,16 +2,18 @@
 import { esc, html, ph, plural } from './util.mjs';
 import {
   ARROW, CHECK, INFO, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
-  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand,
+  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf,
 } from './components.mjs';
+import { isListed, recommended, sale, effectivePrice, discountState, SORTS } from './catalog.mjs';
 
-const real = (list) => list.filter((p) => !p.placeholder);
-const byNewest = (a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || '');
-// Listings lead with photographed machines; ones still waiting for a photo go last.
-const byShowcase = (a, b) => (b.images.length > 0) - (a.images.length > 0) || byNewest(a, b);
+// Listings show published machines that are not sold (drafts, hidden, deleted and sold ones never
+// appear), in the recommended order: featured first, then the order saved in the admin, then
+// photographed machines, newest first.
+const real = (list) => list.filter((p) => !p.placeholder && isListed(p));
+const ordered = (c, list, cat) => recommended(list, (cat && c.catOrder?.[cat]) || c.order);
 const countLabel = (n) => `${n} ${plural(n, 'automat', 'automaty', 'automatů')}`;
 const publishedLabel = (n) => `${n} ${plural(n, 'zveřejněný automat', 'zveřejněné automaty', 'zveřejněných automatů')}`;
-const inCategory = (c, cat) => c.products.filter((p) => p.category === cat.slug);
+const inCategory = (c, cat) => c.products.filter((p) => p.category === cat.slug && isListed(p));
 
 /* ---------- category icons (line drawings, no fake photos) ---------- */
 const ICONS = {
@@ -33,7 +35,7 @@ const listingNotice = (list) => {
 };
 
 const productGrid = (c, list, { headingLevel = 3, label }) =>
-  html`<ul class="card-grid" aria-label="${esc(label)}">${list.map((p) => productCard(c, p, { headingLevel }))}</ul>`;
+  html`<ul class="card-grid" aria-label="${esc(label)}">${list.map((p, i) => productCard(c, p, { headingLevel, order: i }))}</ul>`;
 
 // Categories without published machines: plainly "na dotaz", no counts or photos that would make
 // them look like populated catalogues. Each links to its category page, which carries the form.
@@ -73,58 +75,65 @@ const placeholderNotice = (list) =>
   html`<div class="notice" role="note"><strong>Ukázkový katalog.</strong> Položky níže jsou vzorové a ukazují jen rozvržení katalogu. Skutečné automaty, fotografie a ceny doplníme.</div>`;
 
 /* ---------- catalogue listing with data-driven controls ----------
-   A control is rendered only when the data gives it something to do: a filter needs at least two
-   different values, price sorting needs two priced machines, search needs a large enough catalogue.
-   The controls start hidden and assets/js/catalogue.js reveals them, so without JS the full list shows. */
-function catalogue(c, list, { headingLevel = 2, label = 'Automaty' } = {}) {
+   "Seřadit podle" is there whenever there is more than one machine. A filter is rendered only when
+   the data gives it something to do: category, availability, condition or manufacturer need at
+   least two different values, the price range needs two priced machines, "Pouze ve slevě" a
+   discount that is running or scheduled, search a large enough catalogue. `list` comes in the
+   recommended order. The controls start hidden and assets/js/catalogue.js reveals them, so
+   without JS the full list shows in the recommended order. */
+function catalogue(c, list, { headingLevel = 2, label = 'Automaty', categories = false } = {}) {
   const distinct = (key) => [...new Set(list.map((p) => p[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'cs'));
   const makers = distinct('manufacturer');
   const conds = Object.keys(c.site.conditions).filter((k) => list.some((p) => p.condition === k));
   const types = distinct('type');
-  const priced = list.filter((p) => p.price != null).length >= 2;
+  const cats = categories ? c.categories.filter((cat) => list.some((p) => p.category === cat.slug)) : [];
+  const avail = ['Skladem', 'Na objednávku', 'Rezervováno'].filter((a) => list.some((p) => p.availability === a));
+  const priced = list.filter((p) => effectivePrice(p, nowOf(c)) != null).length >= 2;
+  const discounts = list.some((p) => ['active', 'scheduled'].includes(discountState(p, nowOf(c))));
   const search = list.length >= c.site.catalogue.searchMinProducts;
   const select = (name, text, opts) => html`<div class="tool">
       <label for="f-${name}">${text}</label>
       <select id="f-${name}" name="${name}" data-filter="${name}"><option value="">Vše</option>${opts.map(([v, t]) => html`<option value="${esc(v)}">${esc(t)}</option>`)}</select>
     </div>`;
-  const hasFilters = search || makers.length > 1 || conds.length > 1 || types.length > 1 || priced;
-  const sorted = [...list].sort(byNewest);
+  const hasFilters = search || makers.length > 1 || conds.length > 1 || types.length > 1 || cats.length > 1 || avail.length > 1 || priced || discounts;
 
   return html`<div class="catalogue" data-catalogue>
   ${list.length > 1 && html`<form class="cat-tools" hidden data-cat-tools role="search" aria-label="Filtrovat a řadit automaty">
     ${search && html`<div class="tool tool-search"><label for="f-q">Hledat</label><input id="f-q" type="search" name="q" data-filter="q" placeholder="Název, výrobce, model"></div>`}
+    ${cats.length > 1 && select('category', 'Druh automatu', cats.map((cat) => [cat.slug, cat.name]))}
     ${makers.length > 1 && select('manufacturer', 'Výrobce', makers.map((m) => [m, m]))}
     ${conds.length > 1 && select('condition', 'Stav', conds.map((k) => [k, c.site.conditions[k].label]))}
     ${types.length > 1 && select('type', 'Typ automatu', types.map((t) => [t, t]))}
+    ${avail.length > 1 && select('availability', 'Dostupnost', avail.map((a) => [a, a]))}
     ${priced && html`<fieldset class="tool tool-price"><legend>Cena (Kč)</legend>
       <label class="visually-hidden" for="f-pmin">Cena od</label><input id="f-pmin" type="number" min="0" step="1000" inputmode="numeric" placeholder="od" data-filter="pmin">
       <span aria-hidden="true">–</span>
       <label class="visually-hidden" for="f-pmax">Cena do</label><input id="f-pmax" type="number" min="0" step="1000" inputmode="numeric" placeholder="do" data-filter="pmax">
     </fieldset>`}
+    ${discounts && html`<div class="tool tool-check"><label><input type="checkbox" data-filter="sale" value="1"> Pouze ve slevě</label></div>`}
     <div class="tool">
-      <label for="f-sort">Řadit</label>
+      <label for="f-sort">Seřadit podle</label>
       <select id="f-sort" name="sort" data-sort>
-        <option value="newest">Nejnovější</option>
-        <option value="name">Název A–Z</option>
-        ${priced && '<option value="price-asc">Cena od nejnižší</option><option value="price-desc">Cena od nejvyšší</option>'}
+        ${SORTS.map(([v, t]) => html`<option value="${v}">${t}</option>`)}
       </select>
     </div>
     ${hasFilters && html`<button class="btn btn-ghost tool-reset" type="reset">Zrušit filtry</button>`}
   </form>`}
   <p class="cat-status" aria-live="polite" data-cat-status></p>
   <ul class="card-grid" data-cat-list aria-label="${esc(label)}">
-    ${sorted.map((p) => productCard(c, p, { headingLevel }))}
+    ${list.map((p, i) => productCard(c, p, { headingLevel, order: i }))}
   </ul>
-  <p class="cat-empty" hidden data-cat-empty>Zvoleným filtrům neodpovídá žádný automat. <button class="link-button" type="button" data-cat-clear>Zrušit filtry</button></p>
+  <div class="cat-empty" hidden data-cat-empty><p>Zvoleným filtrům neodpovídá žádný automat.</p><button class="btn btn-secondary" type="button" data-cat-clear>Zrušit filtry</button></div>
 </div>`;
 }
 
 /* ================================================================ */
 
 export function home(c) {
-  const machines = real(c.products).sort(byShowcase);
+  const machines = ordered(c, real(c.products));
   const { stocked, onRequest } = splitCategories(c);
-  const hero = c.products.find((p) => p.id === c.site.home?.heroProduct) || c.products.find((p) => p.images[0]);
+  const shown = c.products.filter(isListed);
+  const hero = shown.find((p) => p.id === c.site.home?.heroProduct) || shown.find((p) => p.images[0]);
   const img = hero?.images[0];
   const main = stocked[0];
   return {
@@ -166,7 +175,7 @@ export function home(c) {
       </div>
       ${main && html`<a class="text-link" href="${c.url(`automaty/${main.slug}/`)}">${esc(main.name)} ${ARROW}</a>`}
     </div>
-    ${machines.length > 0 && html`${listingNotice(machines)}${productGrid(c, machines, { headingLevel: 3, label: 'Zveřejněné automaty' })}`}
+    ${machines.length > 0 && html`${listingNotice(machines)}${catalogue(c, machines, { headingLevel: 3, label: 'Zveřejněné automaty', categories: true })}`}
   </div>
 </section>
 
@@ -212,7 +221,7 @@ ${onRequest.length > 0 && html`<section class="section section-alt" id="na-dotaz
 ${insideLook(c)}
 
 ${ctaBand(c)}`,
-    scripts: ['assets/js/inside.js'],
+    scripts: ['assets/js/inside.js', ...(machines.length > 1 ? ['assets/js/catalogue.js'] : [])],
   };
 }
 
@@ -257,7 +266,7 @@ export function categoriesIndex(c) {
   </div>
 </div>
 ${stocked.map((cat) => {
-  const list = real(inCategory(c, cat)).sort(byShowcase);
+  const list = ordered(c, real(inCategory(c, cat)), cat.slug);
   return html`<section class="section section-tight" aria-labelledby="cat-${esc(cat.slug)}">
   <div class="wrap">
     <div class="section-head">
@@ -291,6 +300,7 @@ export function category(c, cat) {
   return {
     title: cat.name,
     description: cat.metaDescription,
+    scripts: list.length > 1 ? ['assets/js/catalogue.js'] : [],
     body: html`
 <div class="page-head">
   <div class="wrap">
@@ -303,7 +313,7 @@ export function category(c, cat) {
 <section class="section section-tight" aria-label="${list.length ? 'Automaty v kategorii' : 'Automaty na dotaz'}">
   <div class="wrap">
     ${list.length
-      ? html`${placeholderNotice(list)}${listingNotice(list)}${productGrid(c, [...list].sort(byShowcase), { headingLevel: 2, label: cat.name })}`
+      ? html`${placeholderNotice(list)}${listingNotice(list)}${catalogue(c, ordered(c, list, cat.slug), { headingLevel: 2, label: cat.name })}`
       : emptyCategory(c, cat, 'h2')}
   </div>
 </section>
@@ -321,10 +331,12 @@ export function category(c, cat) {
 export function product(c, p) {
   const cat = c.categories.find((x) => x.slug === p.category);
   const cond = p.condition && c.site.conditions[p.condition];
+  const sold = p.availability === 'Prodáno';
   const related = (p.related?.length
-    ? p.related.map((id) => c.products.find((x) => x.id === id)).filter(Boolean)
-    : real(c.products.filter((x) => x.category === p.category && x.id !== p.id)).sort(byShowcase)
+    ? real(p.related.map((id) => c.products.find((x) => x.id === id)).filter(Boolean))
+    : ordered(c, real(c.products.filter((x) => x.category === p.category && x.id !== p.id)), p.category)
   ).slice(0, 3);
+  const s = sale(p, nowOf(c));
   const maker = makerLine(p);
   const filled = filledSpecs(p);
   const missing = p.specs.filter((s) => !filled.includes(s)).map((s) => s.label);
@@ -336,15 +348,17 @@ export function product(c, p) {
     ...(p.manufacturer && { brand: { '@type': 'Brand', name: p.manufacturer } }),
     ...(p.model && { model: p.model }),
     ...(p.images.some((i) => !i.illustrative) && { image: p.images.filter((i) => !i.illustrative).map((i) => mediaUrl({ url: c.absUrl }, i.src)) }),
-    ...(p.price != null && {
-      offers: { '@type': 'Offer', price: p.price, priceCurrency: c.site.catalogue.currency, url: c.absUrl(productPath(p)), itemCondition: p.condition === 'pouzity' ? 'https://schema.org/UsedCondition' : 'https://schema.org/RefurbishedCondition' },
+    ...(p.price != null && !sold && {
+      offers: { '@type': 'Offer', price: s ? s.final : p.price, priceCurrency: c.site.catalogue.currency, url: c.absUrl(productPath(p)), itemCondition: p.condition === 'pouzity' ? 'https://schema.org/UsedCondition' : 'https://schema.org/RefurbishedCondition' },
     }),
   };
   const facts = [
     ['Kategorie', html`<a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a>`],
     ['Stav', cond ? esc(cond.label) : ph('doplní se')],
     ['Typ automatu', p.type ? esc(p.type) : null],
-    ['Dostupnost', p.availability ? esc(p.availability) : null],
+    ['Rok výroby', p.year ? esc(p.year) : null],
+    ['Dostupnost', p.availability ? esc(p.availability + (p.stock > 1 && p.availability === 'Skladem' ? ` (${p.stock} ks)` : '')) : null],
+    ['Umístění', p.location ? esc(p.location) : null],
   ].filter(([, v]) => v);
 
   return {
@@ -361,21 +375,26 @@ export function product(c, p) {
     <div class="gallery" data-gallery>
       <figure class="gallery-main">${productImage(c, p, { eager: true, sizes: '(max-width: 900px) 100vw, 680px' })}</figure>
       ${p.images.length ? photoNote(p) : html`<p class="photo-note">Fotografie tohoto automatu bude doplněna.</p>`}
+      ${p.video && html`<p class="product-video"><a class="text-link" href="${esc(p.video)}" rel="noopener nofollow" target="_blank">Video automatu<span class="visually-hidden"> (otevře se v novém okně)</span>${ARROW}</a></p>`}
       ${p.images.length > 1 && html`<ul class="gallery-thumbs" aria-label="Další fotografie">
         ${p.images.map((img, i) => html`<li><a href="${mediaUrl(c, img.src)}" data-full="${mediaUrl(c, img.src)}" data-alt="${esc(img.alt || p.name)}"${i === 0 ? ' aria-current="true"' : ''}>
           <img src="${mediaUrl(c, img.thumb || img.src)}" alt="${esc(`Fotografie ${i + 1}: ${img.alt || p.name}`)}" width="120" height="90" loading="lazy" decoding="async"></a></li>`)}
       </ul>`}
     </div>
     <div class="product-summary">
-      <div class="card-badges">${conditionBadge(c, p)}</div>
+      <div class="card-badges">${sold ? '<span class="badge badge-sold">Prodáno</span>' : conditionBadge(c, p)}</div>
       ${maker && html`<p class="product-maker">${esc(maker)}</p>`}
       <h1>${esc(p.name)}</h1>
+      ${sold && html`<div class="notice notice-sold" role="note">${INFO}<p><strong>Tento automat je už prodaný.</strong> ${related.length ? 'Podobné automaty najdete níže na této stránce, ' : ''}celou nabídku najdete v kategorii <a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a>.</p></div>`}
       <p class="product-lead">${esc(p.summary)}</p>
       <dl class="facts">${facts.map(([k, v]) => html`<div><dt>${k}</dt><dd>${v}</dd></div>`)}</dl>
       <div class="price-box">
-        <p class="price${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p>
-        <p class="price-hint">Stav, cenu a dostupnost konkrétního kusu vám potvrdíme v odpovědi na poptávku.</p>
-        <a class="btn btn-primary btn-lg btn-block" href="#poptavka">Poptat tento automat</a>
+        ${priceSlot(c, p, 'detail')}
+        ${sold
+          ? html`<p class="price-hint">Napište nám, jaký automat hledáte, a nabídneme vám podobný.</p>
+        <a class="btn btn-primary btn-lg btn-block" href="${related.length ? '#related-title' : '#poptavka'}">${related.length ? 'Zobrazit podobné automaty' : 'Poptat podobný automat'}</a>`
+          : html`<p class="price-hint">Stav, cenu a dostupnost konkrétního kusu vám potvrdíme v odpovědi na poptávku.</p>
+        <a class="btn btn-primary btn-lg btn-block" href="#poptavka">Poptat tento automat</a>`}
         ${(c.site.contact.phone || c.site.contact.email) && html`<div class="price-direct">${c.site.contact.phone && phoneLink(c)}${c.site.contact.email && emailLink(c)}</div>`}
       </div>
       <ul class="product-jump" aria-label="Na této stránce">
@@ -409,6 +428,7 @@ export function product(c, p) {
         ? html`<p><strong>${esc(cond.label)}.</strong> ${cond.verified ? esc(cond.description) : ph(cond.description)}</p>`
         : html`<p>${ph('Stav automatu doplníme.')}</p>`}
       ${p.conditionDetails ? html`<p>${esc(p.conditionDetails)}</p>` : html`<p>${ph('Doplňte, co bylo na tomto kusu zkontrolováno, opraveno nebo vyměněno.')}</p>`}
+      ${p.defects && html`<h3>Známé vady a opotřebení</h3><p>${esc(p.defects)}</p>`}
       <p><a class="text-link" href="${c.url('repasovane-automaty/')}">Jak automaty připravujeme ${ARROW}</a></p>
     </section>
     ${(p.features.length > 0 || p.paymentSystems.length > 0) && html`<section class="detail-box" aria-labelledby="vybaveni">
@@ -417,11 +437,12 @@ export function product(c, p) {
       ${p.paymentSystems.length > 0 && html`<h3>Kompatibilní platební systémy</h3><ul class="ticks">${p.paymentSystems.map((f) => html`<li>${esc(f)}</li>`)}</ul>`}
     </section>`}
     ${p.warranty && html`<section class="detail-box" aria-labelledby="zaruka"><h2 id="zaruka">Záruka</h2><p>${esc(p.warranty)}</p></section>`}
+    ${p.delivery && html`<section class="detail-box" aria-labelledby="doprava"><h2 id="doprava">Doprava a předání</h2><p>${esc(p.delivery)}</p></section>`}
   </div>
 
   <div class="section section-alt"><div class="wrap">
     ${enquiryForm(c, {
-      title: 'Poptat tento automat',
+      title: sold ? 'Hledáte podobný automat?' : 'Poptat tento automat',
       intro: 'Napište nám, co vás zajímá, nebo si vyžádejte cenovou nabídku. Ozveme se vám.',
       kind: 'automat',
       product: p,
@@ -432,7 +453,7 @@ export function product(c, p) {
 
   ${related.length > 0 && html`<section class="section" aria-labelledby="related-title">
     <div class="wrap">
-      <div class="section-head"><h2 id="related-title">Další automaty v nabídce</h2>
+      <div class="section-head"><h2 id="related-title">${sold ? 'Podobné automaty v nabídce' : 'Další automaty v nabídce'}</h2>
         <a class="text-link" href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} ${ARROW}</a></div>
       ${productGrid(c, related, { headingLevel: 3, label: 'Další automaty v nabídce' })}
     </div>
@@ -443,7 +464,7 @@ ${ld && html`<script type="application/ld+json">${JSON.stringify(ld).replace(/</
 }
 
 export function refurbished(c) {
-  const list = c.products.filter((p) => p.condition === 'repasovany' || p.condition === 'renovovany');
+  const list = ordered(c, c.products.filter((p) => isListed(p) && (p.condition === 'repasovany' || p.condition === 'renovovany')));
   const main = c.categories.find((x) => x.featured) || c.categories[0];
   const v = (f) => c.url(`assets/video/${f}`);
   return {

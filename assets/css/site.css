@@ -279,6 +279,21 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; background: var(--bg-alt); border: 1px solid var(--line); color: var(--ink); font-size: var(--fs-caption); font-weight: 600; }
 .badge-repasovany, .badge-renovovany { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-hover); }
 .badge-ph { background: var(--ph-bg); border-color: var(--ph-line); color: var(--ph-ink); }
+/* discounts: restrained, a warm clay tone that reads as an offer without shouting */
+.badge-sale { background: #f8eee7; border-color: #e5c8b4; color: #7a3a17; }
+.badge-featured { background: var(--surface); border-color: var(--accent-line); color: var(--accent-hover); }
+.badge-sold { background: var(--ink); border-color: var(--ink); color: #fff; }
+.price-slot p { margin: 0; }
+.price-slot .is-sale { color: #7a3a17; }
+.price-was { color: var(--muted); font-size: var(--fs-caption); }
+.price-was s { text-decoration-thickness: 1px; }
+.price-sale-end { color: var(--ink-soft); font-size: var(--fs-caption); }
+.price-box .price-was, .price-box .price-sale-end { font-size: var(--fs-ui); }
+.price-box .price-slot { margin-bottom: var(--s1); }
+.price.is-sold { color: var(--ink-soft); }
+.card-avail { margin: -8px 0 var(--s2); font-size: var(--fs-caption); font-weight: 600; color: var(--ink-soft); }
+.notice-sold { margin: 0 0 var(--s3); background: var(--ivory); border-color: var(--line-strong); }
+.product-video { margin: 12px 0 0; }
 
 .photo-note { margin: 10px 0 0; font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--muted); }
 .photo-note a { color: inherit; }
@@ -385,7 +400,12 @@ a.contact-big:hover { color: var(--accent); }
 .cat-tools .tool-price input { width: 110px; }
 .cat-status { margin: 0 0 var(--s2); font-size: var(--fs-ui); color: var(--muted); }
 .cat-status:empty { display: none; }
-.cat-empty { padding: var(--s3); text-align: center; }
+.cat-empty { padding: var(--s4) var(--s3); text-align: center; background: var(--bg-alt); border: 1px solid var(--line); border-radius: var(--radius); }
+.cat-empty p { margin: 0 auto var(--s2); }
+.is-home .cat-empty { background: rgba(255, 255, 255, .94); }
+.tool-check { align-self: center; min-width: 0; }
+.tool-check label { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; font-weight: 600; cursor: pointer; }
+.cat-tools .tool-check input { width: 20px; height: 20px; min-height: 0; margin: 0; padding: 0; box-shadow: none; accent-color: var(--accent); }
 .cat-empty[hidden] { display: none; }
 
 /* ---------- inputs ---------- */

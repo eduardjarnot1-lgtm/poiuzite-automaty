@@ -1,5 +1,6 @@
 // Reusable page parts: layout, header, footer, breadcrumbs, product cards, enquiry form.
 import { esc, html, ph, czk } from './util.mjs';
+import { sale, effectivePrice, isListed, formatPrague, utcToPrague } from './catalog.mjs';
 
 const INFO = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>';
 export const CHECK = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -40,7 +41,7 @@ export const SERVICE_NAV = [
 ];
 const isCurrent = (c, sections) => sections.includes(c.page.section);
 const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
-const published = (c, slug) => c.products.filter((p) => p.category === slug && !p.placeholder).length;
+const published = (c, slug) => c.products.filter((p) => p.category === slug && !p.placeholder && isListed(p)).length;
 
 export function header(c) {
   const home = c.page.path === '';
@@ -150,14 +151,49 @@ export function breadcrumbs(c, trail) {
 // previewPath is set only by the local admin prototype, for machines that have no built page.
 export const productPath = (p) => p.previewPath || `automaty/${p.category}/${p.slug}/`;
 
-export const priceText = (c, p) =>
-  p.price != null ? czk(p.price, c.site.catalogue.currency, c.site.catalogue.pricesIncludeVat) : 'Cena na dotaz';
+const money = (c, n) => czk(n, c.site.catalogue.currency, c.site.catalogue.pricesIncludeVat);
+// The moment prices are worked out for. The admin prototype passes its own clock; the build uses
+// the time of the build.
+export const nowOf = (c) => c.now ?? Date.now();
+
+// The standard price, as text. For what a customer pays now (discounts included) use priceSlot.
+export const priceText = (c, p) => (p.price != null ? money(c, p.price) : 'Cena na dotaz');
+
+// "Akce do 17. 11. 2026" (with the time when it isn't the end of the day)
+const saleEnd = (iso, withTime) => {
+  const t = utcToPrague(iso).time;
+  return `Akce do ${formatPrague(iso, { time: withTime || t !== '23:59' })}`.replace(/ v (2|3|4|12|13|14|2\d):/, ' ve $1:');
+};
+
+// The price block of a card ('card') or of the detail page ('detail'). A running discount shows
+// the price after the discount, the standard price crossed out and labelled, and the end date if
+// it has one. Wrapped in data-price-slot so the prototype can swap it when a discount starts/ends.
+export function priceSlot(c, p, variant = 'card') {
+  const s = sale(p, nowOf(c));
+  const cls = variant === 'card' ? 'card-price' : 'price';
+  if (variant === 'detail' && p.availability === 'Prodáno') {
+    return html`<div class="price-slot" data-price-slot="${esc(p.id)}"><p class="${cls} is-sold">Prodáno</p></div>`;
+  }
+  if (!s) {
+    return html`<div class="price-slot" data-price-slot="${esc(p.id)}"><p class="${cls}${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p></div>`;
+  }
+  return html`<div class="price-slot is-sale" data-price-slot="${esc(p.id)}">
+    <p class="${cls} is-sale"><span class="visually-hidden">Cena po slevě: </span>${esc(money(c, s.final))}</p>
+    <p class="price-was">Běžná cena <s>${esc(money(c, s.standard))}</s>${variant === 'detail' ? html`<span class="price-saved"> · ušetříte ${esc(money(c, s.saved).replace(/ (bez|vč\.) DPH$/, ''))}</span>` : ''}</p>
+    ${s.end && html`<p class="price-sale-end">${esc(saleEnd(s.end, variant === 'detail'))}</p>`}
+  </div>`;
+}
+
+export const saleBadge = (c, p) => {
+  const s = sale(p, nowOf(c));
+  return s && html`<span class="badge badge-sale">${s.percent ? `Sleva ${String(s.percent).replace('.', ',')} %` : 'Sleva'}</span>`;
+};
 
 export const makerLine = (p) => [p.manufacturer, p.model].filter(Boolean).join(' · ');
 
 export function conditionBadge(c, p) {
   const cond = p.condition && c.site.conditions[p.condition];
-  return html`${p.placeholder && '<span class="badge badge-ph">Vzorová položka</span>'}${cond && html`<span class="badge badge-${esc(p.condition)}">${esc(cond.label)}</span>`}`;
+  return html`${p.placeholder && '<span class="badge badge-ph">Vzorová položka</span>'}${p.featured && '<span class="badge badge-featured">Doporučujeme</span>'}${saleBadge(c, p)}${cond && html`<span class="badge badge-${esc(p.condition)}">${esc(cond.label)}</span>`}`;
 }
 
 // Photos may be local (assets/products/...), full URLs to another site, or (in the local admin
@@ -185,13 +221,16 @@ export const photoNote = (p, img = p.images[0], cls = 'photo-note') =>
 /* A published machine: same image well, name, one-line description, price (or "Cena na dotaz")
    and the detail link on every card, with the actions aligned along the bottom. The line under the
    photo always takes the same height, so cards with and without a credit line stay aligned. */
-export function productCard(c, p, { headingLevel = 3 } = {}) {
+export function productCard(c, p, { headingLevel = 3, order = 0 } = {}) {
   const href = c.url(productPath(p));
   const h = `h${headingLevel}`;
   const img = p.images[0];
   const keySpecs = filledSpecs(p).filter((s) => s.key).slice(0, 3);
   const search = [p.name, p.manufacturer, p.model, p.summary].filter(Boolean).join(' ').toLowerCase();
-  return html`<li class="card" data-name="${esc(p.name.toLowerCase())}" data-manufacturer="${esc(p.manufacturer || '')}" data-condition="${esc(p.condition || '')}" data-type="${esc(p.type || '')}" data-price="${p.price ?? ''}" data-date="${esc(p.dateAdded || '')}" data-search="${esc(search)}">
+  // data-* feed the customer filters and sorting in assets/js/catalogue.js; data-price is the
+  // price that applies now, data-order the recommended position (also the tie-break).
+  const price = effectivePrice(p, nowOf(c));
+  return html`<li class="card" data-id="${esc(p.id)}" data-order="${order}" data-heading="${headingLevel}" data-name="${esc(p.name.toLowerCase())}" data-category="${esc(p.category)}" data-manufacturer="${esc(p.manufacturer || '')}" data-condition="${esc(p.condition || '')}" data-type="${esc(p.type || '')}" data-availability="${esc(p.availability || '')}" data-price="${price ?? ''}" data-sale="${sale(p, nowOf(c)) ? '1' : ''}" data-date="${esc(p.dateAdded || '')}" data-search="${esc(search)}">
   <a class="card-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p)}</a>
   ${img?.illustrative ? photoNote(p, img, 'card-note') : html`<p class="card-note">${img ? 'Fotografie automatu' : 'Fotografie bude doplněna'}</p>`}
   <div class="card-body">
@@ -200,8 +239,9 @@ export function productCard(c, p, { headingLevel = 3 } = {}) {
     <${h} class="card-title"><a href="${href}">${esc(p.name)}</a></${h}>
     <p class="card-summary">${esc(p.summary)}</p>
     ${keySpecs.length > 0 && html`<dl class="card-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
+    ${p.availability && html`<p class="card-avail">${esc(p.availability)}</p>`}
     <div class="card-foot">
-      <p class="card-price${p.price == null ? ' is-on-request' : ''}">${esc(priceText(c, p))}</p>
+      ${priceSlot(c, p, 'card')}
       <a class="text-link" href="${href}">Detail automatu${ARROW}<span class="visually-hidden">: ${esc(p.name)}</span></a>
     </div>
   </div>
@@ -296,8 +336,11 @@ ${header(c)}
 ${body}
 </main>
 ${footer(c)}
-${c.proto && c.proto.foot(c)}<script src="${c.url('assets/js/site.js')}" defer></script>
-${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}</body>
+${c.proto
+  // the prototype renders saved changes first, then loads the page scripts itself
+  ? c.proto.foot(c, ['assets/js/site.js', ...scripts].map((s) => c.url(s)))
+  : html`<script src="${c.url('assets/js/site.js')}" defer></script>
+${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}`}</body>
 </html>
 `;
 }

@@ -50,6 +50,17 @@ The build stops with a clear message if a product has a missing field, an unknow
 
 **Catalogue controls follow the data.** A filter appears only when at least two machines differ in that field (manufacturer, condition, type), price filtering and sorting appear once two machines have prices, and search appears from `catalogue.searchMinProducts` machines (8). Without JavaScript the full list still shows.
 
+## Catalogue logic, tests and the admin prototype
+
+Prices, discounts, visibility and ordering live in `scripts/lib/catalog.mjs` (pure functions used by the build, the templates and the prototype). Tests: `node --test scripts/test/*.test.mjs`.
+
+- A machine keeps its standard `price` (whole CZK, or `null` for "Cena na dotaz") and an optional `discount` (`enabled`, `method` `percent`/`amount`/`price`, `value`, `start`, `end` as UTC ISO times; entered in Europe/Prague time). The price after the discount is always computed; the standard price is never overwritten. A discount applies from `start` (inclusive) to `end` (exclusive).
+- `status` is `published` (default), `draft` or `hidden`; `deletedAt` marks the trash. Drafts, hidden and deleted machines get no page and never appear in listings. `availability: "Prodáno"` drops a machine from listings but keeps its page, marked sold, with similar machines.
+- Listings are in the "Doporučené" order: `featured` machines first, then the saved order, then photographed machines, newest first. Customers can switch "Seřadit podle" (price uses the price that applies now; "Cena na dotaz" goes last) and filter by category, availability, condition, price and "Pouze ve slevě"; the choice is kept in the address bar.
+- Optional public fields: `year`, `location`, `defects`, `delivery`, `video`, `stock`. Never public: `ref`, `notes`.
+
+`node scripts/build.mjs --prototype` (previews only, never Netlify) adds "Správa nabídky": overview with search and filters, quick price and availability edits, the add/edit form (photos, details, price and discount, parameters, publication), display order, trash, duplicates, and backup/import. It stores the catalogue in this browser only (localStorage for data, IndexedDB for photos) through `assets/proto/store.js`, the single data layer to replace with a real backend API. `tools/admin-browser-check.cjs` runs the 14 acceptance scenarios in Chromium.
+
 ## Forms
 
 All forms are one Netlify form named `poptavka` with fields `jmeno`, `firma`, `email`, `telefon`, `zprava`, plus hidden `typ` (which page or service) and `automat` (the product, on product pages). Netlify detects it at deploy; turn on notifications in the Netlify dashboard under Forms. To use another service (Formspree, Basin, your own handler), set `forms.endpoint` in `site.json`.

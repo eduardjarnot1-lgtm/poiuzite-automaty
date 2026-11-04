@@ -17,16 +17,16 @@ export const proto = {
   // Hides the page body for the moment it takes to re-render it from saved changes, so visitors
   // of this preview don't see the old prices flash. Only when something was saved.
   head: (c) => html`<link rel="stylesheet" href="${c.url('assets/proto/proto.css')}">
-<script>try{if(localStorage.getItem('pouzite-automaty:prototyp:v1'))document.documentElement.classList.add('proto-pending')}catch(e){}</script>
+<script>try{if(localStorage.getItem('pouzite-automaty:prototyp:v2')||localStorage.getItem('pouzite-automaty:prototyp:v1'))document.documentElement.classList.add('proto-pending')}catch(e){}</script>
 `,
-  foot: (c) => {
+  foot: (c, scripts) => {
     const admin = c.page.path === ADMIN_PATH;
     return html`<nav class="proto-switch" aria-label="Náhled prototypu">
   <span class="proto-switch-label" aria-hidden="true">Prototyp</span>
   <a href="${c.url('')}" data-proto-customer${admin ? '' : ' aria-current="page"'}>Pohled zákazníka</a>
   <a href="${c.url(ADMIN_PATH)}"${admin ? ' aria-current="page"' : ''}>Správa nabídky</a>
 </nav>
-<script type="application/json" id="proto-route">${JSON.stringify(routeInfo(c)).replace(/</g, '\\u003c')}</script>
+<script type="application/json" id="proto-route">${JSON.stringify({ ...routeInfo(c), scripts }).replace(/</g, '\\u003c')}</script>
 <script type="module" src="${c.url('assets/proto/proto.js')}"></script>
 `;
   },
@@ -42,10 +42,10 @@ export function adminPage(c) {
 <div class="page-head">
   <div class="wrap">
     <h1>Správa nabídky</h1>
-    <p class="lead">Přidejte automat nebo upravte název, kategorii, popis, cenu, fotografii a dostupnost. Uložené změny se hned projeví v pohledu zákazníka.</p>
+    <p class="lead">Přidejte automat, nahrajte fotky, vyplňte údaje a cenu a zveřejněte ho. Tady také nastavíte slevy, dostupnost a pořadí v nabídce. Uložené změny se hned projeví v pohledu zákazníka v tomto prohlížeči.</p>
   </div>
 </div>
-<section class="section section-tight" aria-label="Automaty v nabídce">
+<section class="section section-tight pa-page" aria-label="Správa automatů">
   <div class="wrap">
     <div class="proto-note" role="note"><strong>Prototyp pro vyzkoušení, ne ostrá správa webu.</strong> ${esc(STORAGE_NOTE)}</div>
     <div data-proto-admin><noscript><p>Správa nabídky potřebuje zapnutý JavaScript.</p></noscript></div>
