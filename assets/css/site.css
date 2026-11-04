@@ -614,30 +614,83 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .bg-video { display: none; } }
 
 /* ---------- "Podívejte se dovnitř automatu" (homepage) ----------
-   A static wave background (no second moving layer), a neutral surface matching the
-   animation's own light grey, the full frame always visible (contain, 1280 × 944). */
+   A guided look at the illustrative 3D animation. Without JS: the video with its native
+   controls and the full description. With JS (assets/js/inside.js) the section becomes a tall
+   scroll track whose stage sticks to the screen while scrolling moves the video and the active
+   explanation (.is-scrub), or, on short screens / reduced motion / unseekable video, a normal
+   video with step buttons (.is-manual). The frame keeps the video's own ratio (1024 × 756). */
 .inside { background: #f9fafa url("../img/bg/waves-light.webp") center / cover no-repeat; border-top: 1px solid var(--line); }
 .inside-grid { display: grid; grid-template-columns: minmax(0, 42fr) minmax(0, 58fr); gap: var(--s6); align-items: center; }
+.inside-text { position: relative; }
 .inside-text h2 { font-size: var(--fs-h2); margin-bottom: var(--s2); }
-.inside-text .lead { margin-bottom: var(--s4); max-width: 44ch; }
 .inside-media { margin: 0; }
-.inside-frame { position: relative; aspect-ratio: 1280 / 944; background: #e6e6e2; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); overflow: hidden; }
+.inside-frame { position: relative; aspect-ratio: 1024 / 756; background: #e6e6e2; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); overflow: hidden; }
 .inside-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #e6e6e2; }
 .inside-media figcaption { margin-top: 10px; font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--muted); }
-.inside-bar { display: flex; align-items: center; gap: var(--s2); margin-top: 12px; }
-.inside-bar figcaption { margin: 0; }
-.inside-control {
-  flex: none; display: inline-flex; align-items: center; gap: 8px;
-  min-height: 44px; padding: 0 16px 0 12px; border: 1px solid var(--accent-line); border-radius: var(--radius-sm);
-  background: var(--surface); color: var(--accent); font-size: var(--fs-ui); font-weight: 600; cursor: pointer;
-  transition: background .15s, border-color .15s;
+
+.inside-step-head { display: flex; align-items: center; gap: var(--s2); margin-bottom: 12px; }
+.inside-count { margin: 0; flex: none; font-size: var(--fs-ui); font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.inside-progress { position: relative; flex: 1 1 auto; height: 4px; background: var(--line); border-radius: 2px; }
+.inside-progress span { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--inside-p, 0) * 100%); background: var(--accent); border-radius: 2px; }
+.inside-progress i { position: absolute; top: -3px; width: 2px; height: 10px; margin-left: -1px; background: var(--line-strong); border-radius: 1px; }
+/* all steps share one cell, so the panel keeps the height of the longest one */
+.inside-steps { display: grid; }
+.inside-step { grid-area: 1 / 1; }
+.inside-step h3 { margin: 0 0 6px; font-size: var(--fs-h3); }
+.inside-step p { margin: 0; max-width: 46ch; color: var(--ink-soft); }
+.js .inside[data-mode] .inside-step[hidden] { display: block; visibility: hidden; opacity: 0; }
+.inside[data-mode] .inside-step { transition: opacity .28s var(--ease), transform .28s var(--ease), visibility 0s .28s; transform: translateY(6px); }
+.inside[data-mode] .inside-step.is-active { visibility: visible; opacity: 1; transform: none; transition: opacity .28s var(--ease) .06s, transform .28s var(--ease) .06s, visibility 0s; }
+.inside-hint { margin: 12px 0 0; min-height: 1.5em; font-size: var(--fs-caption); color: var(--muted); transition: opacity .3s; }
+.inside-hint.is-gone { opacity: 0; }
+.inside-hint[hidden] { display: none; }
+.inside-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s2); }
+.inside-nav[hidden] { display: none; }
+.inside-nav .btn-sm { min-height: 40px; padding: 0 14px; }
+.inside-all { margin-top: var(--s2); }
+.inside-all summary { display: inline-flex; align-items: center; min-height: 40px; font-size: var(--fs-ui); font-weight: 600; color: var(--accent); cursor: pointer; }
+.inside-all summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.inside-all ol { margin: 8px 0 0; padding-left: 1.3em; font-size: var(--fs-ui); color: var(--ink-soft); }
+.inside-all li { margin-bottom: 8px; }
+.inside-cta { margin-top: var(--s3); }
+
+/* scroll-driven: the stage sticks while the track scrolls past (height set by inside.js) */
+.inside.is-scrub { padding-top: var(--s3); padding-bottom: var(--s3); }
+.inside.is-scrub [data-inside-stage] { position: sticky; top: var(--inside-top, 16px); }
+/* Until inside.js has measured, reserve roughly the scroll track, so a reload or a restored scroll
+   position mid-sequence lands where it was (in the preview build the script starts later). */
+@media (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  .js .inside:not([data-mode]) .inside-track { height: calc(320vh + 600px); }
 }
-.inside-control:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
-.inside-control:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.inside-control .icon { width: 18px; height: 18px; }
+/* the full description opens over the panel, so the sticky layout never changes size */
+.inside.is-scrub .inside-all[open] ol {
+  position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; top: 0; margin: 0; overflow: auto;
+  padding: var(--s3) var(--s3) var(--s3) calc(var(--s3) + 1.3em); background: #fff; border: 1px solid var(--line-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+}
+.inside.is-scrub .inside-all[open] summary { position: relative; z-index: 6; }
+.inside.is-scrub .inside-all[open] ol { padding-bottom: 72px; }
+.inside.is-scrub .inside-all[open] summary::after { content: " – zavřít"; }
+
 @media (max-width: 900px) {
   .inside-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
   .inside { background-image: url("../img/bg/waves-light-900.webp"); background-position: right top; }
+  /* video first, so the picture and its explanation are read together */
+  .inside[data-mode] .inside-media { order: -1; }
+  .inside.is-scrub .inside-grid { gap: 12px; }
+  .inside.is-scrub .inside-text { padding: var(--s2) !important; }
+  .inside.is-scrub .inside-text .eyebrow { margin-bottom: 4px; font-size: var(--fs-caption); }
+  .inside.is-scrub .inside-text h2 { font-size: 1.375rem; margin-bottom: 10px; }
+  .inside.is-scrub .inside-step h3 { font-size: var(--fs-h4); }
+  .inside.is-scrub .inside-step p { font-size: var(--fs-ui); }
+  .inside.is-scrub .inside-media figcaption { margin-top: 4px; }
+  .inside.is-scrub .inside-hint { margin-top: 6px; }
+  .inside.is-scrub .inside-nav { margin-top: 10px; }
+  .inside.is-scrub .inside-all { display: inline-block; margin: 10px 0 0 8px; }
+  .inside.is-scrub .inside-nav, .inside.is-scrub .inside-all { vertical-align: middle; }
+  .inside.is-scrub .inside-cta { margin-top: 10px; min-height: 44px; padding: 0 18px; font-size: var(--fs-ui); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inside[data-mode] .inside-step, .inside[data-mode] .inside-step.is-active, .inside-hint { transition: none; transform: none; }
 }
 
 /* ==========================================================================
@@ -682,7 +735,6 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
 .is-home .notice { background: rgba(255, 255, 255, .94); }
 .is-home .hero-well { background: rgba(255, 255, 255, .94); }
 .is-home .hero-media figcaption { display: table; margin: 10px auto 0; padding: 2px 10px; background: rgba(255, 255, 255, .85); border-radius: 6px; }
-.is-home .inside-bar { padding: 8px; background: rgba(255, 255, 255, .9); border-radius: var(--radius-sm); }
 @media (max-width: 760px) {
   .is-home .hero-text { padding: var(--s3); background: rgba(255, 255, 255, .9); border: 1px solid var(--line); border-radius: var(--radius-lg); }
   .is-home .section-head, .is-home .service-split > div:first-child, .is-home .inside-text, .is-home .cta-band { padding: var(--s3); }

@@ -228,26 +228,62 @@ ${ctaBand(c)}`,
 /* An illustrative 3D animation of a machine opening into an exploded view. Labelled as a
    visualisation, not footage of a real inspection. assets/js/inside.js plays it once when half of
    it is in view and adds the play / pause / replay control; without JS the native controls show. */
+// The stages of the illustrative 3D animation, as they appear in the footage (seconds). The same
+// list drives the scroll-controlled video and the explanation next to it (assets/js/inside.js).
+// Describes only what is visible; the animation is not a specific machine.
+export const INSIDE_DURATION = 25.17;
+export const INSIDE_STEPS = [
+  { from: 0, to: 1.3, title: 'Celý automat', text: 'Výchozí pohled na zavřený automat: prosklená dvířka se zbožím, dotykový displej a platební panel na pravé straně.' },
+  { from: 1.3, to: 10.6, title: 'Otevření a rozložení', text: 'Dvířka se otevřou a horní kryt, boční panely i elektronika se oddálí od rámu. Rozložený automat se pomalu otáčí, aby byly vidět jednotlivé díly.' },
+  { from: 10.6, to: 13.8, title: 'Police se zbožím a ovládací panel', text: 'Bližší pohled na police se spirálami, ve kterých stojí zboží, a na ovládací panel s displejem a platebním terminálem.' },
+  { from: 13.8, to: 16.8, title: 'Spodní část automatu', text: 'Ve spodní části rámu je technická jednotka s ventilátorem a kompresorem. Pod policemi je výdejní přihrádka, do které zboží padá.' },
+  { from: 16.8, to: 20.9, title: 'Mincovník', text: 'Detail mincovníku s tubami na mince a schránky pod ním, vedle nejnižší police s nápoji.' },
+  { from: 20.9, to: INSIDE_DURATION, title: 'Zpět v celku', text: 'Díly se vrátí na své místo a automat se znovu zavře.' },
+];
+
 function insideLook(c) {
-  return html`<section class="section inside" id="pohled-dovnitr" aria-labelledby="inside-title">
-  <div class="wrap inside-grid">
+  const n = INSIDE_STEPS.length;
+  const num = (i) => String(i + 1).padStart(2, '0');
+  return html`<section class="section inside" id="pohled-dovnitr" aria-labelledby="inside-title" data-inside data-duration="${INSIDE_DURATION}">
+  <div class="inside-track" data-inside-track>
+  <div class="wrap inside-grid" data-inside-stage>
     <div class="inside-text">
       <p class="eyebrow">Technický pohled</p>
       <h2 id="inside-title">Podívejte se dovnitř automatu.</h2>
-      <p class="lead">Nahlédněte do konstrukce nápojového automatu a prohlédněte si jeho hlavní součásti v přehledné animaci.</p>
-      <a class="btn btn-primary btn-lg" href="${c.url('kontakt/')}#formular">Zeptat se na konkrétní automat</a>
+      <div class="inside-step-head">
+        <p class="inside-count" data-inside-count><span class="visually-hidden">Krok </span><span data-inside-current>01</span> / ${num(n - 1)}</p>
+        <div class="inside-progress" aria-hidden="true"><span data-inside-bar></span>${INSIDE_STEPS.slice(1).map((s) => html`<i style="left:${((s.from / INSIDE_DURATION) * 100).toFixed(2)}%"></i>`)}</div>
+      </div>
+      <div class="inside-steps" data-inside-steps>
+        ${INSIDE_STEPS.map((s, i) => html`<div class="inside-step${i === 0 ? ' is-active' : ''}" data-from="${s.from}" data-to="${s.to}"${i === 0 ? '' : ' hidden'}>
+          <h3>${esc(s.title)}</h3>
+          <p>${esc(s.text)}</p>
+        </div>`)}
+      </div>
+      <p class="inside-hint" data-inside-hint hidden>Posouvejte dolů a prohlédněte si jednotlivé části.</p>
+      <div class="inside-nav" data-inside-nav hidden>
+        <button class="btn btn-secondary btn-sm" type="button" data-inside-prev>Předchozí krok</button>
+        <button class="btn btn-secondary btn-sm" type="button" data-inside-next>Další krok</button>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-inside-live></p>
+      <details class="inside-all" data-inside-all>
+        <summary>Zobrazit celý popis</summary>
+        <ol>${INSIDE_STEPS.map((s) => html`<li><strong>${esc(s.title)}.</strong> ${esc(s.text)}</li>`)}</ol>
+      </details>
+      <a class="btn btn-primary btn-lg inside-cta" href="${c.url('kontakt/')}#formular">Zeptat se na konkrétní automat</a>
     </div>
     <figure class="inside-media">
-      <div class="inside-frame" data-inside>
-        <video controls muted playsinline preload="none" width="1280" height="944"
+      <div class="inside-frame" data-inside-frame>
+        <video controls muted playsinline preload="none" width="1024" height="756"
           poster="${c.url('assets/img/automat-zevnitr-poster.webp')}"
-          aria-label="Animace: automat se otevírá a ukazuje své hlavní součásti">
+          aria-label="Ilustrační animace: automat se otevře, rozloží na hlavní části a znovu složí">
           <source src="${c.url('assets/video/automat-zevnitr.webm')}" type="video/webm">
           <source src="${c.url('assets/video/automat-zevnitr.mp4')}" type="video/mp4">
         </video>
       </div>
       <figcaption>Ilustrační 3D vizualizace. Konstrukce jednotlivých modelů se může lišit.</figcaption>
     </figure>
+  </div>
   </div>
 </section>`;
 }
