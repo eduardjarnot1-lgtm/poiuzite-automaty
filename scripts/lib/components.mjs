@@ -325,7 +325,7 @@ ${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && h
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500..700&family=Source+Sans+3:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
 ${head}<script>document.documentElement.classList.add('js')</script>${c.proto && '\n' + c.proto.head(c)}
 </head>
