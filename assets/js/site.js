@@ -87,6 +87,14 @@
         box.focus();
       };
       if (data.get('firma-web')) { done(); return; }   // honeypot filled: quietly drop
+      // The preview build has no form service behind it: say so plainly instead of pretending
+      // the enquiry was sent.
+      if (form.hasAttribute('data-preview')) {
+        status.className = 'form-status is-error';
+        status.textContent = 'Formulář je vyplněný správně, ale v pracovním náhledu se neodesílá. Zpráva nikam neodešla.';
+        status.focus();
+        return;
+      }
 
       button.disabled = true;
       const label = button.textContent;

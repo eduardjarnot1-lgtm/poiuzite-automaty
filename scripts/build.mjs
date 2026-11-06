@@ -11,6 +11,8 @@ import { layout, productPath } from './lib/components.mjs';
 import * as pages from './lib/pages.mjs';
 import { isVisible } from './lib/catalog.mjs';
 import { proto, adminPage, previewPage, ADMIN_PATH, PREVIEW_PATH } from './lib/prototype.mjs';
+import * as legal from './lib/legal.mjs';
+import { releaseBlockers } from './lib/release.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name, fallback) => {
@@ -21,6 +23,10 @@ const dataDir = arg('data', 'data');
 const out = arg('out', 'dist');
 const explicitIndex = process.argv.includes('--explicit-index');
 const prototype = process.argv.includes('--prototype');
+// Photos and other media are published only when their usage rights are recorded as cleared
+// ("rights": "cleared" on the image). --show-unverified-assets keeps the others for private
+// previews; the Netlify build never passes it, so the public site shows the neutral drawing.
+const showUnverified = process.argv.includes('--show-unverified-assets');
 
 const load = async (f) => JSON.parse(await readFile(join(dataDir, f), 'utf8'));
 const site = await load('site.json');
@@ -51,6 +57,16 @@ if (errors.length) {
   process.exit(1);
 }
 
+const blockers = await releaseBlockers({ root, site, products });
+let hiddenPhotos = 0;
+if (!showUnverified) {
+  for (const p of products) {
+    const before = p.images.length;
+    p.images = p.images.filter((img) => img.rights === 'cleared');
+    hiddenPhotos += before - p.images.length;
+  }
+}
+
 /* ---------- render ---------- */
 // Absolute URLs (canonical, sitemap, structured data) need a known origin: site.json baseUrl,
 // or the URL Netlify sets during its builds.
@@ -69,6 +85,9 @@ const routes = [
   { path: 'o-nas/', section: 'o-nas/', render: pages.about },
   { path: 'kontakt/', section: 'kontakt/', render: pages.contact },
   { path: 'dekujeme/', section: '', render: pages.thanks, noindex: true },
+  // Draft legal pages carry a draft notice and stay out of search engines until legal.status is "final".
+  ...[['obchodni-podminky/', legal.terms], ['reklamace-a-odstoupeni/', legal.complaints], ['ochrana-osobnich-udaju/', legal.privacy], ['cookies/', legal.cookies]]
+    .map(([path, render]) => ({ path, section: 'legal', render, noindex: (site.legal?.status || 'draft') !== 'final' })),
   { path: '404', file: '404.html', section: '', render: pages.notFound, noindex: true, absolute: true },
   ...(prototype ? [
     { path: ADMIN_PATH, section: ADMIN_PATH, kind: 'admin', render: adminPage, noindex: true },
@@ -84,7 +103,7 @@ for (const route of routes) {
   await writeFile(file, layout(c, route.render(c)));
 }
 
-for (const dir of ['css', 'js', 'img', 'video', 'products']) {
+for (const dir of ['css', 'js', 'img', 'video', 'products', 'fonts']) {
   await cp(join(root, 'assets', dir), join(out, 'assets', dir), { recursive: true }).catch((e) => {
     if (e.code !== 'ENOENT') throw e;
   });
@@ -110,4 +129,7 @@ if (absUrl) {
 }
 await writeFile(join(out, 'robots.txt'), prototype ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\n${absUrl ? `Sitemap: ${absUrl('sitemap.xml')}\n` : ''}`);
 
+if (hiddenPhotos) console.log(`${hiddenPhotos} photo(s) without cleared usage rights left out (use --show-unverified-assets for private previews).`);
+if (blockers.length) console.warn(`Release blockers (${blockers.length}), see LEGAL-AUDIT.md:\n  - ${blockers.join('\n  - ')}`);
+if (blockers.length && process.argv.includes('--strict')) process.exit(2);
 console.log(`Built ${routes.length} pages into ${out}${absUrl ? ` for ${base}` : ' (no baseUrl: canonical links and sitemap skipped)'}`);

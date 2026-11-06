@@ -646,6 +646,43 @@ input, select, textarea, button { font: inherit; color: var(--ink); }
 .footer-base { position: relative; padding-block: var(--s3); font-size: var(--fs-caption); color: var(--muted); }
 .footer-base::before { content: ""; position: absolute; top: 0; left: var(--gutter); right: var(--gutter); border-top: 1px solid var(--line); }
 .center-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.footer-base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s1) var(--s3); }
+.site-footer .footer-legal { display: flex; flex-wrap: wrap; gap: 4px var(--s2); }
+.site-footer .footer-legal a { display: inline-block; padding-block: 6px; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; }
+.footer-operator { margin: 0; padding-block: 6px; max-width: 80ch; }
+
+/* ---------- legal and consumer-information pages: one white reading surface ---------- */
+.legal { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: var(--s3) var(--s5); align-items: start; }
+.legal > .notice { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 899px) { .legal { grid-template-columns: minmax(0, 1fr); } }
+.legal-toc { position: sticky; top: calc(var(--header-h) + var(--s3)); padding: var(--s3); background: var(--solid-bg); border: 1px solid var(--line); border-radius: var(--radius-lg); font-size: var(--fs-ui); }
+@media (max-width: 899px) { .legal-toc { position: static; } }
+.legal-toc-title { margin: 0 0 12px; font-size: var(--fs-small); }
+.legal-toc ol { margin: 0; padding-left: 1.3em; display: grid; gap: 2px; }
+.legal-toc a { display: block; padding-block: 3px; color: var(--ink-soft); }
+.legal-body { max-width: 72ch; padding: var(--s4); background: var(--solid-bg); border: 1px solid var(--line); border-radius: var(--radius-lg); color: var(--ink-soft); }
+@media (max-width: 599px) { .legal-body { padding: var(--s3) var(--s2); } }
+.legal-body section { scroll-margin-top: calc(var(--header-h) + var(--s2)); }
+.legal-body h2 { margin-top: var(--s5); font-size: clamp(1.25rem, 1.15rem + .5vw, 1.5rem); }
+.legal-body section:first-child h2 { margin-top: 0; }
+.legal-body ul { padding-left: 1.3em; }
+.legal-body li { margin-bottom: 8px; }
+.legal-facts { display: grid; gap: 0; margin: var(--s2) 0; border-top: 1px solid var(--line-soft); }
+.legal-facts > div { display: grid; grid-template-columns: minmax(0, 13em) minmax(0, 1fr); gap: 4px var(--s2); padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+@media (max-width: 599px) { .legal-facts > div { grid-template-columns: minmax(0, 1fr); } }
+.legal-facts dt { color: var(--ink); font-weight: 600; }
+.legal-facts dd { margin: 0; }
+.legal-facts dd a, .legal-facts dd span { display: inline-flex; align-items: center; gap: 6px; }
+.table-wrap { overflow-x: auto; margin: var(--s2) 0; }
+.legal-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: var(--fs-ui); }
+.legal-table th, .legal-table td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line-soft); text-align: left; vertical-align: top; }
+.legal-table th { color: var(--ink); font-weight: 600; }
+.legal-form { padding: var(--s3); background: var(--bg-alt); border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); }
+.legal-form p { margin: 0 0 8px; }
+.legal-updated { margin: var(--s5) 0 0; font-size: var(--fs-small); color: var(--muted); }
+.notice-draft { border-color: var(--ph-line); background: var(--ph-bg); }
+.notice-draft .icon { color: var(--ph-ink); }
+.form-preview-note { margin: 0 0 var(--s3); padding: 10px 14px; background: var(--ph-bg); border: 1px dashed var(--ph-line); border-radius: var(--radius-sm); color: var(--ph-ink); font-size: .9375rem; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -882,3 +919,4 @@ html:has(body.is-home) { scroll-padding-top: var(--s2); }
 .is-home .nav-list > li > a.btn:hover { color: var(--on-accent); background: var(--accent-hover); }
 .is-home .nav-toggle { background: rgba(255, 255, 255, .6); border-color: var(--line-strong); }
 .is-home .nav-toggle:hover { border-color: var(--accent); }
+.field .opt { font-weight: 400; color: var(--muted); }

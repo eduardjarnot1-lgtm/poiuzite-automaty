@@ -39,6 +39,14 @@ export const SERVICE_NAV = [
   ['servis/', 'Servis a opravy'],
   ['nahradni-dily/', 'Náhradní díly'],
 ];
+// Legal and consumer information, linked from every footer and next to every form.
+export const LEGAL_NAV = [
+  ['obchodni-podminky/', 'Obchodní podmínky'],
+  ['reklamace-a-odstoupeni/', 'Reklamace a odstoupení'],
+  ['ochrana-osobnich-udaju/', 'Ochrana osobních údajů'],
+  ['cookies/', 'Cookies a úložiště'],
+];
+export const isDraft = (c) => (c.site.legal?.status || 'draft') !== 'final';
 const isCurrent = (c, sections) => sections.includes(c.page.section);
 const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
 const published = (c, slug) => c.products.filter((p) => p.category === slug && !p.placeholder && isListed(p)).length;
@@ -109,7 +117,10 @@ export function footer(c) {
       </ul>
     </div>
   </div>
-  <div class="wrap footer-base">© ${new Date().getFullYear()} ${esc(c.site.name)}</div>
+  <div class="wrap footer-base">
+    <nav aria-label="Právní informace"><ul class="footer-legal">${LEGAL_NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}</ul></nav>
+    <p class="footer-operator">© ${new Date().getFullYear()} ${esc(c.site.name)} · Provozovatel: ${c.site.operator?.legalName ? esc(c.site.operator.legalName) : ph('doplníme')}, IČO ${ct.companyId ? esc(ct.companyId) : ph('doplníme')}, sídlo ${c.site.operator?.registeredOffice ? esc(c.site.operator.registeredOffice) : ph('doplníme')}${c.site.operator?.register ? html`, ${esc(c.site.operator.register)}` : ''}</p>
+  </div>
 </footer>`;
 }
 
@@ -270,7 +281,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
       <li>${emailLink(c)}</li>
     </ul>
   </div>
-  <form class="form" name="poptavka" method="POST" ${attrs} data-enquiry>
+  <form class="form" name="poptavka" method="POST" ${attrs} data-enquiry${c.proto ? ' data-preview' : ''}>
     <input type="hidden" name="form-name" value="poptavka">
     <input type="hidden" name="typ" value="${esc(kind)}">
     <input type="hidden" name="automat" value="${product ? esc(`${product.name} (${product.id})`) : ''}">
@@ -282,7 +293,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
         <input id="${f('jmeno')}" name="jmeno" type="text" autocomplete="name" required maxlength="120">
       </div>
       <div class="field">
-        <label for="${f('firma')}">Firma</label>
+        <label for="${f('firma')}">Firma <span class="opt">(nepovinné)</span></label>
         <input id="${f('firma')}" name="firma" type="text" autocomplete="organization" maxlength="160">
       </div>
       <div class="field">
@@ -290,7 +301,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
         <input id="${f('email')}" name="email" type="email" autocomplete="email" required maxlength="160">
       </div>
       <div class="field">
-        <label for="${f('telefon')}">Telefon</label>
+        <label for="${f('telefon')}">Telefon <span class="opt">(nepovinné)</span></label>
         <input id="${f('telefon')}" name="telefon" type="tel" autocomplete="tel" maxlength="40" pattern="[0-9+()\\s\\-]{9,}">
       </div>
       <div class="field field-wide">
@@ -298,7 +309,8 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
         <textarea id="${f('zprava')}" name="zprava" rows="5" required maxlength="4000" placeholder="${esc(messagePlaceholder)}"></textarea>
       </div>
     </div>
-    <p class="form-note">Pole označená * jsou povinná. Údaje použijeme jen k vyřízení vaší poptávky.</p>
+    <p class="form-note" id="${f('note')}">Pole označená * jsou povinná. Poptávka je nezávazná. Údaje použijeme jen k odpovědi na ni a k jednání o nabídce, nic vám nebudeme posílat bez vyžádání. Více v <a href="${c.url('ochrana-osobnich-udaju/')}#poptavky">zásadách ochrany osobních údajů</a>.</p>
+    ${c.proto && html`<p class="form-preview-note" role="note"><strong>Pracovní náhled:</strong> formulář se odtud neodesílá. Vyplnění si můžete vyzkoušet, zpráva ale nikam nedorazí.</p>`}
     <div class="form-actions"><button class="btn btn-primary btn-lg" type="submit">${esc(submit)}</button></div>
     <div class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
   </form>
@@ -323,9 +335,7 @@ ${c.page.noindex && '<meta name="robots" content="noindex">\n'}${canonical && ht
 <meta property="og:locale" content="cs_CZ">
 ${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="#ffffff">
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500..700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="${c.url('assets/fonts/fonts.css')}">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
 ${head}<script>document.documentElement.classList.add('js')</script>${c.proto && '\n' + c.proto.head(c)}
 </head>

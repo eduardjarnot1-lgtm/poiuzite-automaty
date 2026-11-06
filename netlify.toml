@@ -16,3 +16,6 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    # The site uses no camera, microphone or location, and is not meant to be framed by other sites.
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Content-Security-Policy = "frame-ancestors 'self'"

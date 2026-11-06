@@ -67,6 +67,16 @@ All forms are one Netlify form named `poptavka` with fields `jmeno`, `firma`, `e
 
 With JavaScript, the form validates with Czech messages and sends without leaving the page, then shows a thank-you message or an error with the phone and e-mail. Without JavaScript it posts normally and lands on `/dekujeme/`. A hidden honeypot field filters simple spam bots.
 
+## Legal pages, privacy and release checks
+
+See `LEGAL-AUDIT.md` for the audit of 2026-11-06 (findings, sources, tests, release blockers).
+
+- Draft pages: `/obchodni-podminky/`, `/reklamace-a-odstoupeni/`, `/ochrana-osobnich-udaju/`, `/cookies/` (`scripts/lib/legal.mjs`), linked from every footer and every form. While `legal.status` in `site.json` is `"draft"` they carry a draft notice and `noindex`.
+- Business facts go in `site.json` under `operator`, `business` and `privacy`; missing ones show as marked gaps.
+- Fonts are self-hosted in `assets/fonts/` (no Google Fonts request). Do not add analytics, embeds or remote assets without updating the cookie page and adding consent first.
+- Image rights: product photos are published only with `"rights": "cleared"`. Other media are listed in `data/assets.json`. Previews may pass `--show-unverified-assets`; Netlify never does.
+- Every build prints the remaining release blockers; `node scripts/build.mjs --strict` fails while any remain.
+
 ## Homepage hero
 
 The hero is a workshop scene split into two depth layers, with the Czech copy, navigation, button and before/after switch as plain HTML on top:
