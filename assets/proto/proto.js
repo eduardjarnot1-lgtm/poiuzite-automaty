@@ -93,6 +93,7 @@ function renderCustomer(state, photos) {
   let result = null;
   let banner = '';
   if (route.kind === 'home') result = pages.home(c);
+  else if (route.kind === 'guide') result = pages.guide(c);
   else if (route.kind === 'index') result = pages.categoriesIndex(c);
   else if (route.kind === 'category') {
     const cat = c.categories.find((x) => x.slug === route.category);

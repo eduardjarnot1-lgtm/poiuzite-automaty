@@ -285,14 +285,15 @@ export function cookies(c) {
     toc,
     body: html`
 ${sec('shrnuti', 'Shrnutí', html`
-<p>Cookies a podobné technologie (například localStorage) ukládají údaje ve vašem prohlížeči. Zákon vyžaduje souhlas návštěvníka, pokud nejde o uložení nezbytné pro službu, o kterou návštěvník výslovně požádal. Náš web do vašeho prohlížeče sám nic neukládá, proto lištu se souhlasem nezobrazujeme.</p>`)}
+<p>Cookies a podobné technologie (například localStorage) ukládají údaje ve vašem prohlížeči. Zákon vyžaduje souhlas návštěvníka, pokud nejde o uložení nezbytné pro službu, o kterou návštěvník výslovně požádal. Náš web do vašeho prohlížeče ukládá jen odpovědi z průvodce výběrem automatu, a to až když průvodce sami použijete a jen do zavření karty. Jde o uložení nezbytné pro funkci, kterou jste si vyžádali, proto lištu se souhlasem nezobrazujeme.</p>`)}
 ${sec('web', 'Co web ukládá', html`
 <div class="table-wrap" role="region" tabindex="0" aria-label="Tabulka: cookies a úložiště na webu"><table class="legal-table">
   <caption class="visually-hidden">Cookies a úložiště na webu</caption>
   <thead><tr><th scope="col">Položka</th><th scope="col">Poskytovatel</th><th scope="col">Účel</th><th scope="col">Doba</th><th scope="col">Souhlas</th></tr></thead>
   <tbody>
     <tr><td>Žádné cookies</td><td>–</td><td>Web nenastavuje žádné cookies.</td><td>–</td><td>Není potřeba</td></tr>
-    <tr><td>Žádné localStorage, sessionStorage ani IndexedDB</td><td>–</td><td>Veřejný web nic neukládá. Formulář nic neukládá do prohlížeče, údaje se odešlou jen po stisknutí tlačítka.</td><td>–</td><td>Není potřeba</td></tr>
+    <tr><td>pouzite-automaty:pruvodce (sessionStorage)</td><td>Náš web</td><td>Zapamatuje vybrané odpovědi v průvodci výběrem automatu, abyste je neztratili při otevření detailu automatu. Neobsahuje kontaktní údaje ani text, který napíšete.</td><td>Do zavření karty nebo do stisknutí „Začít znovu“</td><td>Není potřeba (nezbytné pro vyžádanou funkci)</td></tr>
+    <tr><td>Žádné localStorage ani IndexedDB</td><td>–</td><td>Jinak web nic neukládá. Formulář nic neukládá do prohlížeče, údaje se odešlou jen po stisknutí tlačítka.</td><td>–</td><td>Není potřeba</td></tr>
   </tbody>
 </table></div>
 <p>Prohlížeč si může běžně uložit stažené soubory webu do mezipaměti (cache), aby se stránky příště načetly rychleji. To řídí váš prohlížeč a nejde o sledování.</p>`)}

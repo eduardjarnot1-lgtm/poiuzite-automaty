@@ -84,6 +84,7 @@ const routes = [
   { path: 'servis/', section: 'servis/', render: pages.service },
   { path: 'o-nas/', section: 'o-nas/', render: pages.about },
   { path: 'kontakt/', section: 'kontakt/', render: pages.contact },
+  { path: pages.GUIDE_PATH, section: pages.GUIDE_PATH, kind: 'guide', render: pages.guide },
   { path: 'dekujeme/', section: '', render: pages.thanks, noindex: true },
   // Draft legal pages carry a draft notice and stay out of search engines until legal.status is "final".
   ...[['obchodni-podminky/', legal.terms], ['reklamace-a-odstoupeni/', legal.complaints], ['ochrana-osobnich-udaju/', legal.privacy], ['cookies/', legal.cookies]]
@@ -109,12 +110,19 @@ for (const dir of ['css', 'js', 'img', 'video', 'products', 'fonts']) {
   });
 }
 
+// The guide's rules run in the browser too: the same modules, with browser-friendly names.
+await mkdir(join(out, 'assets', 'js', 'lib'), { recursive: true });
+for (const f of ['catalog', 'guide']) {
+  const src = await readFile(join(root, 'scripts', 'lib', `${f}.mjs`), 'utf8');
+  await writeFile(join(out, 'assets', 'js', 'lib', `${f}.js`), src.replace(/from '\.\/(\w+)\.mjs'/g, "from './$1.js'"));
+}
+
 // The prototype runs the same page templates in the browser, on one shared catalogue: the data
 // as built (seed) plus whatever was saved in this browser.
 if (prototype) {
   const dir = join(out, 'assets', 'proto');
   await mkdir(join(dir, 'lib'), { recursive: true });
-  for (const f of ['util', 'catalog', 'components', 'pages']) {
+  for (const f of ['util', 'catalog', 'components', 'pages', 'guide']) {
     const src = await readFile(join(root, 'scripts', 'lib', `${f}.mjs`), 'utf8');
     await writeFile(join(dir, 'lib', `${f}.js`), src.replace(/from '\.\/(\w+)\.mjs'/g, "from './$1.js'"));
   }

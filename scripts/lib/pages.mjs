@@ -5,6 +5,7 @@ import {
   conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf,
 } from './components.mjs';
 import { isListed, recommended, sale, effectivePrice, discountState, SORTS } from './catalog.mjs';
+import * as guideRules from './guide.mjs';
 
 // Listings show published machines that are not sold (drafts, hidden, deleted and sold ones never
 // appear), in the recommended order: featured first, then the order saved in the admin, then
@@ -151,7 +152,7 @@ export function home(c) {
       <p class="hero-lead">Prodáváme použité, repasované a renovované prodejní automaty pro firmy a provozovatele. Specializujeme se na automaty na instantní kávu a teplé nápoje.</p>
       <div class="hero-actions">
         <a class="btn btn-primary btn-lg" href="#nabidka">Prohlédnout nabídku</a>
-        <a class="btn btn-secondary btn-lg" href="${c.url('kontakt/')}#formular">Poradit s výběrem</a>
+        <a class="btn btn-secondary btn-lg" href="${c.url(GUIDE_PATH)}">Poradit s výběrem</a>
       </div>
       <ul class="hero-points">
         ${machines.length > 0 && html`<li>${CHECK}${publishedLabel(machines.length)}</li>`}
@@ -808,5 +809,139 @@ export function notFound(c) {
   <p class="lead">Odkaz je možná zastaralý nebo automat už není v nabídce.</p>
   <p class="center-actions"><a class="btn btn-primary" href="${c.url('automaty/')}">Prohlédnout automaty</a> <a class="btn btn-ghost" href="${c.url('kontakt/')}">Kontaktujte nás</a></p>
 </div></section>`,
+  };
+}
+
+/* ---------- "Pomůžeme vám vybrat automat": the selection guide ----------
+   Five short steps, then a result built from the shared catalogue (scripts/lib/guide.mjs), then
+   an optional written enquiry on the usual form. The questions are plain HTML radio groups;
+   assets/js/guide.js shows one step at a time, keeps the answers in memory (choices only, no
+   free text, also in sessionStorage so a visit to a machine's page and back keeps them) and
+   renders the result. Without JS the page offers the written enquiry directly. */
+export const GUIDE_PATH = 'pruvodce-vyberem/';
+
+const gOption = (name, [value, title, desc], type = 'radio') => html`<label class="g-option">
+  <input type="${type}" name="${name}" value="${esc(value)}">
+  <span class="g-option-text"><span class="g-option-title">${esc(title)}</span>${desc && html`<span class="g-option-desc">${esc(desc)}</span>`}</span>
+</label>`;
+const gGroup = (name, legend, options, { hint, optional, cls = '', when, compact } = {}) => html`<fieldset class="g-q${cls ? ` ${cls}` : ''}" data-q="${name}"${when ? ` data-when="${when}" hidden` : ''}${hint ? ` aria-describedby="g-${name}-hint"` : ''}>
+  <legend class="g-legend">${esc(legend)}${optional ? html` <span class="opt">(nepovinné)</span>` : ''}</legend>
+  ${hint && html`<p class="g-hint" id="g-${name}-hint">${hint}</p>`}
+  <div class="g-options${compact ? ' is-compact' : ''}">${options.map((o) => gOption(name, o))}</div>
+  <p class="field-error g-error" id="g-${name}-error" hidden></p>
+</fieldset>`;
+const gText = (name, labelText, { when, hint, multiline, inputmode, maxlength = 200 } = {}) => html`<div class="field g-field"${when ? ` data-when="${when}" hidden` : ''}>
+  <label for="g-${name}">${esc(labelText)} <span class="opt">(nepovinné)</span></label>
+  ${hint && html`<p class="g-hint" id="g-${name}-hint">${hint}</p>`}
+  ${multiline
+    ? html`<textarea id="g-${name}" name="${name}" rows="3" maxlength="${maxlength}"${hint ? ` aria-describedby="g-${name}-hint"` : ''}></textarea>`
+    : html`<input id="g-${name}" name="${name}" type="text" maxlength="${maxlength}"${inputmode ? ` inputmode="${inputmode}"` : ''}${hint ? ` aria-describedby="g-${name}-hint"` : ''} autocomplete="off">`}
+  <p class="field-error g-error" id="g-${name}-error" hidden></p>
+</div>`;
+
+export function guide(c) {
+  const G = guideRules;
+  const steps = G.STEPS;
+  const head = (i) => html`<h2 class="g-step-title" tabindex="-1">${esc(steps[i].title)}</h2>`;
+  // Machines that could appear in a result, in the catalogue's own order per category. The cards
+  // are rendered here with the same price, photo and credit line as the catalogue.
+  const listed = c.categories.flatMap((cat) => ordered(c, real(inCategory(c, cat)), cat.slug));
+  const data = {
+    categories: c.categories.map(({ slug, name, short }) => ({ slug, name, short, url: c.url(`automaty/${slug}/`) })),
+    order: listed.map((p) => p.id),
+    products: listed.map((p) => ({
+      id: p.id, name: p.name, category: p.category, status: p.status, deletedAt: p.deletedAt, placeholder: p.placeholder,
+      availability: p.availability, price: p.price, discount: p.discount, specs: p.specs, paymentSystems: p.paymentSystems,
+    })),
+  };
+  return {
+    title: 'Pomůžeme vám vybrat automat',
+    description: 'Krátký průvodce výběrem prodejního automatu: odpovězte na několik otázek, uvidíte vhodný směr výběru a připravíte si přehled požadavků. Bez telefonování a bez zadávání kontaktu.',
+    body: html`
+<div class="page-head guide-head">
+  <div class="wrap">
+    ${breadcrumbs(c, [[GUIDE_PATH, 'Poradit s výběrem']])}
+    <h1>Pomůžeme vám vybrat automat</h1>
+    <p class="lead">Odpovězte na několik jednoduchých otázek. Ukážeme vám vhodný směr výběru a připravíme přehled požadavků. Bez telefonování a bez zadávání kontaktu před zobrazením výsledku.</p>
+    <p class="guide-alt"><a class="text-link" href="${c.url('kontakt/')}#formular">Vím, co potřebuji — napsat zprávu ${ARROW}</a></p>
+  </div>
+</div>
+
+<section class="section section-tight guide" aria-label="Průvodce výběrem automatu" data-guide>
+  <div class="wrap">
+    <noscript><div class="notice" role="note">${INFO}<p>Průvodce potřebuje zapnutý JavaScript. Své požadavky nám můžete napsat přímo v <a href="${c.url('kontakt/')}#formular">kontaktním formuláři</a>.</p></div></noscript>
+    <div class="guide-panel" data-guide-panel hidden>
+      <div class="guide-top">
+        <p class="guide-count" data-guide-count aria-hidden="true"></p>
+        <a class="guide-leave" href="${c.url('')}" data-guide-leave>Ukončit průvodce</a>
+      </div>
+      <div class="guide-progress" data-guide-progress aria-hidden="true"><span></span></div>
+      <p class="visually-hidden" aria-live="polite" data-guide-live></p>
+
+      <form class="guide-form" data-guide-form novalidate>
+        <section class="g-step" data-step="nabidka" aria-labelledby="g-t-0" hidden>
+          ${head(0).replace('<h2', '<h2 id="g-t-0"')}
+          ${gGroup('offer', 'Vyberte jednu možnost', G.OFFER, { cls: 'g-q-main' })}
+          ${gGroup('coffee', 'Máte představu o typu kávy?', G.COFFEE, { when: 'coffee', optional: true })}
+        </section>
+
+        <section class="g-step" data-step="misto" aria-labelledby="g-t-1" hidden>
+          ${head(1).replace('<h2', '<h2 id="g-t-1"')}
+          ${gGroup('place', 'Vyberte jednu možnost', G.PLACE, { cls: 'g-q-main' })}
+          ${gText('placeOther', 'Upřesněte místo', { when: 'placeOther', maxlength: 120 })}
+          ${gGroup('people', 'Kolik lidí ho bude přibližně využívat?', G.PEOPLE, { optional: true, compact: true })}
+          ${Object.entries(G.USAGE).map(([scale, opts]) => gGroup(`usage-${scale}`, scale === 'drinks' ? 'Víte, kolik nápojů denně čekáte?' : scale === 'items' ? 'Víte, kolik nákupů denně čekáte?' : 'Víte, kolik nápojů nebo nákupů denně čekáte?', opts, { optional: true, compact: true, when: `usage-${scale}`, hint: 'Stačí hrubý odhad. Počet lidí ani druh místa o vhodném automatu sám nerozhoduje, kapacitu konkrétního automatu ověříme.' }))}
+        </section>
+
+        <section class="g-step" data-step="vydej" aria-labelledby="g-t-2" hidden>
+          ${head(2).replace('<h2', '<h2 id="g-t-2"')}
+          ${gGroup('mode', 'Vyberte jednu možnost', G.MODE, { cls: 'g-q-main' })}
+          ${gGroup('payment', 'Jaké placení preferujete?', G.PAYMENT, { when: 'payment', optional: true, compact: true, hint: 'Berme to jako váš požadavek. Jaké placení umí konkrétní automat, případně zda jde doplnit, ověříme u daného modelu.' })}
+        </section>
+
+        <section class="g-step" data-step="rozpocet" aria-labelledby="g-t-3" hidden>
+          ${head(3).replace('<h2', '<h2 id="g-t-3"')}
+          ${gGroup('budget', 'Rozpočet je nepovinný', G.BUDGET, { hint: 'Rozpočet nám pomůže při přípravě nabídky. Cenu konkrétního automatu vám potvrdíme individuálně.' })}
+          ${gText('budgetMax', `Maximální částka v Kč ${c.site.catalogue.pricesIncludeVat ? 'včetně' : 'bez'} DPH`, { when: 'budgetMax', inputmode: 'numeric', maxlength: 15, hint: `Například 80 000. Ceny v katalogu uvádíme ${c.site.catalogue.pricesIncludeVat ? 'včetně' : 'bez'} DPH.` })}
+        </section>
+
+        <section class="g-step" data-step="doplneni" aria-labelledby="g-t-4" hidden>
+          ${head(4).replace('<h2', '<h2 id="g-t-4"')}
+          <p class="g-intro">Vše na tomto kroku je nepovinné, klidně ho přeskočte. Technické možnosti ověříme před přípravou nabídky. Adresu ani kontakt teď nepotřebujeme.</p>
+          ${gGroup('placement', 'Kde bude automat umístěný?', G.PLACEMENT, { optional: true, compact: true })}
+          ${gText('space', 'Kolik máte pro automat místa, případně maximální rozměry', { maxlength: 160, hint: 'Například „výška do 190 cm, šířka 80 cm“.' })}
+          ${gGroup('water', 'Je na místě přípojka vody?', G.WATER, { optional: true, compact: true, when: 'water' })}
+          <div class="field g-field">
+            <label for="g-when">Kdy byste automat potřebovali? <span class="opt">(nepovinné)</span></label>
+            <select id="g-when" name="when"><option value="">Neuvádím</option>${G.WHEN.map(([v, t]) => html`<option value="${v}">${esc(t)}</option>`)}</select>
+          </div>
+          ${gText('region', 'Přibližná oblast dodání (kraj nebo město)', { maxlength: 80, hint: 'Celou adresu nepotřebujeme.' })}
+          ${gText('other', 'Další požadavky', { multiline: true, maxlength: 1000 })}
+        </section>
+
+        <div class="guide-nav" data-guide-nav>
+          <button class="btn btn-secondary" type="button" data-guide-back>Zpět</button>
+          <button class="btn btn-primary" type="submit" data-guide-next>Pokračovat</button>
+        </div>
+      </form>
+
+      <div class="guide-result" data-guide-result hidden></div>
+
+      <div class="guide-enquiry" data-guide-enquiry hidden>
+        <p class="guide-backlink"><button class="link-button" type="button" data-guide-to-result>← Zpět na výsledek</button></p>
+        ${enquiryForm(c, { id: 'poptavka-pruvodce', title: 'Připravit nezávaznou poptávku', intro: 'Pokud chcete poradit s konkrétní nabídkou, doplňte e-mail. Telefon není potřeba.', kind: 'pruvodce', nameRequired: false, messageLabel: 'Shrnutí požadavků a zpráva', messageRows: 12, submit: 'Odeslat nezávaznou poptávku', messagePlaceholder: '' })}
+        <div class="guide-tools">
+          <p>Shrnutí si můžete uložit i bez odeslání:</p>
+          <button class="btn btn-secondary btn-sm" type="button" data-guide-copy>Zkopírovat shrnutí</button>
+          <button class="btn btn-ghost btn-sm" type="button" data-guide-download>Stáhnout jako text</button>
+          <p class="g-tool-status" role="status" data-guide-tool-status></p>
+        </div>
+      </div>
+    </div>
+    ${listed.map((p) => html`<template data-guide-card="${esc(p.id)}">${productCard(c, p, { headingLevel: 5 })}</template>`)}
+    <script type="application/json" id="guide-data">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>
+  </div>
+</section>`,
+    scripts: ['assets/js/guide.js'],
   };
 }

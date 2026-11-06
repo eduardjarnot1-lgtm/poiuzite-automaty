@@ -266,7 +266,9 @@ export { specValue };
    (Formspree, Basin, your own handler...), the form posts there instead. assets/js/site.js adds
    validation messages and sends it without a page reload; without JS it posts normally and
    lands on /dekujeme/. */
-export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, kind = 'obecna', product, submit = 'Odeslat poptávku', messagePlaceholder = 'S čím vám můžeme pomoci?' } = {}) {
+// The guide (pruvodce-vyberem/) uses the same form with an optional name, since an email
+// reply needs only the email address (nameRequired: false).
+export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, kind = 'obecna', product, submit = 'Odeslat poptávku', messagePlaceholder = 'S čím vám můžeme pomoci?', nameRequired = true, messageLabel = 'Zpráva', messageRows = 5 } = {}) {
   const endpoint = c.site.forms.endpoint;
   const attrs = endpoint
     ? `action="${esc(endpoint)}"`
@@ -289,8 +291,8 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
     ${product && html`<p class="form-about">Poptávka automatu: <strong>${esc(product.name)}</strong></p>`}
     <div class="form-grid">
       <div class="field">
-        <label for="${f('jmeno')}">Jméno a příjmení <span class="req" aria-hidden="true">*</span></label>
-        <input id="${f('jmeno')}" name="jmeno" type="text" autocomplete="name" required maxlength="120">
+        <label for="${f('jmeno')}">Jméno a příjmení ${nameRequired ? '<span class="req" aria-hidden="true">*</span>' : '<span class="opt">(nepovinné)</span>'}</label>
+        <input id="${f('jmeno')}" name="jmeno" type="text" autocomplete="name"${nameRequired ? ' required' : ''} maxlength="120">
       </div>
       <div class="field">
         <label for="${f('firma')}">Firma <span class="opt">(nepovinné)</span></label>
@@ -305,8 +307,8 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
         <input id="${f('telefon')}" name="telefon" type="tel" autocomplete="tel" maxlength="40" pattern="[0-9+()\\s\\-]{9,}">
       </div>
       <div class="field field-wide">
-        <label for="${f('zprava')}">Zpráva <span class="req" aria-hidden="true">*</span></label>
-        <textarea id="${f('zprava')}" name="zprava" rows="5" required maxlength="4000" placeholder="${esc(messagePlaceholder)}"></textarea>
+        <label for="${f('zprava')}">${esc(messageLabel)} <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="${f('zprava')}" name="zprava" rows="${messageRows}" required maxlength="4000" placeholder="${esc(messagePlaceholder)}"></textarea>
       </div>
     </div>
     <p class="form-note" id="${f('note')}">Pole označená * jsou povinná. Poptávka je nezávazná. Údaje použijeme jen k odpovědi na ni a k jednání o nabídce, nic vám nebudeme posílat bez vyžádání. Více v <a href="${c.url('ochrana-osobnich-udaju/')}#poptavky">zásadách ochrany osobních údajů</a>.</p>

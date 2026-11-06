@@ -82,7 +82,7 @@
         box.className = 'form-success';
         box.tabIndex = -1;
         box.setAttribute('role', 'status');
-        box.innerHTML = '<h3>Děkujeme, zprávu jsme přijali.</h3><p>Ozveme se vám co nejdříve.</p>';
+        box.innerHTML = form.dataset.successHtml || '<h3>Děkujeme, zprávu jsme přijali.</h3><p>Ozveme se vám co nejdříve.</p>';
         form.replaceChildren(box);
         box.focus();
       };
