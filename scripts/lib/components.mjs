@@ -1,5 +1,5 @@
 // Reusable page parts: layout, header, footer, breadcrumbs, product cards, enquiry form.
-import { esc, html, ph, czk } from './util.mjs';
+import { esc, html, ph, czk, typeset } from './util.mjs';
 import { sale, effectivePrice, isListed, formatPrague, utcToPrague } from './catalog.mjs';
 
 const INFO = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>';
@@ -56,6 +56,10 @@ export function header(c) {
   return html`<header class="site-header">
   <div class="wrap header-inner">
     ${logo(c)}
+    <!-- before the menu in the source, so Tab goes from the button straight into the opened menu -->
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-bars" aria-hidden="true"></span><span class="nav-toggle-label">Menu</span>
+    </button>
     <nav class="site-nav" id="site-nav" aria-label="Hlavní navigace">
       <ul class="nav-list">
         ${NAV.map(([path, label, sections], i) => {
@@ -79,9 +83,6 @@ export function header(c) {
       </ul>
     </nav>
     <a class="btn btn-primary btn-sm header-cta" href="${c.url('kontakt/')}#formular">Poptat automat</a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-      <span class="nav-toggle-bars" aria-hidden="true"></span><span class="visually-hidden">Menu</span>
-    </button>
   </div>
 </header>`;
 }
@@ -324,18 +325,18 @@ export function layout(c, { title, description, body, head = '', scripts = [], b
   const fullTitle = c.page.path === '' ? title : `${title} | ${c.site.name}`;
   const canonical = c.absUrl && !c.page.noindex ? c.absUrl(c.page.path) : null;
   const og = ogImage && (/^https?:\/\//.test(ogImage) ? ogImage : c.absUrl ? c.absUrl(ogImage) : null);
-  return html`<!doctype html>
+  return typeset(html`<!doctype html>
 <html lang="cs">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
 ${c.page.noindex && '<meta name="robots" content="noindex">\n'}${canonical && html`<link rel="canonical" href="${canonical}">\n`}<meta property="og:type" content="website">
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:locale" content="cs_CZ">
-${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="#ffffff">
+${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="${c.page.path === '' ? '#f3f7f5' : '#fbfcf9'}">
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
 <link rel="stylesheet" href="${c.url('assets/fonts/fonts.css')}">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
@@ -354,5 +355,5 @@ ${c.proto
   : html`<script src="${c.url('assets/js/site.js')}" defer></script>
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}`}</body>
 </html>
-`;
+`);
 }

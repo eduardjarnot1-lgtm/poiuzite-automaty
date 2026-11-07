@@ -172,7 +172,7 @@ const nb = (s) => s.replace(/[  ]/g, ' ');
   await page.goto(BASE + 'index.html'); await page.waitForTimeout(300);
   ok('10 hidden not listed', await page.locator(`.card[data-id="${victim}"]`).count() === 0);
   await page.goto(BASE + 'automaty/instantni-kavove-automaty/colibri-c5/index.html'); await page.waitForTimeout(300);
-  ok('10 hidden detail says unavailable', (await page.locator('h1').innerText()).includes('není v nabídce'));
+  ok('10 hidden detail says unavailable', (await page.locator('h1').innerText()).replace(/\u00a0/g, ' ').includes('není v nabídce'));
   await admin();
   await page.locator(`tr[data-id="${victim}"] summary`).click();
   await page.locator(`tr[data-id="${victim}"] [data-act="delete"]`).click();

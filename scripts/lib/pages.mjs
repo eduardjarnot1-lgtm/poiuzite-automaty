@@ -513,7 +513,9 @@ export function refurbished(c) {
     var v = document.createElement('video');
     var playable = v.canPlayType && (v.canPlayType('video/mp4; codecs="avc1.640028"') || v.canPlayType('video/webm; codecs="vp9"'));
     var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (playable && !still) document.documentElement.classList.add('js-scrub');
+    // a short screen (a phone held sideways) gets the readable static layout instead of a cramped pinned frame
+    var short = window.innerHeight < 500;
+    if (playable && !still && !short) document.documentElement.classList.add('js-scrub');
   })();
 </script>
 `,

@@ -6,7 +6,7 @@
 // While a page is open, prices switch by themselves when a discount starts or ends.
 // This is not authentication and publishes nothing: other visitors keep seeing the built data.
 import seed from './seed.js';
-import { html, esc, linker } from './lib/util.js';
+import { html, esc, linker, typeset } from './lib/util.js';
 import { header, productCard, priceSlot, conditionBadge } from './lib/components.js';
 import * as pages from './lib/pages.js';
 import { isVisible, nextBoundary, statusOf } from './lib/catalog.js';
@@ -122,7 +122,7 @@ function renderCustomer(state, photos) {
   }
   if (!result) return [];
   document.title = `${result.title} | ${c.site.name}`;
-  document.getElementById('obsah').innerHTML = `\n${banner}${result.body}\n`;
+  document.getElementById('obsah').innerHTML = typeset(`\n${banner}${result.body}\n`);
   return (result.scripts || []).map((s) => url(s));
 }
 

@@ -4,15 +4,25 @@
   const toggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('site-nav');
   if (toggle && nav) {
-    const setOpen = (open) => {
+    // A disclosure panel in the header: it pushes nothing behind it, never locks page scrolling,
+    // and closes on Escape, a tap outside, choosing a link, or focus leaving it.
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+    const setOpen = (open, { restoreFocus = false } = {}) => {
       toggle.setAttribute('aria-expanded', String(open));
       nav.classList.toggle('is-open', open);
+      if (!open && restoreFocus) toggle.focus();
     };
-    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
+      if (e.key === 'Escape' && isOpen()) setOpen(false, { restoreFocus: nav.contains(document.activeElement) || document.activeElement === toggle });
     });
-    nav.addEventListener('click', (e) => { if (e.target.closest('a[href^="#"]')) setOpen(false); });   // in-page links close the menu
+    document.addEventListener('click', (e) => {
+      if (isOpen() && !nav.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+    });
+    nav.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+    nav.addEventListener('focusout', (e) => {
+      if (isOpen() && e.relatedTarget && !nav.contains(e.relatedTarget) && e.relatedTarget !== toggle) setOpen(false);
+    });
     matchMedia('(min-width: 961px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
   }
 
@@ -139,6 +149,7 @@
   if (!script || !('IntersectionObserver' in window)) return;
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (motion.matches) return;
+  if (navigator.connection?.saveData) return;   // data saver: the still posters are enough
   const asset = (f) => new URL(`../video/${f}`, script.src).href;
   const ext = document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4';
   const poster = (f) => new URL(`../img/bg/${f}`, script.src).href;

@@ -316,3 +316,41 @@ body.pa-editing .proto-switch { display: none; }
 
 /* keep the last row of content clear of the switch */
 body:has(.proto-switch) .site-footer { padding-bottom: 56px; }
+
+/* ---------- phones and touch (2026-11-07) ---------- */
+@media (pointer: coarse), (max-width: 899px) {
+  .proto-switch a { min-height: 44px; }
+  .pa input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), .pa select, .pa textarea { font-size: 1rem; }
+  .pa-steps a { min-height: 44px; }
+  .pa-order-pos input, .pa-order-btns .btn-sm { min-height: 44px; }
+  .pa-name, .pa-quick { padding-block: 10px; }
+  .pa-menu-list button { min-height: 44px; }
+}
+/* on a phone the view switch shrinks to the one link that leads to the other view, at the
+   bottom right, and the page ends with room for it so it never hides the footer or a button */
+@media (max-width: 767px), (max-height: 500px) {
+  .proto-switch { left: auto; right: max(12px, env(safe-area-inset-right)); transform: none; padding: 3px; }
+  .proto-switch-label, .proto-switch a[aria-current="page"] { display: none; }
+  .proto-switch a { padding: 0 16px; background: var(--surface); font-weight: 600; color: var(--accent); }
+  body:has(.proto-switch) .site-footer { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 560px) {
+  .pa-menu-list { left: auto; right: 0; max-width: calc(100vw - 32px); }
+  .pa-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+  .pa-filters .tool, .pa-filters .tool-search { min-width: 0; }
+  .pa-filters .tool-search, .pa-filters > .btn { grid-column: 1 / -1; }
+  .pa-order-item { display: grid; grid-template-columns: auto 56px minmax(0, 1fr); align-items: center; gap: 10px 12px; }
+  .pa-order-item .pa-thumb { width: 56px; }
+  .pa-order-pos, .pa-order-btns { grid-column: 1 / -1; }
+  .pa-order-pos { justify-self: start; }
+  .pa-order-item:has(.pa-order-pos) { grid-template-areas: none; }
+  .pa-savebar-static .pa-save-actions { flex-wrap: wrap; }
+  .pa-savebar-static .pa-save-actions .btn { flex: 1 1 120px; }
+}
+@media (max-width: 420px) {
+  .pa-spec { grid-template-columns: minmax(0, 1fr) auto; }
+  .pa-spec > .field { grid-column: 1 / -1; }
+  .pa-spec .pa-check { padding-bottom: 10px; }
+}
+/* the guide keeps Back and Continue at the bottom of the screen, so the switch steps aside there */
+@media (max-width: 599px) { body:has(.guide-nav) .proto-switch { display: none; } }

@@ -117,7 +117,8 @@
     background: linear-gradient(180deg, var(--scrub-bg) 0%, var(--scrub-bg) 30%, rgba(226,226,222,0) 46%, rgba(226,226,222,0) 88%, rgba(226,226,222,.7) 100%);
   }
   .js-scrub .scrub-video {   /* full frame width so parts that swing out to the sides stay in view */
-    inset: auto; left: 0; bottom: 21%; width: 100%; height: auto; aspect-ratio: 1280 / 944;
+    /* centred in the space between the copy (top third) and the progress marks */
+    inset: auto; left: 0; top: max(34%, calc((134% - 64px - 73.75vw) / 2)); width: 100%; height: auto; aspect-ratio: 1280 / 944;
     object-position: 50% 50%;
     -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
             mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);

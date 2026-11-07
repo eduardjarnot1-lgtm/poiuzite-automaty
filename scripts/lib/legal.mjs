@@ -33,6 +33,20 @@ const legalSubnav = (c) => html`<ul class="subnav" aria-label="Právní informac
 
 const updatedLine = (c) => html`<p class="legal-updated">${c.site.legal?.updated ? `Platné od ${esc(c.site.legal.updated)}.` : ph('Datum platnosti doplníme po schválení.')}</p>`;
 
+// Each table cell gets its column heading as data-label, so phones can show rows as labelled cards.
+function labelTables(src) {
+  return src.replace(/<table\b[\s\S]*?<\/table>/g, (table) => {
+    const head = /<thead>([\s\S]*?)<\/thead>/.exec(table);
+    if (!head) return table;
+    const labels = [...head[1].matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)].map((m) => m[1].replace(/<[^>]+>/g, '').replace(/"/g, '&quot;').trim());
+    return table.replace(/<tr>([\s\S]*?)<\/tr>/g, (row, cells) => {
+      if (!/<td\b/.test(cells)) return row;
+      let i = 0;
+      return `<tr>${cells.replace(/<td\b/g, () => `<td data-label="${labels[i++] || ''}"`)}</tr>`;
+    });
+  });
+}
+
 function legalPage(c, { path, title, h1, description, lead, toc, body }) {
   return {
     title,
@@ -55,7 +69,7 @@ function legalPage(c, { path, title, h1, description, lead, toc, body }) {
       <ol>${toc.map(([id, t]) => html`<li><a href="#${id}">${esc(t)}</a></li>`)}</ol>
     </nav>
     <div class="prose legal-body">
-      ${body}
+      ${labelTables(body)}
       ${updatedLine(c)}
     </div>
   </div>
