@@ -30,13 +30,13 @@
 .scrub-panel { display: grid; align-content: start; gap: 10px; padding-top: 20px; border-top: 1px solid var(--scrub-rule); min-width: 0; }
 .scrub-intro, .scrub-closing { grid-column: 1 / -1; border-top: 0; padding-top: 0; }
 .scrub-closing { justify-items: start; }
-.scrub h2 { margin: 0; font-weight: 300; letter-spacing: -.03em; line-height: 1.05; font-size: clamp(32px, 4vw, 58px); text-wrap: balance; max-width: 16ch; }
-.scrub h3 { margin: 0; font-weight: 600; letter-spacing: -.015em; font-size: clamp(21px, 1.8vw, 28px); line-height: 1.15; text-wrap: balance; }
-.scrub-closing h3 { font-weight: 300; letter-spacing: -.03em; font-size: clamp(30px, 3.6vw, 52px); }
-.scrub-panel p { margin: 0; color: var(--scrub-soft); font-size: clamp(16px, 1.2vw, 19px); line-height: 1.55; max-width: 40ch; }
-.scrub-no { color: var(--accent); font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.scrub h2 { margin: 0; font-weight: 600; letter-spacing: -.015em; line-height: 1.15; font-size: var(--fs-display); text-wrap: balance; max-width: 16ch; }
+.scrub h3 { margin: 0; font-weight: 600; letter-spacing: -.01em; font-size: clamp(1.3125rem, 1.1rem + .8vw, 1.75rem); line-height: 1.25; text-wrap: balance; }
+.scrub-closing h3 { font-size: var(--fs-h1); line-height: 1.2; }
+.scrub-panel p { margin: 0; color: var(--scrub-soft); font-size: var(--fs-body); line-height: var(--lh-body); max-width: 44ch; }
+.scrub-no { color: var(--accent); font-size: var(--fs-caption); font-weight: 600; font-variant-numeric: tabular-nums; }
 .scrub-hint, .scrub-progress { display: none; }
-.scrub-note { margin: 0; color: var(--scrub-soft); font-size: 13px; letter-spacing: .02em; }
+.scrub-note { margin: 0; color: var(--scrub-soft); font-size: var(--fs-caption); }
 .scrub-closing .btn { margin-top: 12px; }
 @media (max-width: 760px) { .scrub-panels { grid-template-columns: minmax(0, 1fr); } }
 
@@ -84,10 +84,10 @@
   opacity: 1; transform: none; visibility: visible;
   transition: opacity .45s ease .05s, transform .55s cubic-bezier(.2,.7,.2,1) .05s, visibility 0s;
 }
-.js-scrub .scrub-panel h3 { font-size: clamp(28px, 3vw, 44px); font-weight: 300; letter-spacing: -.03em; }
+.js-scrub .scrub-panel h3 { font-size: var(--fs-h1); line-height: 1.2; }
 .js-scrub .scrub-hint {
   display: inline-flex; align-items: center; gap: 12px; margin-top: 18px;
-  font-size: 14px; font-weight: 600; color: var(--scrub-soft);
+  font-size: var(--fs-caption); font-weight: 600; color: var(--scrub-soft);
 }
 .js-scrub .scrub-hint::before {
   content: ""; width: 1.5px; height: 28px; background: linear-gradient(var(--accent), transparent);
@@ -101,14 +101,14 @@
 }
 .scrub-track { position: relative; width: 168px; height: 2px; border-radius: 2px; background: var(--scrub-rule); overflow: hidden; }
 .scrub-fill { position: absolute; inset: 0; background: var(--accent); transform-origin: left; transform: scaleX(0); }
-.scrub-marks { display: flex; gap: 14px; font-size: 12px; font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; color: rgba(17,19,18,.32); }
+.scrub-marks { display: flex; gap: 14px; font-size: var(--fs-caption); font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(17,19,18,.32); }
 .scrub-marks span { transition: color .3s; }
 .scrub-marks span.is-done { color: var(--scrub-soft); }
 .scrub-marks span.is-current { color: var(--accent); }
 .js-scrub .scrub-note {
   position: absolute; right: max(clamp(16px, 3.4vw, 56px), env(safe-area-inset-right, 0px));
   bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 20px));
-  font-size: 12px; color: rgba(17,19,18,.5);
+  font-size: var(--fs-caption); color: rgba(17,19,18,.62);
 }
 
 @media (max-width: 760px) {
@@ -117,14 +117,15 @@
     background: linear-gradient(180deg, var(--scrub-bg) 0%, var(--scrub-bg) 30%, rgba(226,226,222,0) 46%, rgba(226,226,222,0) 88%, rgba(226,226,222,.7) 100%);
   }
   .js-scrub .scrub-video {   /* full frame width so parts that swing out to the sides stay in view */
-    inset: auto; left: 0; bottom: 21%; width: 100%; height: auto; aspect-ratio: 1280 / 944;
+    /* centred in the space between the copy (top third) and the progress marks */
+    inset: auto; left: 0; top: max(34%, calc((134% - 64px - 73.75vw) / 2)); width: 100%; height: auto; aspect-ratio: 1280 / 944;
     object-position: 50% 50%;
     -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
             mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
   }
   .js-scrub .scrub-panels { top: max(40px, calc(env(safe-area-inset-top, 0px) + 28px)); transform: none; width: auto; left: 16px; right: 16px; }
-  .js-scrub .scrub-panel h3 { font-size: 28px; }
-  .js-scrub .scrub h2 { font-size: 32px; }
+  .js-scrub .scrub-panel h3 { font-size: 1.75rem; }
+  .js-scrub .scrub h2 { font-size: 2rem; }
   .js-scrub .scrub-progress { left: 50%; transform: translateX(-50%); }
   .js-scrub .scrub-note { display: none; }
 }

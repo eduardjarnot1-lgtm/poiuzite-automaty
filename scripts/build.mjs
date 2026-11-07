@@ -1,12 +1,20 @@
 // Builds the static site into dist/ from the data files in data/.
 // No dependencies: `node scripts/build.mjs [--data data] [--out dist] [--explicit-index]`.
 // --explicit-index writes links as .../index.html, for previews on hosts without directory indexes.
+// --prototype adds the local admin prototype (switch, admin page, browser storage) for previews only;
+// the Netlify build never passes it.
+// --offline makes a copy that opens straight from disk (e.g. a zip sent by e-mail): explicit
+// index links, forms that say they do not send, and one video format instead of two.
 import { readFile, writeFile, mkdir, rm, cp } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { linker } from './lib/util.mjs';
 import { layout, productPath } from './lib/components.mjs';
 import * as pages from './lib/pages.mjs';
+import { isVisible } from './lib/catalog.mjs';
+import { proto, adminPage, previewPage, ADMIN_PATH, PREVIEW_PATH } from './lib/prototype.mjs';
+import * as legal from './lib/legal.mjs';
+import { releaseBlockers } from './lib/release.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name, fallback) => {
@@ -15,7 +23,13 @@ const arg = (name, fallback) => {
 };
 const dataDir = arg('data', 'data');
 const out = arg('out', 'dist');
-const explicitIndex = process.argv.includes('--explicit-index');
+const offline = process.argv.includes('--offline');
+const explicitIndex = offline || process.argv.includes('--explicit-index');
+const prototype = process.argv.includes('--prototype');
+// Photos and other media are published only when their usage rights are recorded as cleared
+// ("rights": "cleared" on the image). --show-unverified-assets keeps the others for private
+// previews; the Netlify build never passes it, so the public site shows the neutral drawing.
+const showUnverified = process.argv.includes('--show-unverified-assets');
 
 const load = async (f) => JSON.parse(await readFile(join(dataDir, f), 'utf8'));
 const site = await load('site.json');
@@ -33,7 +47,8 @@ for (const p of products) {
   if (p.slug && !slugRe.test(p.slug)) errors.push(`${where}: slug must be lowercase-with-dashes`);
   if (!categories.some((c) => c.slug === p.category)) errors.push(`${where}: unknown category "${p.category}"`);
   if (p.condition && !site.conditions[p.condition]) errors.push(`${where}: unknown condition "${p.condition}" (use ${Object.keys(site.conditions).join(', ')})`);
-  if (p.price != null && typeof p.price !== 'number') errors.push(`${where}: price must be a number or null`);
+  if (p.price != null && !(Number.isInteger(p.price) && p.price > 0)) errors.push(`${where}: price must be a whole number above 0, or null for "Cena na dotaz"`);
+  if (p.status && !['published', 'draft', 'hidden'].includes(p.status)) errors.push(`${where}: status must be published, draft or hidden`);
   for (const img of p.images || []) if (!img.src || !img.alt) errors.push(`${where}: every image needs "src" and "alt"`);
   const key = `${p.category}/${p.slug}`;
   if (seen.has(key) || seen.has(p.id)) errors.push(`${where}: duplicate id or slug`);
@@ -45,6 +60,16 @@ if (errors.length) {
   process.exit(1);
 }
 
+const blockers = await releaseBlockers({ root, site, products });
+let hiddenPhotos = 0;
+if (!showUnverified) {
+  for (const p of products) {
+    const before = p.images.length;
+    p.images = p.images.filter((img) => img.rights === 'cleared');
+    hiddenPhotos += before - p.images.length;
+  }
+}
+
 /* ---------- render ---------- */
 // Absolute URLs (canonical, sitemap, structured data) need a known origin: site.json baseUrl,
 // or the URL Netlify sets during its builds.
@@ -52,31 +77,94 @@ const base = (site.baseUrl || process.env.URL || '').replace(/\/$/, '');
 const absUrl = base ? (path) => `${base}/${path}` : null;
 
 const routes = [
-  { path: '', section: '', render: pages.home },
-  { path: 'automaty/', section: 'automaty/', render: pages.categoriesIndex },
-  ...categories.map((cat) => ({ path: `automaty/${cat.slug}/`, section: 'automaty/', render: (c) => pages.category(c, cat) })),
-  ...products.map((p) => ({ path: productPath(p), section: 'automaty/', render: (c) => pages.product(c, p), noindex: p.placeholder })),
+  { path: '', section: '', kind: 'home', render: pages.home },
+  { path: 'automaty/', section: 'automaty/', kind: 'index', render: pages.categoriesIndex },
+  ...categories.map((cat) => ({ path: `automaty/${cat.slug}/`, section: 'automaty/', kind: 'category', category: cat.slug, render: (c) => pages.category(c, cat) })),
+  // drafts, hidden and deleted machines get no page; sold ones keep theirs, marked as sold
+  ...products.filter(isVisible).map((p) => ({ path: productPath(p), section: 'automaty/', kind: 'product', id: p.id, render: (c) => pages.product(c, p), noindex: p.placeholder })),
   { path: 'repasovane-automaty/', section: 'repasovane-automaty/', render: pages.refurbished },
   { path: 'nahradni-dily/', section: 'nahradni-dily/', render: pages.parts },
   { path: 'servis/', section: 'servis/', render: pages.service },
   { path: 'o-nas/', section: 'o-nas/', render: pages.about },
   { path: 'kontakt/', section: 'kontakt/', render: pages.contact },
+  { path: pages.GUIDE_PATH, section: pages.GUIDE_PATH, kind: 'guide', render: pages.guide },
   { path: 'dekujeme/', section: '', render: pages.thanks, noindex: true },
+  // Draft legal pages carry a draft notice and stay out of search engines until legal.status is "final".
+  ...[['obchodni-podminky/', legal.terms], ['reklamace-a-odstoupeni/', legal.complaints], ['ochrana-osobnich-udaju/', legal.privacy], ['cookies/', legal.cookies]]
+    .map(([path, render]) => ({ path, section: 'legal', render, noindex: (site.legal?.status || 'draft') !== 'final' })),
   { path: '404', file: '404.html', section: '', render: pages.notFound, noindex: true, absolute: true },
+  ...(prototype ? [
+    { path: ADMIN_PATH, section: ADMIN_PATH, kind: 'admin', render: adminPage, noindex: true },
+    { path: PREVIEW_PATH, section: 'automaty/', kind: 'preview', render: previewPage, noindex: true },
+  ] : []),
 ];
 
 await rm(out, { recursive: true, force: true });
 for (const route of routes) {
-  const c = { site, categories, products, page: route, url: linker(route.path, route.absolute, explicitIndex), absUrl };
+  const c = { site, categories, products, page: route, url: linker(route.path, route.absolute, explicitIndex), absUrl, explicitIndex, formPreview: prototype || offline, ...(prototype && { proto }) };
   const file = join(out, route.file || join(route.path, 'index.html'));
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, layout(c, route.render(c)));
 }
 
-for (const dir of ['css', 'js', 'img', 'video', 'products']) {
+for (const dir of ['css', 'js', 'img', 'video', 'products', 'fonts']) {
   await cp(join(root, 'assets', dir), join(out, 'assets', dir), { recursive: true }).catch((e) => {
     if (e.code !== 'ENOENT') throw e;
   });
+}
+
+// The guide's rules run in the browser too: the same modules, with browser-friendly names, and
+// as one classic script (window.GuideRules), because browsers refuse module imports for pages
+// opened from disk.
+await mkdir(join(out, 'assets', 'js', 'lib'), { recursive: true });
+const bundle = [];
+for (const f of ['catalog', 'guide']) {
+  const src = await readFile(join(root, 'scripts', 'lib', `${f}.mjs`), 'utf8');
+  await writeFile(join(out, 'assets', 'js', 'lib', `${f}.js`), src.replace(/from '\.\/(\w+)\.mjs'/g, "from './$1.js'"));
+  bundle.push(src.replace(/^import .*$/gm, '').replace(/^export (const|function|let) /gm, '$1 '));
+}
+const guideSrc = await readFile(join(root, 'scripts', 'lib', 'guide.mjs'), 'utf8');
+const guideNames = [...guideSrc.matchAll(/^export (?:const|function|let) (\w+)/gm)].map((m) => m[1]);
+await writeFile(join(out, 'assets', 'js', 'lib', 'guide-rules.js'),
+  `// Generated by scripts/build.mjs from scripts/lib/catalog.mjs and guide.mjs.\n(() => {\n${bundle.join('\n')}\nwindow.GuideRules = { ${guideNames.join(', ')} };\n})();\n`);
+
+// Offline copy: keep the MP4 of each video (every current browser plays it) and drop the WebM twins.
+if (offline) {
+  const { readdir, unlink } = await import('node:fs/promises');
+  const vdir = join(out, 'assets', 'video');
+  const files = await readdir(vdir).catch(() => []);
+  const dropped = files.filter((f) => f.endsWith('.webm') && files.includes(f.replace(/\.webm$/, '.mp4')) && !f.startsWith('bg-'));
+  for (const f of dropped) await unlink(join(vdir, f));
+  const walk = async (dir) => (await readdir(dir, { withFileTypes: true })).flatMap((e) => (e.isDirectory() ? [] : [join(dir, e.name)])).concat(
+    ...(await Promise.all((await readdir(dir, { withFileTypes: true })).filter((e) => e.isDirectory() && e.name !== 'assets').map((e) => walk(join(dir, e.name))))));
+  for (const file of (await walk(out)).filter((f) => f.endsWith('.html'))) {
+    const html = await readFile(file, 'utf8');
+    // scripts go inline: mail services such as Gmail and Outlook reject archives that contain .js files
+    const scripts = new Map();
+    const inline = async (m, src) => {
+      const path = join(dirname(file), src);
+      if (!scripts.has(path)) scripts.set(path, await readFile(path, 'utf8'));
+      return `<script>\n${scripts.get(path)}</script>`;
+    };
+    let next = html.replace(/\s*<source[^>]*video\/([\w.-]+\.webm)"[^>]*>/g, (m, name) => (dropped.includes(name) ? '' : m));
+    const tags = [...next.matchAll(/<script src="([^"]+\.js)" defer><\/script>/g)];
+    for (const [m, src] of tags) next = next.replace(m, await inline(m, src));
+    if (next !== html) await writeFile(file, next);
+  }
+  await rm(join(out, 'assets', 'js'), { recursive: true, force: true });
+}
+
+// The prototype runs the same page templates in the browser, on one shared catalogue: the data
+// as built (seed) plus whatever was saved in this browser.
+if (prototype) {
+  const dir = join(out, 'assets', 'proto');
+  await mkdir(join(dir, 'lib'), { recursive: true });
+  for (const f of ['util', 'catalog', 'components', 'pages', 'guide']) {
+    const src = await readFile(join(root, 'scripts', 'lib', `${f}.mjs`), 'utf8');
+    await writeFile(join(dir, 'lib', `${f}.js`), src.replace(/from '\.\/(\w+)\.mjs'/g, "from './$1.js'"));
+  }
+  await writeFile(join(dir, 'seed.js'), `// Generated by scripts/build.mjs from data/*.json.\nexport default ${JSON.stringify({ site, categories, products })};\n`);
+  for (const f of ['proto.js', 'admin.js', 'store.js', 'proto.css']) await cp(join(root, 'assets', 'proto', f), join(dir, f));
 }
 
 const indexed = routes.filter((r) => !r.noindex);
@@ -84,6 +172,9 @@ if (absUrl) {
   await writeFile(join(out, 'sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexed.map((r) => `  <url><loc>${absUrl(r.path)}</loc></url>`).join('\n')}\n</urlset>\n`);
 }
-await writeFile(join(out, 'robots.txt'), `User-agent: *\nAllow: /\n${absUrl ? `Sitemap: ${absUrl('sitemap.xml')}\n` : ''}`);
+await writeFile(join(out, 'robots.txt'), prototype ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\n${absUrl ? `Sitemap: ${absUrl('sitemap.xml')}\n` : ''}`);
 
+if (hiddenPhotos) console.log(`${hiddenPhotos} photo(s) without cleared usage rights left out (use --show-unverified-assets for private previews).`);
+if (blockers.length) console.warn(`Release blockers (${blockers.length}), see LEGAL-AUDIT.md:\n  - ${blockers.join('\n  - ')}`);
+if (blockers.length && process.argv.includes('--strict')) process.exit(2);
 console.log(`Built ${routes.length} pages into ${out}${absUrl ? ` for ${base}` : ' (no baseUrl: canonical links and sitemap skipped)'}`);

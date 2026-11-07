@@ -140,11 +140,26 @@
   function kick() { if (!raf) raf = requestAnimationFrame(tick); }
 
   function onScroll() {
+    if (!root.classList.contains('js-scrub')) return;
     target = progress();
     kick();
   }
 
+  // Turning a phone sideways makes the screen too short for the pinned frame: switch to the
+  // static layout (all text and the poster) and back again when there is room.
+  var SHORT = 500;
   function onResize() {
+    var short = window.innerHeight < SHORT;
+    if (short && root.classList.contains('js-scrub')) {
+      root.classList.remove('js-scrub'); root.classList.add('scrub-short');
+      video.pause();
+      return;
+    }
+    if (!short && root.classList.contains('scrub-short')) {
+      root.classList.remove('scrub-short'); root.classList.add('js-scrub');
+      lastSeek = -1;
+    }
+    if (!root.classList.contains('js-scrub')) return;
     measure();
     onScroll();
   }
