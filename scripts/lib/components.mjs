@@ -284,7 +284,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
       <li>${emailLink(c)}</li>
     </ul>
   </div>
-  <form class="form" name="poptavka" method="POST" ${attrs} data-enquiry${c.proto ? ' data-preview' : ''}>
+  <form class="form" name="poptavka" method="POST" ${attrs} data-enquiry${c.formPreview ? ' data-preview' : ''}>
     <input type="hidden" name="form-name" value="poptavka">
     <input type="hidden" name="typ" value="${esc(kind)}">
     <input type="hidden" name="automat" value="${product ? esc(`${product.name} (${product.id})`) : ''}">
@@ -313,7 +313,7 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
       </div>
     </div>
     <p class="form-note" id="${f('note')}">Pole označená * jsou povinná. Poptávka je nezávazná. Údaje použijeme jen k odpovědi na ni a k jednání o nabídce, nic vám nebudeme posílat bez vyžádání. Více v <a href="${c.url('ochrana-osobnich-udaju/')}#poptavky">zásadách ochrany osobních údajů</a>.</p>
-    ${c.proto && html`<p class="form-preview-note" role="note"><strong>Pracovní náhled:</strong> formulář se odtud neodesílá. Vyplnění si můžete vyzkoušet, zpráva ale nikam nedorazí.</p>`}
+    ${c.formPreview && html`<p class="form-preview-note" role="note"><strong>Pracovní náhled:</strong> formulář se odtud neodesílá. Vyplnění si můžete vyzkoušet, zpráva ale nikam nedorazí.</p>`}
     <div class="form-actions"><button class="btn btn-primary btn-lg" type="submit">${esc(submit)}</button></div>
     <div class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
   </form>

@@ -10,7 +10,10 @@
   const root = document.querySelector('[data-guide]');
   if (!root) return;
   const base = document.currentScript?.src || location.href;
-  import(new URL('lib/guide.js', base).href).then((G) => start(G)).catch((e) => {
+  // the rules come as a classic script (lib/guide-rules.js, loaded first), which also works for
+  // pages opened from disk; the module import is the fallback
+  const rules = window.GuideRules ? Promise.resolve(window.GuideRules) : import(new URL('lib/guide.js', base).href);
+  rules.then((G) => start(G)).catch((e) => {
     console.error('[průvodce]', e);   // the noscript-style fallback: the page head links to the contact form
   });
 

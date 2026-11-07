@@ -145,14 +145,17 @@
    reduced motion; loaded only when the section comes near the viewport; paused when it is off
    screen or the tab is hidden. */
 (() => {
+  // asset paths are resolved from this script's address, or from the stylesheet's when the
+  // script is inline (the offline copy)
   const script = document.currentScript;
-  if (!script || !('IntersectionObserver' in window)) return;
+  const baseHref = script?.src || document.querySelector('link[rel="stylesheet"][href*="assets/css/site.css"]')?.href;
+  if (!baseHref || !('IntersectionObserver' in window)) return;
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (motion.matches) return;
   if (navigator.connection?.saveData) return;   // data saver: the still posters are enough
-  const asset = (f) => new URL(`../video/${f}`, script.src).href;
+  const asset = (f) => new URL(`../video/${f}`, baseHref).href;
   const ext = document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4';
-  const poster = (f) => new URL(`../img/bg/${f}`, script.src).href;
+  const poster = (f) => new URL(`../img/bg/${f}`, baseHref).href;
   const targets = [];
   // On the homepage the hero animation is one fixed backdrop behind the whole page.
   const hero = document.querySelector('.home-backdrop') || document.querySelector('.hero');

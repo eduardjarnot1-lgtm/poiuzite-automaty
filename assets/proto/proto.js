@@ -50,6 +50,7 @@ const context = (state, photos, extra = {}) => ({
   absUrl: null,
   now: Date.now(),
   proto: true,   // forms show that the preview does not send them
+  formPreview: true,
   ...extra,
 });
 

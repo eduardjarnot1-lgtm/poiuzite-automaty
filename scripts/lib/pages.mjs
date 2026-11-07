@@ -944,6 +944,6 @@ export function guide(c) {
     <script type="application/json" id="guide-data">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>
   </div>
 </section>`,
-    scripts: ['assets/js/guide.js'],
+    scripts: ['assets/js/lib/guide-rules.js', 'assets/js/guide.js'],
   };
 }
