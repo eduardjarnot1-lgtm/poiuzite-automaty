@@ -20,10 +20,10 @@ Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish
 
 | URL | Page |
 | --- | --- |
-| `/` | Homepage: hero, short introduction, category panels with the machine carousel, how it works, enquiry footer |
-| `/automaty/` | All categories |
-| `/automaty/<category>/` | Category catalogue with filters and sorting |
-| `/automaty/<category>/<product>/` | Product detail with gallery, specs table, enquiry form, related machines |
+| `/` | Homepage: two-column hero, every published machine in a grid, categories available on enquiry, how enquiries work, refurbishment and service, contact call to action |
+| `/automaty/` | Nabídka automatů: published machines per category, then the categories available on enquiry |
+| `/automaty/<category>/` | Category page: its machines in the product grid, or an "on enquiry" explanation with the form when it has none |
+| `/automaty/<category>/<product>/` | Product detail: photo beside the summary, specifications (missing ones listed in one line), condition, enquiry form with the product filled in, other machines |
 | `/repasovane-automaty/` | Refurbished and renovated machines, condition grades, the scroll-controlled video |
 | `/nahradni-dily/` | Spare parts enquiry |
 | `/servis/` | Repairs, servicing and maintenance |
@@ -31,7 +31,7 @@ Netlify builds it with `netlify.toml` (command `node scripts/build.mjs`, publish
 | `/kontakt/` | Phone, e-mail, address and contact form |
 | `/dekujeme/` | Thank-you page after a form is sent without JavaScript |
 
-Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, product card, enquiry form) and `pages.mjs` (one function per page).
+Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, product card, contact call to action, enquiry form) and `pages.mjs` (one function per page).
 
 ## Editing content
 
@@ -39,8 +39,10 @@ Templates are in `scripts/lib/`: `components.mjs` (layout, header, footer, produ
 - `data/categories.json`: categories, their intros and meta descriptions.
 - `data/products.json`: the machines. Each has `id`, `slug`, `category`, `name`, `manufacturer`, `model`, `type`, `condition` (`pouzity`, `repasovany` or `renovovany`), `conditionDetails`, `summary`, `description` (paragraphs), `specs` (`label`, `value`, `key: true` to show it on the card), `features`, `paymentSystems`, `warranty`, `price` (number, or `null` for "Cena na dotaz"), `availability`, `images` (`src`, `alt`, optional `width`, `height`, `thumb`, `srcset: [{src, w}]`), `dateAdded` and optional `related` ids.
 - Product photos go in `assets/products/<slug>/` and are referenced as `assets/products/<slug>/1.webp`. A full `https://` URL also works. Mark a photo of a similar model (not the unit for sale) with `"illustrative": true` and `"credit": {"label", "url"}`: it gets an "Ilustrační foto" line with the source, and a photo that fails to load is replaced by the neutral drawing.
-- Homepage: editorial layout (`assets/css/home.css`, `assets/js/home.js`; Bodoni Moda from Google Fonts plus the site's Inter). It has its own slim header and footer (`variant: 'home'` in `pages.mjs`). The machine in the hero is set by `home.heroProduct` in `data/site.json`; keep its photo about 1000 px wide on a white background. Each category panel's photo comes from `home.categoryPhotos` (category slug → product id), else the newest machine. Only categories with machines get a panel; the rest are listed as links. Display green `#4c9e8b` is for large type only; small text, states and focus use `#2f7a68`. The earlier 3D before/after hero (`hero.css`, `hero.js`, `assets/img/hero-*`) is no longer used.
-- Browsing: the category cards on the homepage and `/automaty/` reveal that category's machines below in a carousel (`assets/js/browse.js`, `assets/js/carousel.js`); without JS they link to the category pages, which use the same carousel.
+- Design: one stylesheet, `assets/css/site.css`, for every page (Source Sans 3 at 400/500/600 with a rem type scale in `--fs-*` tokens, warm white and light grey, charcoal text, deep green `#1d5c43` for actions, 8–12px corners, 1200px content width, 8px spacing scale). The refurbishment page adds `servis.css` for its video section. Change the look through the tokens at the top of `site.css`.
+- Header: "Nabídka automatů" (with a submenu of all machine types), "Repase a servis" (the refurbishment, service and spare-parts pages, linked to each other by a sub-navigation), "O nás", "Kontakt" and the "Poptat automat" button. The list is `NAV` in `components.mjs`.
+- Homepage: the hero machine is set by `home.heroProduct` in `data/site.json`. All published machines show immediately in a 3/2/1-column grid (desktop/tablet/phone); categories without published machines are listed separately as "na dotaz". Nothing on the page depends on JavaScript.
+- Product cards: every card has the same 4:3 image well (`object-fit: contain`, so photos are never cropped), the photo credit line, name, one-line summary, the price or "Cena na dotaz" and the "Detail automatu" link.
 
 The build stops with a clear message if a product has a missing field, an unknown category or condition, a duplicate slug, or an image without alt text.
 
@@ -48,11 +50,32 @@ The build stops with a clear message if a product has a missing field, an unknow
 
 **Catalogue controls follow the data.** A filter appears only when at least two machines differ in that field (manufacturer, condition, type), price filtering and sorting appear once two machines have prices, and search appears from `catalogue.searchMinProducts` machines (8). Without JavaScript the full list still shows.
 
+## Catalogue logic, tests and the admin prototype
+
+Prices, discounts, visibility and ordering live in `scripts/lib/catalog.mjs` (pure functions used by the build, the templates and the prototype). Tests: `node --test scripts/test/*.test.mjs`.
+
+- A machine keeps its standard `price` (whole CZK, or `null` for "Cena na dotaz") and an optional `discount` (`enabled`, `method` `percent`/`amount`/`price`, `value`, `start`, `end` as UTC ISO times; entered in Europe/Prague time). The price after the discount is always computed; the standard price is never overwritten. A discount applies from `start` (inclusive) to `end` (exclusive).
+- `status` is `published` (default), `draft` or `hidden`; `deletedAt` marks the trash. Drafts, hidden and deleted machines get no page and never appear in listings. `availability: "Prodáno"` drops a machine from listings but keeps its page, marked sold, with similar machines.
+- Listings are in the "Doporučené" order: `featured` machines first, then the saved order, then photographed machines, newest first. Customers can switch "Seřadit podle" (price uses the price that applies now; "Cena na dotaz" goes last) and filter by category, availability, condition, price and "Pouze ve slevě"; the choice is kept in the address bar.
+- Optional public fields: `year`, `location`, `defects`, `delivery`, `video`, `stock`. Never public: `ref`, `notes`.
+
+`node scripts/build.mjs --prototype` (previews only, never Netlify) adds "Správa nabídky": overview with search and filters, quick price and availability edits, the add/edit form (photos, details, price and discount, parameters, publication), display order, trash, duplicates, and backup/import. It stores the catalogue in this browser only (localStorage for data, IndexedDB for photos) through `assets/proto/store.js`, the single data layer to replace with a real backend API. `tools/admin-browser-check.cjs` runs the 14 acceptance scenarios in Chromium.
+
 ## Forms
 
 All forms are one Netlify form named `poptavka` with fields `jmeno`, `firma`, `email`, `telefon`, `zprava`, plus hidden `typ` (which page or service) and `automat` (the product, on product pages). Netlify detects it at deploy; turn on notifications in the Netlify dashboard under Forms. To use another service (Formspree, Basin, your own handler), set `forms.endpoint` in `site.json`.
 
 With JavaScript, the form validates with Czech messages and sends without leaving the page, then shows a thank-you message or an error with the phone and e-mail. Without JavaScript it posts normally and lands on `/dekujeme/`. A hidden honeypot field filters simple spam bots.
+
+## Legal pages, privacy and release checks
+
+See `LEGAL-AUDIT.md` for the audit of 2026-11-06 (findings, sources, tests, release blockers).
+
+- Draft pages: `/obchodni-podminky/`, `/reklamace-a-odstoupeni/`, `/ochrana-osobnich-udaju/`, `/cookies/` (`scripts/lib/legal.mjs`), linked from every footer and every form. While `legal.status` in `site.json` is `"draft"` they carry a draft notice and `noindex`.
+- Business facts go in `site.json` under `operator`, `business` and `privacy`; missing ones show as marked gaps.
+- Fonts are self-hosted in `assets/fonts/` (no Google Fonts request). Do not add analytics, embeds or remote assets without updating the cookie page and adding consent first.
+- Image rights: product photos are published only with `"rights": "cleared"`. Other media are listed in `data/assets.json`. Previews may pass `--show-unverified-assets`; Netlify never does.
+- Every build prints the remaining release blockers; `node scripts/build.mjs --strict` fails while any remain.
 
 ## Homepage hero
 
@@ -108,3 +131,13 @@ ffmpeg -i $SRC -an -vf scale=720:-2 -c:v libvpx-vp9 -crf 37 -b:v 0 -g 6 assets/v
 If the video length changes, update `data-duration` on the section and the panel timings.
 
 Visitors who prefer reduced motion, browsers that can't play the video, and any failed load get a normal section instead, with no cover: the poster, then all the copy and steps laid out in order. The script waits for the page to load before fetching video, and plays it from memory if the server doesn't support range requests (which seeking needs).
+
+## Admin prototype (preview only)
+
+`node scripts/build.mjs --out preview --explicit-index --prototype` adds a local prototype for
+managing the catalogue: a "Pohled zákazníka / Správa nabídky" switch, the page `sprava-nabidky/`
+(list, add and edit) and `automaty/nahled/` for machines added there. Changes are kept only in
+the browser's localStorage and are rendered with the same templates as the build, so other
+visitors never see them. It is not authentication. The Netlify build does not pass
+`--prototype`, so none of this reaches the public site. Production would need protected admin
+access and shared storage (a CMS or a small backend) before going live.

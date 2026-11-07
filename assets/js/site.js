@@ -4,16 +4,26 @@
   const toggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('site-nav');
   if (toggle && nav) {
-    const setOpen = (open) => {
+    // A disclosure panel in the header: it pushes nothing behind it, never locks page scrolling,
+    // and closes on Escape, a tap outside, choosing a link, or focus leaving it.
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+    const setOpen = (open, { restoreFocus = false } = {}) => {
       toggle.setAttribute('aria-expanded', String(open));
       nav.classList.toggle('is-open', open);
+      if (!open && restoreFocus) toggle.focus();
     };
-    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
+      if (e.key === 'Escape' && isOpen()) setOpen(false, { restoreFocus: nav.contains(document.activeElement) || document.activeElement === toggle });
     });
-    nav.addEventListener('click', (e) => { if (e.target.closest('a[href^="#"]')) setOpen(false); });   // in-page links close the menu
-    matchMedia('(min-width: 1061px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
+    document.addEventListener('click', (e) => {
+      if (isOpen() && !nav.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+    });
+    nav.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+    nav.addEventListener('focusout', (e) => {
+      if (isOpen() && e.relatedTarget && !nav.contains(e.relatedTarget) && e.relatedTarget !== toggle) setOpen(false);
+    });
+    matchMedia('(min-width: 961px)').addEventListener?.('change', (e) => e.matches && setOpen(false));
   }
 
   /* ---------- category submenu (desktop: also opens on hover / focus) ---------- */
@@ -82,11 +92,19 @@
         box.className = 'form-success';
         box.tabIndex = -1;
         box.setAttribute('role', 'status');
-        box.innerHTML = '<h3>Děkujeme, zprávu jsme přijali.</h3><p>Ozveme se vám co nejdříve.</p>';
+        box.innerHTML = form.dataset.successHtml || '<h3>Děkujeme, zprávu jsme přijali.</h3><p>Ozveme se vám co nejdříve.</p>';
         form.replaceChildren(box);
         box.focus();
       };
       if (data.get('firma-web')) { done(); return; }   // honeypot filled: quietly drop
+      // The preview build has no form service behind it: say so plainly instead of pretending
+      // the enquiry was sent.
+      if (form.hasAttribute('data-preview')) {
+        status.className = 'form-status is-error';
+        status.textContent = 'Formulář je vyplněný správně, ale v pracovním náhledu se neodesílá. Zpráva nikam neodešla.';
+        status.focus();
+        return;
+      }
 
       button.disabled = true;
       const label = button.textContent;
@@ -119,4 +137,62 @@
   };
   document.addEventListener('error', (e) => { if (e.target.tagName === 'IMG') swap(e.target); }, true);
   document.querySelectorAll('img[data-fallback]').forEach((img) => { if (img.complete && img.naturalWidth === 0 && img.currentSrc) swap(img); });
+})();
+
+/* ---------- animated wave backgrounds ----------
+   A muted looping video behind the homepage hero and the enquiry sections. The section's CSS
+   background is the video's first frame, so nothing changes if this never runs. Skipped with
+   reduced motion; loaded only when the section comes near the viewport; paused when it is off
+   screen or the tab is hidden. */
+(() => {
+  const script = document.currentScript;
+  if (!script || !('IntersectionObserver' in window)) return;
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (motion.matches) return;
+  if (navigator.connection?.saveData) return;   // data saver: the still posters are enough
+  const asset = (f) => new URL(`../video/${f}`, script.src).href;
+  const ext = document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4';
+  const poster = (f) => new URL(`../img/bg/${f}`, script.src).href;
+  const targets = [];
+  // On the homepage the hero animation is one fixed backdrop behind the whole page.
+  const hero = document.querySelector('.home-backdrop') || document.querySelector('.hero');
+  if (hero) targets.push([hero, 'bg-hero']);
+  document.querySelectorAll('.section-alt > .wrap > .enquiry').forEach((el) => targets.push([el.parentElement.parentElement, 'bg-enquiry']));
+  if (!targets.length) return;
+
+  const videos = [];
+  for (const [section, name] of targets) {
+    const layer = document.createElement('div');
+    layer.className = 'bg-video';
+    layer.setAttribute('aria-hidden', 'true');
+    const v = document.createElement('video');
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('tabindex', '-1');
+    v.disablePictureInPicture = true;
+    v.poster = poster(`video-${name.slice(3)}-poster.webp`);
+    v.dataset.src = asset(`${name}.${ext}`);
+    v.addEventListener('playing', () => v.classList.add('is-playing'));
+    v.addEventListener('error', () => layer.remove());   // the poster background stays
+    layer.append(v);
+    section.classList.add('has-bg-video');
+    section.prepend(layer);
+    videos.push(v);
+  }
+
+  const visible = new Set();
+  const play = (v) => {
+    if (document.hidden || motion.matches || !visible.has(v)) return;
+    if (!v.src) v.src = v.dataset.src;
+    v.play().catch(() => {});   // autoplay blocked: the poster stays
+  };
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const v = e.target.querySelector('.bg-video video');
+      if (!v) continue;
+      if (e.isIntersecting) { visible.add(v); play(v); } else { visible.delete(v); v.pause(); }
+    }
+  }, { rootMargin: '200px 0px' });
+  videos.forEach((v) => io.observe(v.closest('.has-bg-video')));
+  document.addEventListener('visibilitychange', () => videos.forEach((v) => (document.hidden ? v.pause() : play(v))));
+  motion.addEventListener?.('change', () => { if (motion.matches) videos.forEach((v) => v.pause()); });
 })();

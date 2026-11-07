@@ -10,6 +10,43 @@
     "hours": null,
     "companyId": null
   },
+  "operator": {
+    "_note": "Údaje provozovatele pro patičku, obchodní podmínky a zásady ochrany osobních údajů. null = zatím nedodáno; na webu se zobrazí jako zřetelně označená mezera.",
+    "legalName": null,
+    "legalForm": null,
+    "registeredOffice": null,
+    "register": null,
+    "vatPayer": null,
+    "vatId": null,
+    "complaintsAddress": null,
+    "privacyContact": null
+  },
+  "business": {
+    "_note": "customers: \"b2b\", \"b2c\" nebo \"both\". onlineOrdering/onlinePayment zůstávají false, dokud web neumí závaznou objednávku ani platbu. processClaimsConfirmed: true až provozovatel potvrdí, že každý automat před prodejem kontroluje, čistí, opravuje a testuje (texty na úvodní stránce a v Repase a servis).",
+    "customers": null,
+    "onlineOrdering": false,
+    "onlinePayment": false,
+    "contractFormation": null,
+    "delivery": null,
+    "installation": null,
+    "warrantyBeyondLaw": null,
+    "usedGoodsDefectPeriodMonths": null,
+    "voluntaryReturns": null,
+    "processClaimsConfirmed": false
+  },
+  "privacy": {
+    "_note": "Zpracovatelé a doby uchování. Hostingem a formuláři je Netlify podle netlify.toml; potvrďte, že živý web běží na Netlify.",
+    "hosting": "Netlify, Inc.",
+    "hostingConfirmed": false,
+    "emailProvider": null,
+    "enquiryRetention": null
+  },
+  "legal": {
+    "_note": "status: \"draft\" (stránky nesou upozornění a noindex) nebo \"final\" (až po doplnění údajů a právní kontrole). reviewedBy/updated vyplní provozovatel.",
+    "status": "draft",
+    "updated": null,
+    "reviewedBy": null
+  },
   "forms": {
     "endpoint": ""
   },
