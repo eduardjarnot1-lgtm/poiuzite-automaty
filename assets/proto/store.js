@@ -91,8 +91,19 @@ function normalise(data) {
   };
 }
 
+// Fingerprint of the built catalogue. A save made against an older build (other machines, other
+// photos) is set aside instead of hiding the new catalogue: the preview always starts from the
+// catalogue that was published last.
+function fingerprint(v) {
+  const s = JSON.stringify(v);
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return h.toString(36) + ':' + s.length.toString(36);
+}
+
 export function createLocalStore(seed) {
   const fromSeed = () => normalise({ products: clone(seed.products) });
+  const seedSig = fingerprint(seed.products);
 
   return {
     kind: 'local',
@@ -106,6 +117,15 @@ export function createLocalStore(seed) {
         if (!raw) return { state: fromSeed(), source: 'seed' };
         const data = JSON.parse(raw);
         if (!data || !Array.isArray(data.products)) throw new Error('Neplatná data');
+        if (data.seedSig !== seedSig) {
+          // Built from an older catalogue: keep it aside (not lost) and show the current one.
+          try {
+            localStorage.setItem(KEY + ':starsi-verze', raw);
+            localStorage.removeItem(KEY);
+            localStorage.removeItem(OLD_KEY);
+          } catch (e) { /* storage blocked: still show the current catalogue */ }
+          return { state: fromSeed(), source: 'seed' };
+        }
         return { state: normalise(data), source: 'local' };
       } catch (e) {
         return { state: fromSeed(), source: 'seed', error: e };
@@ -114,7 +134,7 @@ export function createLocalStore(seed) {
 
     // Writes the whole catalogue and reads it back; resolves only once it is really stored.
     async save(state) {
-      const doc = { ...normalise(state), savedAt: new Date().toISOString() };
+      const doc = { ...normalise(state), savedAt: new Date().toISOString(), seedSig };
       const json = JSON.stringify(doc);
       try {
         localStorage.setItem(KEY, json);
