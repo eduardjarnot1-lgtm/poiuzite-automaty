@@ -4,17 +4,17 @@
   "tagline": "Prodej repasovaných automatů, servis a náhradní díly.",
   "baseUrl": "",
   "contact": {
-    "phone": null,
-    "email": null,
-    "address": null,
+    "phone": "+420 773 881 333",
+    "email": "info@stravovaciautomaty.cz",
+    "address": "Kaštanová 489/34, 620 00 Brno",
     "hours": null,
     "companyId": null
   },
   "operator": {
-    "_note": "Údaje provozovatele pro patičku, obchodní podmínky a zásady ochrany osobních údajů. null = zatím nedodáno; na webu se zobrazí jako zřetelně označená mezera.",
-    "legalName": null,
+    "_note": "Údaje provozovatele pro patičku, obchodní podmínky a zásady ochrany osobních údajů. null = zatím nedodáno; na webu se zobrazí jako zřetelně označená mezera. Telefon, e-mail, adresa a jméno provozovatele převzaty 2026-11-18 z bistro24.eu (stejný provozovatel, potvrdil Eduard). IČO tam uvedené není.",
+    "legalName": "Ing. Jan Petr",
     "legalForm": null,
-    "registeredOffice": null,
+    "registeredOffice": "Kaštanová 489/34, 620 00 Brno",
     "register": null,
     "vatPayer": null,
     "vatId": null,

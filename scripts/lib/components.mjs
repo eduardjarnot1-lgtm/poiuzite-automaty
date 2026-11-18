@@ -102,11 +102,12 @@ export function footer(c) {
     <div class="footer-brand">
       ${logo(c)}
       <p>${esc(c.site.tagline)}</p>
+      ${c.site.related && html`<p class="footer-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><span class="footer-related-label">Nové automaty</span><span class="footer-related-name">${esc(c.site.related.name)} <span aria-hidden="true">↗</span></span>${NEW_TAB}</a></p>`}
     </div>
     <nav aria-label="Druhy automatů">
       <h2 class="footer-title">Nabídka automatů</h2>
       <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
-        ${c.site.related && html`<li class="footer-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><span class="footer-related-label">Nové automaty</span><span class="footer-related-name">${esc(c.site.related.name)} <span aria-hidden="true">↗</span></span>${NEW_TAB}</a></li>`}</ul>
+</ul>
     </nav>
     <nav aria-label="Služby a firma">
       <h2 class="footer-title">Služby a firma</h2>
