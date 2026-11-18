@@ -603,19 +603,19 @@ export function refurbished(c) {
         <article class="scrub-panel" data-from="1.8" data-to="10.7">
           <span class="scrub-no">01</span>
           <h3>Důkladná kontrola</h3>
-          <p>Prověříme technický stav a funkčnost důležitých součástí automatu.</p>
+          <p>Automat otevřeme a zkontrolujeme, jak funguje výdej, ovládání a podle výbavy také chlazení a platby. Zjistíme, které díly jsou opotřebené nebo potřebují opravu.</p>
         </article>
         <!-- 10.7–20.7 s: close-ups of shelves, control board, cooling unit, dispenser and coin box -->
         <article class="scrub-panel" data-from="10.7" data-to="20.7">
           <span class="scrub-no">02</span>
-          <h3>Servis a opravy</h3>
-          <p>Automat vyčistíme a podle jeho stavu opravíme nebo vyměníme opotřebené díly.</p>
+          <h3>Čištění a opravy</h3>
+          <p>Vyčistíme vnitřek automatu i části, kterými prochází zboží nebo nápoj. Vadné díly opravíme nebo vyměníme a automat znovu sestavíme.</p>
         </article>
         <!-- 20.7–23.7 s: the parts come back together and the door closes -->
         <article class="scrub-panel" data-from="20.7" data-to="23.7">
           <span class="scrub-no">03</span>
           <h3>Závěrečné testování</h3>
-          <p>Před předáním ověříme funkčnost a připravenost automatu k používání.</p>
+          <p>Vyzkoušíme výdej od výběru položky až po její převzetí. Podle výbavy ověříme také platbu nebo to, že chlazení drží nastavenou teplotu.</p>
         </article>
         <!-- 23.7 s to the end: the complete machine -->
         <article class="scrub-panel scrub-closing" data-from="23.7">
