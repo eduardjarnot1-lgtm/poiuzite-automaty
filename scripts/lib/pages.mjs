@@ -1,7 +1,7 @@
 // One function per page type. Each returns { title, description, body, ... } for layout().
 import { esc, html, ph, plural } from './util.mjs';
 import {
-  ARROW, CHECK, INFO, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
+  ARROW, CHECK, INFO, NEW_TAB, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
   conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf, relatedPromo,
 } from './components.mjs';
 import { isListed, recommended, sale, effectivePrice, discountState, SORTS } from './catalog.mjs';
@@ -140,7 +140,6 @@ export function home(c) {
     head: heroPhotos.length >= 3 ? html`<link rel="preload" as="image" href="${mediaUrl(c, heroPhotos[0].src)}">\n` : img ? html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">\n` : '',
     bodyClass: 'is-home',
     body: html`
-<div class="home-backdrop" aria-hidden="true"></div>
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-text">
@@ -891,11 +890,18 @@ export function guide(c) {
     ${breadcrumbs(c, [[GUIDE_PATH, 'Poradit s výběrem']])}
     <h1>Pomůžeme vám vybrat automat</h1>
     <p class="lead">Odpovězte na několik jednoduchých otázek. Ukážeme vám vhodný směr výběru a připravíme přehled požadavků. Bez telefonování a bez zadávání kontaktu před zobrazením výsledku.</p>
+    ${c.site.related && html`<div class="guide-kind" role="group" aria-labelledby="guide-kind-title">
+      <p class="guide-kind-title" id="guide-kind-title">Hledáte použitý, nebo nový automat?</p>
+      <div class="guide-kind-options">
+        <a class="guide-kind-opt" href="#pruvodce"><strong>Použitý nebo repasovaný</strong><span>Pokračujte krátkými otázkami níže.</span></a>
+        <a class="guide-kind-opt guide-kind-new" href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><strong>Nový automat <span aria-hidden="true">↗</span></strong><span>Stravovací automaty a výdejní boxy na ${esc(c.site.related.name)}.</span>${NEW_TAB}</a>
+      </div>
+    </div>`}
     <p class="guide-alt"><a class="text-link" href="${c.url('kontakt/')}#formular">Vím, co potřebuji — napsat zprávu ${ARROW}</a></p>
   </div>
 </div>
 
-<section class="section section-tight guide" aria-label="Průvodce výběrem automatu" data-guide>
+<section class="section section-tight guide" id="pruvodce" aria-label="Průvodce výběrem automatu" data-guide>
   <div class="wrap">
     <noscript><div class="notice" role="note">${INFO}<p>Průvodce potřebuje zapnutý JavaScript. Své požadavky nám můžete napsat přímo v <a href="${c.url('kontakt/')}#formular">kontaktním formuláři</a>.</p></div></noscript>
     <div class="guide-panel" data-guide-panel hidden>

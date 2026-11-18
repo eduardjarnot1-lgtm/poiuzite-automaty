@@ -1376,3 +1376,91 @@ html:has(body.is-home) { scroll-padding-top: var(--s2); }
 }
 /* phones: the lead already names the offer; the list would make the panel a second screen */
 @media (max-width: 599px) { .related-showroom { display: none; } }
+
+/* ================================================================
+   Fixed backdrop on every page (2026-11-18, Eduard: "stacionární pozadí ve všech záložkách
+   stejně jako na úvodní stránce"). The same .home-backdrop layer now sits right after <body>
+   on all pages. Sections drop their own wave pictures; on subpages each section's content sits
+   on one soft frosted sheet so text stays readable over the waves.
+   ================================================================ */
+body.has-backdrop { background: #f3f7f5; }
+.has-backdrop .site-footer {
+  position: relative; z-index: 1;
+  background: rgba(250, 251, 247, .86); border-top: 1px solid var(--soft-line);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15); backdrop-filter: blur(18px) saturate(1.15);
+}
+.has-backdrop .page-head, .has-backdrop .section, .has-backdrop .section-alt { background: transparent !important; border: 0; }
+.has-backdrop .page-head { padding: var(--s4) 0 var(--s2); }
+.has-backdrop:not(.is-home) .section { padding: var(--s3) 0; }
+.has-backdrop:not(.is-home) .section-alt + .section-alt { padding-top: 0; }
+.has-backdrop:not(.is-home) main > :last-child { padding-bottom: var(--s6); }
+
+/* subpages: one frosted sheet per section */
+.has-backdrop:not(.is-home) main > .page-head > .wrap,
+.has-backdrop:not(.is-home) main > .section > .wrap,
+.has-backdrop:not(.is-home) main > .section-alt > .wrap,
+.has-backdrop:not(.is-home) main > .product > .wrap,
+.has-backdrop:not(.is-home) main > .product > .section > .wrap,
+.has-backdrop:not(.is-home) main > .product > .section-alt > .wrap {
+  padding-block: var(--s4);
+  background: rgba(250, 251, 247, .9); border: 1px solid var(--soft-line); border-radius: var(--radius-xl);
+  box-shadow: var(--soft-highlight), var(--shadow-sm);
+  -webkit-backdrop-filter: var(--soft-blur); backdrop-filter: var(--soft-blur);
+}
+.has-backdrop:not(.is-home) main > .product > .wrap + .wrap { margin-top: var(--s3); }
+.has-backdrop:not(.is-home) .product-top { padding-block: var(--s4); }
+.has-backdrop:not(.is-home) .product-crumbs { padding-top: var(--s3); padding-bottom: var(--s2); }
+.has-backdrop:not(.is-home) .product-crumbs .breadcrumbs { display: inline-flex; padding: 6px 12px; border-radius: 999px; background: rgba(250, 251, 247, .9); border: 1px solid var(--soft-line); }
+/* the full-bleed pinned video on /repasovane-automaty/ keeps its own surface */
+.has-backdrop .scrub { background: #f3f7f5; }
+@media (max-width: 760px) {
+  .has-backdrop:not(.is-home) main > .page-head > .wrap,
+  .has-backdrop:not(.is-home) main > .section > .wrap,
+  .has-backdrop:not(.is-home) main > .section-alt > .wrap,
+  .has-backdrop:not(.is-home) main > .product > .wrap,
+  .has-backdrop:not(.is-home) main > .product > .section > .wrap,
+  .has-backdrop:not(.is-home) main > .product > .section-alt > .wrap {
+    width: calc(100% - 16px); padding-block: var(--s3); border-radius: 18px;
+    padding-inline: max(calc(var(--gutter) - 8px), 12px);
+    -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(250, 251, 247, .95);
+  }
+  .has-backdrop:not(.is-home) .section { padding: var(--s1) 0; }
+  .has-backdrop .page-head { padding: var(--s2) 0 var(--s1); }
+  .has-backdrop .site-footer { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(250, 251, 247, .96); }
+}
+/* a section holding only the closing band needs no second sheet around it */
+.has-backdrop:not(.is-home) main > .section > .wrap:has(> .cta-band:only-child) { padding-block: 0; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* Bistro 24: more visible in the menu and the footer (2026-11-18) */
+.nav-sub-related { margin-top: 6px; }
+.nav-sub-related a { background: #171b1a; color: #f4f6f2; }
+.nav-sub-related a small { margin-left: 6px; color: #9fd3b3; font-size: .8125rem; font-weight: 600; }
+.nav-sub-related a:hover { background: #222826; color: #fff; }
+@media (max-width: 960px) { .js .nav-sub-related a { margin-top: 4px; } }
+.footer-related { margin-top: 12px; padding-top: 0; border-top: 0; }
+.footer-related a {
+  display: inline-flex; flex-direction: column; gap: 2px; min-width: 190px; padding: 12px 16px;
+  background: #171b1a; color: #f4f6f2; border-radius: var(--radius); text-decoration: none;
+  box-shadow: 0 10px 24px -16px rgba(10, 14, 13, .6);
+}
+.footer-related-label { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-ui); color: #f4f6f2; }
+.footer-related-name { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-size: 1.0625rem; color: #9fd3b3; }
+.footer-related a:hover { background: #222826; }
+.footer-related a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* guide: used or new, at the very start */
+.guide-kind { margin: var(--s3) 0 0; }
+.guide-kind-title { margin: 0 0 10px; font-family: var(--font-display); font-weight: 600; color: var(--ink); }
+.guide-kind-options { display: grid; grid-template-columns: repeat(2, minmax(0, 260px)); gap: 12px; }
+.guide-kind-opt {
+  display: grid; gap: 4px; min-height: 44px; padding: 14px 16px; border-radius: var(--radius);
+  background: #fff; border: 1.5px solid var(--accent); color: var(--ink); text-decoration: none;
+}
+.guide-kind-opt strong { font-family: var(--font-display); font-weight: 600; }
+.guide-kind-opt > span { font-size: var(--fs-small); color: var(--muted); line-height: 1.4; }
+.guide-kind-opt:hover { background: var(--accent-soft); }
+.guide-kind-new { background: #171b1a; border-color: #171b1a; color: #f4f6f2; }
+.guide-kind-new > span { color: #b9c4bd; }
+.guide-kind-new:hover { background: #222826; }
+.guide-kind-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 599px) { .guide-kind-options { grid-template-columns: minmax(0, 1fr); } }

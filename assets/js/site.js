@@ -160,7 +160,8 @@
   // On the homepage the hero animation is one fixed backdrop behind the whole page.
   const hero = document.querySelector('.home-backdrop') || document.querySelector('.hero');
   if (hero) targets.push([hero, 'bg-hero']);
-  document.querySelectorAll('.section-alt > .wrap > .enquiry').forEach((el) => targets.push([el.parentElement.parentElement, 'bg-enquiry']));
+  // with the fixed backdrop on every page, the enquiry sections no longer get their own animation
+  if (!document.querySelector('.home-backdrop')) document.querySelectorAll('.section-alt > .wrap > .enquiry').forEach((el) => targets.push([el.parentElement.parentElement, 'bg-enquiry']));
   if (!targets.length) return;
 
   const videos = [];

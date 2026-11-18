@@ -82,6 +82,7 @@ export function header(c) {
               return html`<li${cat.parent ? ' class="nav-sub-child"' : ''}><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} <small>${n ? `${n} v nabídce` : 'na dotaz'}</small></a></li>`;
             })}
             <li class="nav-sub-all"><a href="${c.url('automaty/')}">Celá nabídka automatů</a></li>
+            ${c.site.related && html`<li class="nav-sub-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><span>Nové automaty <small>${esc(c.site.related.name)}</small></span><span aria-hidden="true">↗</span>${NEW_TAB}</a></li>`}
           </ul>
         </li>`;
         })}
@@ -105,7 +106,7 @@ export function footer(c) {
     <nav aria-label="Druhy automatů">
       <h2 class="footer-title">Nabídka automatů</h2>
       <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
-        ${c.site.related && html`<li class="footer-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer">Nové automaty — ${esc(c.site.related.name)} <span aria-hidden="true">↗</span>${NEW_TAB}</a></li>`}</ul>
+        ${c.site.related && html`<li class="footer-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><span class="footer-related-label">Nové automaty</span><span class="footer-related-name">${esc(c.site.related.name)} <span aria-hidden="true">↗</span></span>${NEW_TAB}</a></li>`}</ul>
     </nav>
     <nav aria-label="Služby a firma">
       <h2 class="footer-title">Služby a firma</h2>
@@ -349,7 +350,8 @@ ${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && h
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
 ${head}<script>document.documentElement.classList.add('js')</script>${c.proto && '\n' + c.proto.head(c)}
 </head>
-<body${bodyClass ? ` class="${bodyClass}"` : ''}>
+<body class="${['has-backdrop', bodyClass].filter(Boolean).join(' ')}">
+<div class="home-backdrop" aria-hidden="true"></div>
 <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
 ${header(c)}
 <main id="obsah" tabindex="-1">
