@@ -51,10 +51,7 @@ function askCards(c, cats, { headingLevel = 3 } = {}) {
   </li>`)}</ul>`;
 }
 
-const splitCategories = (c) => {
-  const stocked = c.categories.filter((cat) => real(inCategory(c, cat)).length);
-  return { stocked, onRequest: c.categories.filter((cat) => cat.accessory) };
-};
+const accessoryCategories = (c) => c.categories.filter((cat) => cat.accessory);
 
 const emptyCategory = (c, cat, h = 'h2') => html`<div class="empty-state">
   ${catIcon(cat.slug)}
@@ -132,7 +129,7 @@ function catalogue(c, list, { headingLevel = 2, label = 'Automaty', categories =
 
 export function home(c) {
   const machines = ordered(c, real(c.products));
-  const { onRequest } = splitCategories(c);
+  const onRequest = accessoryCategories(c);
   const shown = c.products.filter(isListed);
   const hero = shown.find((p) => p.id === c.site.home?.heroProduct) || shown.find((p) => p.images[0]);
   const img = hero?.images[0];
@@ -313,9 +310,11 @@ export function realizations(c, groups) {
 }
 
 export function categoriesIndex(c) {
-  const { stocked, onRequest } = splitCategories(c);
+  const machines = ordered(c, real(c.products));
+  const onRequest = accessoryCategories(c);
   return {
     title: 'Kategorie prodejních automatů',
+    scripts: machines.length > 1 ? ['assets/js/catalogue.js'] : [],
     description: 'Nabídka nápojových, spirálových, karuselových a mrazicích automatů, mincovníků a platebních terminálů.',
     body: html`
 <div class="page-head">
@@ -328,22 +327,12 @@ export function categoriesIndex(c) {
     </ul>
   </div>
 </div>
-${stocked.map((cat) => {
-  const list = ordered(c, real(inCategory(c, cat)), cat.slug);
-  return html`<section class="section section-tight" aria-labelledby="cat-${esc(cat.slug)}">
+${machines.length > 0 && html`<section class="section section-tight" aria-label="Prodejní automaty">
   <div class="wrap">
-    <div class="section-head">
-      <div class="section-head-text">
-        <h2 id="cat-${esc(cat.slug)}">${esc(cat.name)}</h2>
-        <p>${esc(cat.short)} ${publishedLabel(list.length)}.</p>
-      </div>
-      <a class="text-link" href="${c.url(`automaty/${cat.slug}/`)}">Stránka kategorie ${ARROW}</a>
-    </div>
-    ${listingNotice(list)}
-    ${productGrid(c, list, { headingLevel: 3, label: cat.name })}
+    ${listingNotice(machines)}
+    ${catalogue(c, machines, { label: 'Prodejní automaty', categories: true })}
   </div>
-</section>`;
-})}
+</section>`}
 ${onRequest.length > 0 && html`<section class="section section-alt" aria-labelledby="ask-title">
   <div class="wrap">
     <div class="section-head"><div class="section-head-text">

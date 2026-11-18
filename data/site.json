@@ -51,7 +51,7 @@
     "endpoint": ""
   },
   "catalogue": {
-    "searchMinProducts": 8,
+    "searchMinProducts": 4,
     "currency": "CZK",
     "pricesIncludeVat": false
   },
