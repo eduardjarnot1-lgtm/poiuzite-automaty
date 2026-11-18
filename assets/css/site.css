@@ -1163,3 +1163,8 @@ html:has(body.is-home) { scroll-padding-top: var(--s2); }
   .catalogue > .cat-tools:not(:has(.tool ~ .tool)) .tool { flex-wrap: wrap; }
   .catalogue > .cat-tools:not(:has(.tool ~ .tool)) .tool select { flex: 1 1 11em; }
 }
+
+/* Indent the two beverage subcategories in the catalogue menu. */
+.nav-sub .nav-sub-child > a {
+  padding-inline-start: 1.75rem;
+}

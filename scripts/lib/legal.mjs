@@ -98,7 +98,7 @@ export function terms(c) {
     body: html`
 ${sec('provozovatel', 'Kdo jsme', html`<p>Web provozuje a automaty prodává:</p>${operatorFacts(c)}`)}
 ${sec('rozsah', 'K čemu web slouží', html`
-<p>Web je katalog použitých, repasovaných a renovovaných prodejních automatů a souvisejících služeb. ${customers || ph('Doplníme, zda prodáváme jen podnikatelům, nebo i spotřebitelům.')}</p>
+<p>Web je katalog použitých a repasovaných prodejních automatů a souvisejících služeb. ${customers || ph('Doplníme, zda prodáváme jen podnikatelům, nebo i spotřebitelům.')}</p>
 <p><strong>Na webu nelze automat objednat ani zaplatit.</strong> Nemá košík ani platební bránu. Formulářem nám můžete poslat jen nezávaznou poptávku.</p>`)}
 ${sec('poptavka', 'Poptávka je nezávazná', html`
 <p>Odesláním poptávky nevzniká smlouva, objednávka ani rezervace automatu. Poptávka vás k ničemu nezavazuje a my na jejím základě nemusíme automat prodat. Poptávku můžete kdykoli vzít zpět, stačí nám napsat nebo zavolat.</p>`)}
@@ -131,7 +131,7 @@ ${sec('platba-dodani', 'Platba, dodání a předání', html`
 ${sec('sluzby', 'Doprava, instalace a servis', html`
 <p>${b.installation ? esc(b.installation) : ph('Doplníme, zda nabízíme dopravu, instalaci, zaškolení, odvoz starého automatu a servis, kde a za jakých podmínek. Dokud to nedoplníme, platí jen to, co výslovně uvedeme v nabídce.')}</p>`)}
 ${sec('stav', 'Použité a repasované automaty', html`
-<p>Prodáváme použité věci. Stav každého kusu, provedené práce a známé vady a opotřebení popíšeme v nabídce. Popis stavů „použitý“, „repasovaný“ a „plně renovovaný“ najdete na stránce <a href="${c.url('repasovane-automaty/')}">Repasované automaty</a>.</p>
+<p>Prodáváme použité automaty po kompletní repasi. Na automaty poskytujeme záruku 12 měsíců. Informace o repasi najdete na stránce <a href="${c.url('repasovane-automaty/')}">Repasované automaty</a>.</p>
 <p>U použité věci neodpovídáme za vadu, která odpovídá míře používání nebo opotřebení, kterou věc měla při převzetí, ani za vadu, kvůli které byla sjednána nižší cena. Za ostatní vady odpovídáme podle zákona. Použité zboží spotřebitele práv z vadného plnění nezbavuje.</p>`)}
 ${sec('vady', 'Vady, reklamace a odstoupení', html`
 <p>Jak uplatnit práva z vadného plnění (reklamaci) a kdy lze od smlouvy odstoupit, popisujeme na stránce <a href="${c.url('reklamace-a-odstoupeni/')}">Reklamace a odstoupení</a>.</p>

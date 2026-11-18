@@ -1,513 +1,432 @@
 [
   {
-    "id": "necta-brio-3",
-    "slug": "necta-brio-3",
-    "placeholder": false,
+    "id": "rhea-xs",
+    "slug": "rhea-xs",
+    "name": "Rhea XS",
     "category": "instantni-kavove-automaty",
-    "name": "Necta Brio 3",
-    "manufacturer": null,
-    "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Kompaktní automat na teplé nápoje.",
+    "manufacturer": "Rhea",
+    "model": "XS",
+    "type": "Instantní nápoje",
+    "condition": "repasovany",
+    "summary": "Kompaktní stolní automat na instantní nápoje. Kelímky se vkládají ručně.",
     "description": [
-      "Kompaktní automat na teplé nápoje.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
+      "Kompaktní stolní automat na instantní nápoje. Kelímky se vkládají ručně.",
+      "Mincovník nevrací."
     ],
     "specs": [
       {
         "label": "Rozměry (v × š × h)",
-        "value": null,
+        "value": "50 × 38 × 45 cm",
         "key": true
       },
       {
         "label": "Hmotnost",
-        "value": null,
+        "value": "27 kg",
+        "key": true
+      },
+      {
+        "label": "Zásobníky",
+        "value": "6",
         "key": false
       },
       {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
+        "label": "Volby nápojů",
+        "value": "8",
         "key": false
       }
     ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
+    "warranty": "12 měsíců",
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/rhea-xs/1.webp",
+        "alt": "Rhea XS – pohled na automat",
+        "width": 175,
+        "height": 175,
+        "rights": "cleared"
+      }
+    ],
+    "status": "published",
+    "order": 1
+  },
+  {
+    "id": "rhea-xm",
+    "slug": "rhea-xm",
+    "name": "Rhea XM",
+    "category": "instantni-kavove-automaty",
+    "manufacturer": "Rhea",
+    "model": "XM",
+    "type": "Instantní nápoje",
+    "condition": "repasovany",
+    "summary": "Stolní automat s výdejem kelímků. Lze ho postavit na podstavec a provozovat s kanystrem a čerpadlem.",
+    "description": [
+      "Stolní automat s výdejem kelímků. Lze ho postavit na podstavec a provozovat s kanystrem a čerpadlem.",
+      "Mincovník vrací."
+    ],
+    "specs": [
+      {
+        "label": "Kapacita kelímků",
+        "value": "150–240",
+        "key": true
+      },
+      {
+        "label": "Zásobníky",
+        "value": "6",
+        "key": true
+      },
+      {
+        "label": "Volby nápojů",
+        "value": "10",
+        "key": false
+      }
+    ],
+    "warranty": "12 měsíců",
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/rhea-xm/1.webp",
+        "alt": "Rhea XM – pohled na automat",
+        "width": 759,
+        "height": 1400,
+        "rights": "cleared"
+      }
+    ],
+    "status": "published",
+    "order": 2
+  },
+  {
+    "id": "rhea-sagoma",
+    "slug": "rhea-sagoma",
+    "name": "Rhea Sagoma H5",
+    "category": "instantni-kavove-automaty",
+    "manufacturer": "Rhea",
+    "model": "Sagoma H5",
+    "type": "Instantní nápoje",
+    "condition": "repasovany",
+    "summary": "Automat na instantní nápoje s možností úpravy programu. Může fungovat s kanystrem.",
+    "description": [
+      "Automat na instantní nápoje s možností úpravy programu. Může fungovat s kanystrem.",
+      "Mincovník vrací."
+    ],
+    "specs": [
+      {
+        "label": "Kapacita kelímků",
+        "value": "400",
+        "key": true
+      },
+      {
+        "label": "Zásobníky",
+        "value": "5",
+        "key": true
+      },
+      {
+        "label": "Volby nápojů",
+        "value": "12",
+        "key": false
+      }
+    ],
+    "warranty": "12 měsíců",
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/rhea-sagoma/1.webp",
+        "alt": "Rhea Sagoma H5 – pohled na automat",
+        "width": 549,
+        "height": 1400,
+        "rights": "cleared"
+      }
+    ],
+    "status": "published",
+    "order": 3
+  },
+  {
+    "id": "rhea-lazio",
+    "slug": "rhea-lazio",
+    "name": "Rhea Lazio",
+    "category": "instantni-kavove-automaty",
+    "manufacturer": "Rhea",
+    "model": "Lazio",
+    "type": "Instantní nápoje",
+    "condition": "repasovany",
+    "summary": "Automat na instantní nápoje s výdejem kelímků.",
+    "description": [
+      "Automat na instantní nápoje s výdejem kelímků.",
+      "Mincovník vrací."
+    ],
+    "specs": [
+      {
+        "label": "Kapacita kelímků",
+        "value": "500",
+        "key": true
+      },
+      {
+        "label": "Zásobníky",
+        "value": "6",
+        "key": true
+      },
+      {
+        "label": "Volby nápojů",
+        "value": "18",
+        "key": false
+      }
+    ],
+    "warranty": "12 měsíců",
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/rhea-lazio/1.webp",
+        "alt": "Rhea Lazio – pohled na automat",
+        "width": 651,
+        "height": 1400,
+        "rights": "cleared"
+      }
+    ],
+    "status": "published",
+    "order": 4
+  },
+  {
+    "id": "necta-brio",
+    "slug": "necta-brio",
+    "name": "Necta Brio",
+    "category": "instantni-kavove-automaty",
+    "manufacturer": "Necta",
+    "model": "Brio",
+    "type": "Instantní nápoje",
+    "condition": "repasovany",
+    "summary": "Kompaktní automat s výdejem kelímků. Lze ho umístit na stůl nebo podstavec.",
+    "description": [
+      "Kompaktní automat s výdejem kelímků. Lze ho umístit na stůl nebo podstavec.",
+      "Mincovník vrací."
+    ],
+    "specs": [
+      {
+        "label": "Kapacita kelímků",
+        "value": "až 300",
+        "key": true
+      },
+      {
+        "label": "Zásobníky",
+        "value": "5–7",
+        "key": true
+      },
+      {
+        "label": "Volby nápojů",
+        "value": "14",
+        "key": false
+      }
+    ],
+    "warranty": "12 měsíců",
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/necta-brio/1.webp",
+        "alt": "Necta Brio – pohled na automat",
+        "width": 1050,
+        "height": 1400,
+        "rights": "cleared"
+      }
+    ],
+    "status": "published",
+    "order": 5
+  },
+  {
+    "id": "necta-astro",
+    "slug": "necta-astro",
+    "name": "Necta Astro",
+    "category": "instantni-kavove-automaty",
+    "manufacturer": "Necta",
+    "model": "Astro",
+    "type": "Instantní nápoje",
+    "condition": "repasovany",
+    "summary": "Automat na teplé nápoje s výdejem kelímků. Provedení z nabídky umí připravovat nápoje z instantní i zrnkové kávy.",
+    "description": [
+      "Automat na teplé nápoje s výdejem kelímků. Provedení z nabídky umí připravovat nápoje z instantní i zrnkové kávy.",
+      "Mincovník vrací."
+    ],
+    "specs": [
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": "183 × 65 × 74,2 cm",
+        "key": true
+      },
+      {
+        "label": "Hmotnost",
+        "value": "170 kg",
+        "key": true
+      },
+      {
+        "label": "Kapacita kelímků",
+        "value": "650",
+        "key": false
+      },
+      {
+        "label": "Zásobníky",
+        "value": "7",
+        "key": false
+      },
+      {
+        "label": "Volby nápojů",
+        "value": "18",
+        "key": false
+      }
+    ],
+    "warranty": "12 měsíců",
+    "price": null,
+    "availability": null,
+    "images": [
+      {
+        "src": "assets/products/necta-astro/1.webp",
+        "alt": "Necta Astro – pohled na automat",
+        "width": 185,
+        "height": 462,
+        "rights": "cleared"
+      }
+    ],
+    "status": "published",
+    "order": 6
+  },
+  {
+    "id": "rhea-x2",
+    "slug": "rhea-x2",
+    "name": "Rhea X2",
+    "category": "automaty-na-zrnkovou-kavu",
+    "manufacturer": "Rhea",
+    "model": "X2",
+    "type": "Automaty na zrnkovou kávu",
+    "condition": "repasovany",
+    "summary": "Automat na nápoje ze zrnkové kávy.",
+    "description": [
+      "Automat na nápoje ze zrnkové kávy."
+    ],
+    "specs": [],
+    "warranty": "12 měsíců",
     "price": null,
     "availability": null,
     "images": [],
-    "dateAdded": "2026-10-20"
+    "status": "published",
+    "order": 7
   },
   {
-    "id": "atlantis-select",
-    "slug": "atlantis-select",
-    "placeholder": false,
-    "category": "instantni-kavove-automaty",
-    "name": "Atlantis Select",
-    "manufacturer": null,
-    "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Instantní automat na kávu a další teplé nápoje.",
+    "id": "damian-eta-beta",
+    "slug": "damian-eta-beta",
+    "name": "Damian Eta Beta",
+    "category": "spiralove-automaty",
+    "manufacturer": "Damian",
+    "model": "Eta Beta",
+    "type": "Spirálové automaty",
+    "condition": "repasovany",
+    "summary": "Spirálový automat se šesti prodejními patry na balené občerstvení a nápoje.",
     "description": [
-      "Instantní automat na kávu a další teplé nápoje.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
+      "Spirálový automat se šesti prodejními patry na balené občerstvení a nápoje."
     ],
     "specs": [
       {
-        "label": "Rozměry (v × š × h)",
-        "value": null,
+        "label": "Prodejní patra",
+        "value": "6",
         "key": true
+      },
+      {
+        "label": "Chlazení",
+        "value": "až na 5 °C",
+        "key": true
+      },
+      {
+        "label": "Počet voleb",
+        "value": "až 32",
+        "key": false
+      },
+      {
+        "label": "Rozměry (v × š × h)",
+        "value": "183 × 80 × 82 cm",
+        "key": false
       },
       {
         "label": "Hmotnost",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
+        "value": "280 kg",
         "key": false
       }
     ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
+    "warranty": "12 měsíců",
     "price": null,
     "availability": null,
     "images": [
       {
-        "src": "assets/products/atlantis-select/1.jpg",
-        "alt": "Atlantis Select, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "3stechnologies.in",
-          "url": "https://www.3stechnologies.in/products/select/10083"
-        },
-        "width": 1000,
-        "height": 1000,
-        "rights": "unverified",
-        "rightsNote": "Fotografie převzatá z cizího webu (viz credit). Souhlas autora ani licence nejsou doloženy."
+        "src": "assets/products/damian-eta-beta/1.webp",
+        "alt": "Damian Eta Beta – pohled na automat",
+        "width": 441,
+        "height": 811,
+        "rights": "cleared"
       }
     ],
-    "dateAdded": "2026-10-19"
+    "status": "published",
+    "order": 8
   },
   {
-    "id": "crane-voce",
-    "slug": "crane-voce",
-    "placeholder": false,
-    "category": "instantni-kavove-automaty",
-    "name": "Crane Voce",
-    "manufacturer": null,
-    "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Větší automat na teplé nápoje.",
+    "id": "necta-starfood",
+    "slug": "necta-starfood",
+    "name": "Necta Starfood",
+    "category": "karuselove-automaty",
+    "manufacturer": "Necta",
+    "model": "Starfood",
+    "type": "Karuselové automaty",
+    "condition": "repasovany",
+    "summary": "Karuselový automat s otočnými patry a jednotlivými výdejními přihrádkami.",
     "description": [
-      "Větší automat na teplé nápoje.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
+      "Karuselový automat s otočnými patry a jednotlivými výdejními přihrádkami."
     ],
-    "specs": [
-      {
-        "label": "Rozměry (v × š × h)",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Hmotnost",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
-        "key": false
-      }
-    ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
+    "specs": [],
+    "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [
-      {
-        "src": "assets/products/crane-voce/1.jpg",
-        "alt": "Crane Voce, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "ebay.co.uk",
-          "url": "https://www.ebay.co.uk/itm/326679664537"
-        },
-        "width": 1000,
-        "height": 1000,
-        "rights": "unverified",
-        "rightsNote": "Fotografie převzatá z cizího webu (viz credit). Souhlas autora ani licence nejsou doloženy."
-      }
-    ],
-    "dateAdded": "2026-10-18"
+    "images": [],
+    "status": "published",
+    "order": 9
   },
   {
-    "id": "necta-brio-alternativni-provedeni",
-    "slug": "necta-brio-alternativni-provedeni",
-    "placeholder": false,
-    "category": "instantni-kavove-automaty",
-    "name": "Necta Brio – alternativní provedení",
-    "manufacturer": null,
+    "id": "aht",
+    "slug": "aht",
+    "name": "AHT – automat na mražené zboží",
+    "category": "ostatni-prodejni-automaty",
+    "manufacturer": "AHT",
     "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Automat s výběrem více druhů kávy a teplých nápojů.",
+    "type": "Ostatní prodejní automaty",
+    "condition": "repasovany",
+    "summary": "Prodejní automat na mražené zboží značky AHT. Konkrétní model a konfiguraci upřesníme na dotaz.",
     "description": [
-      "Automat s výběrem více druhů kávy a teplých nápojů.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
+      "Prodejní automat na mražené zboží značky AHT. Konkrétní model a konfiguraci upřesníme na dotaz."
     ],
-    "specs": [
-      {
-        "label": "Rozměry (v × š × h)",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Hmotnost",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
-        "key": false
-      }
-    ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
+    "specs": [],
+    "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [
-      {
-        "src": "assets/products/necta-brio-alternativni-provedeni/1.jpg",
-        "alt": "Necta Brio – alternativní provedení, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "quickservice.mi.it",
-          "url": "https://www.quickservice.mi.it/macchine.html"
-        },
-        "width": 585,
-        "height": 585,
-        "rights": "unverified",
-        "rightsNote": "Fotografie převzatá z cizího webu (viz credit). Souhlas autora ani licence nejsou doloženy."
-      }
-    ],
-    "dateAdded": "2026-10-17"
+    "images": [],
+    "status": "published",
+    "order": 10
   },
   {
-    "id": "nescafe-freshers-700-auto",
-    "slug": "nescafe-freshers-700-auto",
-    "placeholder": false,
-    "category": "instantni-kavove-automaty",
-    "name": "Nescafé Freshers 700 Auto",
-    "manufacturer": null,
+    "id": "fastcorp",
+    "slug": "fastcorp",
+    "name": "Fastcorp – automat na mražené zboží",
+    "category": "ostatni-prodejni-automaty",
+    "manufacturer": "Fastcorp",
     "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Starší typ instantního automatu s tlačítkovým panelem.",
+    "type": "Ostatní prodejní automaty",
+    "condition": "repasovany",
+    "summary": "Prodejní automat na mražené zboží značky Fastcorp. Konkrétní model a konfiguraci upřesníme na dotaz.",
     "description": [
-      "Starší typ instantního automatu s tlačítkovým panelem.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
+      "Prodejní automat na mražené zboží značky Fastcorp. Konkrétní model a konfiguraci upřesníme na dotaz."
     ],
-    "specs": [
-      {
-        "label": "Rozměry (v × š × h)",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Hmotnost",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
-        "key": false
-      }
-    ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
+    "specs": [],
+    "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [
-      {
-        "src": "assets/products/nescafe-freshers-700-auto/1.jpg",
-        "alt": "Nescafé Freshers 700 Auto, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "gumtree.com",
-          "url": "https://www.gumtree.com/p/other-miscellaneous-goods/darenthmjs-refresh-700-auto-freevend-hot-drinks-vending-machine-/1485327509"
-        },
-        "width": 750,
-        "height": 1000,
-        "rights": "unverified",
-        "rightsNote": "Fotografie převzatá z cizího webu (viz credit). Souhlas autora ani licence nejsou doloženy."
-      }
-    ],
-    "dateAdded": "2026-10-16"
-  },
-  {
-    "id": "colibri-c5",
-    "slug": "colibri-c5",
-    "placeholder": false,
-    "category": "instantni-kavove-automaty",
-    "name": "Colibri C5",
-    "manufacturer": null,
-    "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Úzký automat na kávu a teplé nápoje.",
-    "description": [
-      "Úzký automat na kávu a teplé nápoje.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
-    ],
-    "specs": [
-      {
-        "label": "Rozměry (v × š × h)",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Hmotnost",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
-        "key": false
-      }
-    ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
-    "price": null,
-    "availability": null,
-    "images": [
-      {
-        "src": "assets/products/colibri-c5/1.jpg",
-        "alt": "Colibri C5, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "kafemati.com.mk",
-          "url": "https://kafemati.com.mk/shop/products?categories=vending-reparirani-kafemati"
-        },
-        "width": 540,
-        "height": 540,
-        "rights": "unverified",
-        "rightsNote": "Fotografie převzatá z cizího webu (viz credit). Souhlas autora ani licence nejsou doloženy."
-      }
-    ],
-    "dateAdded": "2026-10-15"
-  },
-  {
-    "id": "wittenborg-5100",
-    "slug": "wittenborg-5100",
-    "placeholder": false,
-    "category": "instantni-kavove-automaty",
-    "name": "Wittenborg 5100",
-    "manufacturer": null,
-    "model": null,
-    "type": null,
-    "condition": null,
-    "conditionDetails": null,
-    "summary": "Stolní automat na horké nápoje.",
-    "description": [
-      "Stolní automat na horké nápoje.",
-      "Technické parametry, stav konkrétního kusu, cenu a dostupnost doplníme."
-    ],
-    "specs": [
-      {
-        "label": "Rozměry (v × š × h)",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Hmotnost",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Napájení",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Počet nápojových voleb",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobníky instantních surovin",
-        "value": null,
-        "key": true
-      },
-      {
-        "label": "Zásobník kelímků",
-        "value": null,
-        "key": false
-      },
-      {
-        "label": "Připojení vody",
-        "value": null,
-        "key": false
-      }
-    ],
-    "features": [],
-    "paymentSystems": [],
-    "warranty": null,
-    "price": null,
-    "availability": null,
-    "images": [
-      {
-        "src": "assets/products/wittenborg-5100/1.jpg",
-        "alt": "Wittenborg 5100, ilustrační fotografie podobného modelu",
-        "illustrative": true,
-        "credit": {
-          "label": "baumgarten-automatenservice.de",
-          "url": "https://www.baumgarten-automatenservice.de/produkte/tischger%C3%A4te/wittenborg-5100/"
-        },
-        "width": 558,
-        "height": 984,
-        "rights": "unverified",
-        "rightsNote": "Fotografie převzatá z cizího webu (viz credit). Souhlas autora ani licence nejsou doloženy."
-      }
-    ],
-    "dateAdded": "2026-10-14"
+    "images": [],
+    "status": "published",
+    "order": 11
   }
 ]

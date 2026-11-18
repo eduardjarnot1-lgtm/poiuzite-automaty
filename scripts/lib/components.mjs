@@ -49,7 +49,10 @@ export const LEGAL_NAV = [
 export const isDraft = (c) => (c.site.legal?.status || 'draft') !== 'final';
 const isCurrent = (c, sections) => sections.includes(c.page.section);
 const hasContact = (c) => Boolean(c.site.contact.phone || c.site.contact.email);
-const published = (c, slug) => c.products.filter((p) => p.category === slug && !p.placeholder && isListed(p)).length;
+const published = (c, slug) => {
+  const slugs = new Set([slug, ...c.categories.filter((cat) => cat.parent === slug).map((cat) => cat.slug)]);
+  return c.products.filter((p) => slugs.has(p.category) && !p.placeholder && isListed(p)).length;
+};
 
 export function header(c) {
   const home = c.page.path === '';
@@ -73,7 +76,7 @@ export function header(c) {
           <ul class="nav-sub" id="nav-sub">
             ${c.categories.map((cat) => {
               const n = published(c, cat.slug);
-              return html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} <small>${n ? `${n} v nabídce` : 'na dotaz'}</small></a></li>`;
+              return html`<li${cat.parent ? ' class="nav-sub-child"' : ''}><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} <small>${n ? `${n} v nabídce` : 'na dotaz'}</small></a></li>`;
             })}
             <li class="nav-sub-all"><a href="${c.url('automaty/')}">Celá nabídka automatů</a></li>
           </ul>

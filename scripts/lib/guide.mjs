@@ -55,9 +55,9 @@ export const WHEN = [['asap', 'Co nejdříve'], ['m1', 'Do měsíce'], ['m3', 'D
 export const CATEGORY_FOR = {
   instant: 'instantni-kavove-automaty',
   beans: 'automaty-na-zrnkovou-kavu',
-  cold: 'napojove-automaty',
-  snack: 'snackove-automaty',
-  combo: 'kombinovane-automaty',
+  cold: 'spiralove-automaty',
+  snack: 'spiralove-automaty',
+  combo: 'spiralove-automaty',
 };
 
 export const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? '';

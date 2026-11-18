@@ -1,7 +1,7 @@
 {
   "name": "Použité automaty",
   "logoText": "použité automaty",
-  "tagline": "Použité, repasované a renovované prodejní automaty pro firmy a provozovatele.",
+  "tagline": "Prodej repasovaných automatů, servis a náhradní díly.",
   "baseUrl": "",
   "contact": {
     "phone": null,
@@ -29,10 +29,10 @@
     "contractFormation": null,
     "delivery": null,
     "installation": null,
-    "warrantyBeyondLaw": null,
+    "warrantyBeyondLaw": "Na automaty po kompletní repasi poskytujeme záruku 12 měsíců.",
     "usedGoodsDefectPeriodMonths": null,
     "voluntaryReturns": null,
-    "processClaimsConfirmed": false
+    "processClaimsConfirmed": true
   },
   "privacy": {
     "_note": "Zpracovatelé a doby uchování. Hostingem a formuláři je Netlify podle netlify.toml; potvrďte, že živý web běží na Netlify.",
@@ -56,26 +56,14 @@
     "pricesIncludeVat": false
   },
   "conditions": {
-    "pouzity": {
-      "label": "Použitý",
-      "description": "Automat v původním stavu, před prodejem zkontrolovaný.",
-      "verified": false
-    },
     "repasovany": {
-      "label": "Repasovaný",
-      "description": "Automat vyčištěný, zkontrolovaný a podle potřeby opravený, s vyměněnými opotřebenými díly.",
-      "verified": false
-    },
-    "renovovany": {
-      "label": "Plně renovovaný",
-      "description": "Automat rozebraný a obnovený včetně vnějších dílů, s otestovanou funkčností před předáním.",
-      "verified": false
+      "label": "Po kompletní repasi",
+      "description": "Automat je po kompletní repasi vyčištěný a odzkoušený. Poskytujeme záruku 12 měsíců.",
+      "verified": true
     }
   },
   "home": {
-    "heroProduct": "atlantis-select",
-    "categoryPhotos": {
-      "instantni-kavove-automaty": "necta-brio-alternativni-provedeni"
-    }
+    "heroProduct": "rhea-lazio",
+    "categoryPhotos": {}
   }
 }

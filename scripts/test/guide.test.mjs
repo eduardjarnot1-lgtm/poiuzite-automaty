@@ -61,22 +61,22 @@ test('categories follow what the machine should offer', () => {
   assert.deepEqual(targetCategories({ offer: 'hot', coffee: 'beans' }), ['automaty-na-zrnkovou-kavu']);
   assert.deepEqual(targetCategories({ offer: 'hot', coffee: 'help' }), ['instantni-kavove-automaty', 'automaty-na-zrnkovou-kavu']);
   assert.deepEqual(targetCategories({ offer: 'hot' }), ['instantni-kavove-automaty', 'automaty-na-zrnkovou-kavu']);
-  assert.deepEqual(targetCategories({ offer: 'cold' }), ['napojove-automaty']);
-  assert.deepEqual(targetCategories({ offer: 'snack' }), ['snackove-automaty']);
-  assert.deepEqual(targetCategories({ offer: 'combo' }), ['kombinovane-automaty']);
+  assert.deepEqual(targetCategories({ offer: 'cold' }), ['spiralove-automaty']);
+  assert.deepEqual(targetCategories({ offer: 'snack' }), ['spiralove-automaty']);
+  assert.deepEqual(targetCategories({ offer: 'combo' }), ['spiralove-automaty']);
   assert.deepEqual(targetCategories({ offer: 'unsure' }), []);
 });
 
 test('today\'s catalogue: instant coffee is a category result with examples in catalogue order, no ranking', () => {
-  const order = ['wittenborg-5100', 'colibri-c5'];
+  const order = ['rhea-xs', 'rhea-xm'];
   const r = cat(realProducts, { offer: 'hot', coffee: 'instant', place: 'office', mode: 'free', budget: 'none' }, order);
   assert.equal(r.branch, 'published');
   assert.equal(r.comparable, false);
   assert.equal(r.shortlist.length, 0);
   assert.deepEqual(r.examples.slice(0, 2).map((x) => x.product.id), order, 'the saved catalogue order, not a ranking');
   assert.equal(r.examples.length, 3);
-  assert.equal(r.total, 7);
-  assert.equal(r.categories[0].published, 7);
+  assert.equal(r.total, 6);
+  assert.equal(r.categories[0].published, 6);
 });
 
 test('card payment requested while no machine records a payment system: requested, not confirmed', () => {
@@ -98,16 +98,16 @@ test('numeric budget with unknown prices: no budget match is claimed', () => {
   assert.equal(r.groups.length, 0);
 });
 
-test('on-request categories never borrow instant-coffee machines', () => {
+test('the guide uses the current spiral and bean coffee categories', () => {
   for (const offer of ['cold', 'snack', 'combo']) {
     const r = cat(realProducts, { offer, place: 'office', mode: 'paid' });
-    assert.equal(r.branch, 'onRequest', offer);
-    assert.equal(r.examples.length + r.shortlist.length, 0, offer);
-    assert.equal(r.categories[0].published, 0);
+    assert.equal(r.branch, 'published', offer);
+    assert.equal(r.examples[0].product.id, 'damian-eta-beta');
+    assert.equal(r.categories[0].published, 1);
   }
   const beans = cat(realProducts, { offer: 'hot', coffee: 'beans', place: 'office', mode: 'free' });
-  assert.equal(beans.branch, 'onRequest');
-  assert.equal(beans.examples.length, 0);
+  assert.equal(beans.branch, 'published');
+  assert.equal(beans.examples[0].product.id, 'rhea-x2');
 });
 
 test('"Zatím nevím" everywhere still gives a useful, honest result', () => {
@@ -163,7 +163,7 @@ test('summary: answers in words, machines only when ticked, nothing from the URL
   assert.match(plain, /80\s000 Kč bez DPH/);
   assert.match(plain, /Platební karta/);
   assert.doesNotMatch(plain, /Vybrané automaty/);
-  const ticked = summaryText({ ...a, selected: ['colibri-c5'] }, r, { products: realProducts });
-  assert.match(ticked, /Vybrané automaty: Colibri C5 \(colibri-c5\)/);
+  const ticked = summaryText({ ...a, selected: ['rhea-xm'] }, r, { products: realProducts });
+  assert.match(ticked, /Vybrané automaty: Rhea XM \(rhea-xm\)/);
   assert.ok(answerLines(a).every(([step]) => STEPS.some((s) => s.id === step)));
 });
