@@ -2,7 +2,7 @@
 import { esc, html, ph, plural } from './util.mjs';
 import {
   ARROW, CHECK, INFO, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
-  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf,
+  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf, relatedPromo,
 } from './components.mjs';
 import { isListed, recommended, sale, effectivePrice, discountState, SORTS } from './catalog.mjs';
 import * as guideRules from './guide.mjs';
@@ -179,6 +179,8 @@ export function home(c) {
     ${machines.length > 0 && html`${listingNotice(machines)}${catalogue(c, machines, { headingLevel: 3, label: 'Zveřejněné automaty', categories: true })}`}
   </div>
 </section>
+
+${relatedPromo(c)}
 
 ${onRequest.length > 0 && html`<section class="section section-alt" id="na-dotaz" aria-labelledby="ask-title">
   <div class="wrap">
@@ -874,6 +876,7 @@ export function guide(c) {
   const data = {
     categories: c.categories.map(({ slug, name, short }) => ({ slug, name, short, url: c.url(`automaty/${slug}/`) })),
     order: listed.map((p) => p.id),
+    related: c.site.related ? { name: c.site.related.name, url: c.site.related.machinesUrl } : null,
     products: listed.map((p) => ({
       id: p.id, name: p.name, category: p.category, status: p.status, deletedAt: p.deletedAt, placeholder: p.placeholder,
       availability: p.availability, price: p.price, discount: p.discount, specs: p.specs, paymentSystems: p.paymentSystems,

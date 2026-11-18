@@ -6,6 +6,8 @@ const INFO = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentC
 export const CHECK = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 export { INFO };
 const LEAF = '<path d="M27 4C14 4 5 10 5 20c0 3 1 5.5 2.5 7.5C9 18 15 13 22 10 16 14 11 19 9 28.5 11 29.5 13 30 15 30c9 0 14-8 12-26z" fill="currentColor"/>';
+export const EXT = '<svg class="icon icon-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 16 16 8M9 8h7v7"/></svg>';
+export const NEW_TAB = '<span class="visually-hidden"> (otevře se v nové kartě)</span>';
 export const ARROW = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const PHONE = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
 const MAIL = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>';
@@ -102,7 +104,8 @@ export function footer(c) {
     </div>
     <nav aria-label="Druhy automatů">
       <h2 class="footer-title">Nabídka automatů</h2>
-      <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}</ul>
+      <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
+        ${c.site.related && html`<li class="footer-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer">Nové automaty — ${esc(c.site.related.name)} <span aria-hidden="true">↗</span>${NEW_TAB}</a></li>`}</ul>
     </nav>
     <nav aria-label="Služby a firma">
       <h2 class="footer-title">Služby a firma</h2>
@@ -360,4 +363,36 @@ ${c.proto
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}`}</body>
 </html>
 `);
+}
+
+// Bistro 24 (same owner): new machines. A quiet, typography-led window, no photos: Bistro 24's
+// images are manufacturer visualisations whose reuse rights are not established here.
+export function relatedPromo(c) {
+  const r = c.site.related;
+  if (!r) return '';
+  return html`<section class="section section-tight related-wrap" aria-labelledby="related-title">
+  <div class="wrap">
+    <div class="related">
+      <div class="related-text">
+        <p class="related-eyebrow">Další možnost od stejného majitele</p>
+        <h2 id="related-title">Hledáte raději nový automat?</h2>
+        <p class="related-lead">Na ${esc(r.name)} najdete nabídku nových stravovacích automatů, AI řešení a výdejních boxových systémů. Prohlédněte si další možnosti pro svůj provoz.</p>
+        <div class="related-actions">
+          <a class="btn btn-lg related-cta" href="${esc(r.machinesUrl)}" target="_blank" rel="noopener noreferrer">Prohlédnout nové automaty ${EXT}${NEW_TAB}</a>
+          <a class="related-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Poznat ${esc(r.name)}${NEW_TAB}</a>
+        </div>
+        <p class="related-dest">Pokračujete na ${esc(r.domain)}</p>
+      </div>
+      <div class="related-showroom">
+        <p class="related-mark" aria-hidden="true"><span>Bistro</span> 24</p>
+        <ul class="related-list" aria-label="Co najdete na ${esc(r.name)}">
+          <li>AI stravovací automaty s rozpoznáváním produktů</li>
+          <li>Chlazené automaty na potraviny</li>
+          <li>Výdejní boxové systémy</li>
+          <li>Prodej, pronájem a servis</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>`;
 }

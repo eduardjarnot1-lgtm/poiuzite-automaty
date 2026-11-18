@@ -1288,3 +1288,91 @@ html:has(body.is-home) { scroll-padding-top: var(--s2); }
   .cat-tools:has(.tool ~ .tool) .tool select { width: 100%; min-width: 0; }
   .cat-tools:has(.tool ~ .tool) > .btn, .cat-tools:has(.tool ~ .tool) > button { grid-column: 1 / -1; justify-self: start; }
 }
+
+/* ================================================================
+   Bistro 24 (same owner, new machines), 2026-11-18: a compact dark "window into the
+   new-machine showroom" after the used-machine catalogue. Charcoal, white editorial serif,
+   restrained green; no photos, no motion. Footer link and an optional card in the guide.
+   ================================================================ */
+.related-wrap { padding-block: var(--s4) var(--s5); }
+.related {
+  --r-bg: #171b1a; --r-ink: #f4f6f2; --r-soft: #b9c4bd; --r-line: rgba(255,255,255,.12); --r-green: #6fbf8f;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--s5); align-items: center;
+  padding: clamp(28px, 4vw, 52px) clamp(24px, 4.5vw, 60px);
+  background: var(--r-bg); color: var(--r-ink); border-radius: var(--radius-xl, 24px);
+  box-shadow: 0 1px 2px rgba(10,14,13,.2), 0 28px 60px -34px rgba(10,14,13,.65);
+}
+/* a faint green ambient light from the upper right, and a hairline sheen at the top edge */
+.related::before {
+  content: ""; position: absolute; z-index: -1; inset: -40% -20% auto auto; width: 70%; aspect-ratio: 1;
+  background: radial-gradient(closest-side, rgba(111,191,143,.20), rgba(111,191,143,0) 70%);
+  pointer-events: none;
+}
+.related::after { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent); pointer-events: none; }
+.related-eyebrow { margin: 0 0 14px; font-family: var(--font-display); font-size: .75rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--r-green); }
+.related h2 {
+  margin: 0 0 14px; color: var(--r-ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  font-weight: 500; font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.625rem); line-height: 1.1; letter-spacing: -.01em;
+}
+.related-lead { max-width: 46ch; margin: 0 0 var(--s4); color: var(--r-soft); font-size: var(--fs-body, 1.0625rem); line-height: 1.6; }
+.related-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+.related-cta { background: var(--r-ink); color: #141817; border: 1px solid var(--r-ink); }
+.related-cta:hover { background: #fff; color: #0f3a28; border-color: #fff; }
+.related-cta .icon-ext { width: 18px; height: 18px; }
+.related-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--r-ink); font-family: var(--font-display); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 4px; }
+.related-link:hover { text-decoration-color: var(--r-green); }
+.related a:focus-visible { outline: 2px solid var(--r-green); outline-offset: 3px; }
+.related-dest { margin: 14px 0 0; font-size: var(--fs-caption); color: #8d9992; }
+.related-showroom { padding-left: var(--s5); border-left: 1px solid var(--r-line); }
+.related-mark {
+  margin: 0 0 var(--s3); color: var(--r-ink); line-height: 1;
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  font-size: clamp(2.25rem, 1.6rem + 2vw, 3.5rem); letter-spacing: -.01em;
+}
+.related-mark span { font-style: italic; }
+.related-list { margin: 0; padding: 0; list-style: none; }
+.related-list li { position: relative; padding: 11px 0 11px 20px; border-top: 1px solid var(--r-line); color: var(--r-ink); font-size: var(--fs-small); line-height: 1.45; }
+.related-list li:last-child { border-bottom: 1px solid var(--r-line); }
+.related-list li::before { content: ""; position: absolute; left: 2px; top: 1.15em; width: 6px; height: 6px; border-radius: 50%; background: var(--r-green); }
+@media (max-width: 899px) {
+  .related { grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+  .related-showroom { padding: var(--s3) 0 0; border-left: 0; border-top: 1px solid var(--r-line); }
+  .related-mark { display: none; }   /* the heading already names the offer; keeps the phone panel short */
+  .related-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--s3); }
+  .related-list li:last-child { border-bottom: 0; }
+  .related-list li { border-top: 0; border-bottom: 1px solid var(--r-line); }
+}
+@media (max-width: 599px) {
+  .related-wrap { padding-block: var(--s3) var(--s4); }
+  .related { border-radius: 20px; padding: 26px 20px 22px; }
+  .related-actions { flex-direction: column; align-items: stretch; gap: 4px; }
+  .related-cta { width: 100%; justify-content: center; }
+  .related-link { justify-content: center; }
+  .related-dest { text-align: center; margin-top: 6px; }
+  .related-list { grid-template-columns: minmax(0, 1fr); }
+  .related-list li { padding-block: 9px; }
+}
+
+/* footer: the one outbound link */
+.footer-related { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line-soft); }
+
+/* guide: optional, quiet pointer after the result */
+.g-related { margin: var(--s3) 0; padding: 18px 20px; background: #171b1a; color: #f4f6f2; border-radius: var(--radius); }
+.g-related h3 { margin: 0 0 6px; color: #f4f6f2; font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-weight: 500; font-size: 1.3125rem; }
+.g-related p { margin: 0 0 8px; color: #b9c4bd; }
+.g-related-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: #f4f6f2; font-family: var(--font-display); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 4px; }
+.g-related-link:hover { text-decoration-color: #6fbf8f; }
+.g-related-link:focus-visible { outline: 2px solid #6fbf8f; outline-offset: 3px; }
+@media (max-width: 599px) {
+  .related { gap: var(--s3); }
+  .related h2 { font-size: 1.75rem; margin-bottom: 10px; }
+  .related-lead { margin-bottom: var(--s3); font-size: 1rem; line-height: 1.55; }
+  .related-showroom { padding-top: var(--s2); }
+  .related-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .related-list li, .related-list li:last-child { padding: 6px 11px 6px 22px; border: 1px solid var(--r-line); border-radius: 999px; font-size: .8125rem; line-height: 1.35; }
+  .related-list li::before { left: 10px; top: 50%; margin-top: -3px; }
+}
+/* phones: the lead already names the offer; the list would make the panel a second screen */
+@media (max-width: 599px) { .related-showroom { display: none; } }
