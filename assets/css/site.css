@@ -1168,3 +1168,15 @@ html:has(body.is-home) { scroll-padding-top: var(--s2); }
 .nav-sub .nav-sub-child > a {
   padding-inline-start: 1.75rem;
 }
+
+.realization-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--s4);
+  padding: 0;
+  list-style: none;
+}
+.realization-grid figure { margin: 0; }
+.realization-grid a { display: block; background: var(--bg-well); border-radius: var(--radius-lg); }
+.realization-grid img { display: block; width: 100%; height: clamp(230px, 32vw, 345px); object-fit: contain; }
+.realization-grid figcaption { margin-top: var(--s2); color: var(--muted); }

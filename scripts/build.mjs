@@ -35,6 +35,7 @@ const load = async (f) => JSON.parse(await readFile(join(dataDir, f), 'utf8'));
 const site = await load('site.json');
 const categories = await load('categories.json');
 const products = await load('products.json');
+const realizations = JSON.parse(await readFile(join(root, 'data', 'realizations.json'), 'utf8'));
 
 /* ---------- validate the data so mistakes fail the build, not the visitor ---------- */
 const errors = [];
@@ -86,6 +87,7 @@ const routes = [
   { path: 'nahradni-dily/', section: 'nahradni-dily/', render: pages.parts },
   { path: 'servis/', section: 'servis/', render: pages.service },
   { path: 'o-nas/', section: 'o-nas/', render: pages.about },
+  { path: 'realizace/', section: 'realizace/', render: (c) => pages.realizations(c, realizations) },
   { path: 'kontakt/', section: 'kontakt/', render: pages.contact },
   { path: pages.GUIDE_PATH, section: pages.GUIDE_PATH, kind: 'guide', render: pages.guide },
   { path: 'dekujeme/', section: '', render: pages.thanks, noindex: true },

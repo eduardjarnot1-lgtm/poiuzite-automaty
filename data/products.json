@@ -132,10 +132,10 @@
     "availability": null,
     "images": [
       {
-        "src": "assets/products/rhea-sagoma/1.webp",
-        "alt": "Rhea Sagoma H5 – pohled na automat",
-        "width": 549,
-        "height": 1400,
+        "src": "assets/products/rhea-sagoma/celem.webp",
+        "alt": "Rhea Sagoma H5 s červeným čelním panelem",
+        "width": 768,
+        "height": 1024,
         "rights": "cleared"
       }
     ],
@@ -178,10 +178,10 @@
     "availability": null,
     "images": [
       {
-        "src": "assets/products/rhea-lazio/1.webp",
-        "alt": "Rhea Lazio – pohled na automat",
-        "width": 651,
-        "height": 1400,
+        "src": "assets/products/rhea-lazio/celem.webp",
+        "alt": "Rhea Lazio v provedení Selecta",
+        "width": 599,
+        "height": 1000,
         "rights": "cleared"
       }
     ],
@@ -307,7 +307,22 @@
     "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/rhea-x2/celem.webp",
+        "alt": "Rhea X2 zepředu",
+        "width": 1200,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/rhea-x2/zboku.webp",
+        "alt": "Rhea X2 s kávovým polepem, pohled z boku",
+        "width": 1200,
+        "height": 1600,
+        "rights": "cleared"
+      }
+    ],
     "status": "published",
     "order": 7
   },
@@ -361,6 +376,20 @@
         "width": 441,
         "height": 811,
         "rights": "cleared"
+      },
+      {
+        "src": "assets/products/damian-eta-beta/oplatky.webp",
+        "alt": "Damian Eta Beta naplněný balenými oplatkami",
+        "width": 473,
+        "height": 1000,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/damian-eta-beta/sestava.webp",
+        "alt": "Řada automatů Damian Eta Beta s nápoji a občerstvením",
+        "width": 1500,
+        "height": 844,
+        "rights": "cleared"
       }
     ],
     "status": "published",
@@ -377,13 +406,36 @@
     "condition": "repasovany",
     "summary": "Karuselový automat s otočnými patry a jednotlivými výdejními přihrádkami.",
     "description": [
-      "Karuselový automat s otočnými patry a jednotlivými výdejními přihrádkami."
+      "Karuselový automat s otočnými patry a jednotlivými výdejními přihrádkami.",
+      "Fotografie ukazují provedení pro značku Mäso od tatka. Polep a výbavu konkrétního kusu potvrdíme na dotaz."
     ],
     "specs": [],
     "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/necta-starfood/celem.webp",
+        "alt": "Necta Starfood zepředu, ukázka s polepem Mäso od tatka",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/necta-starfood/zboku.webp",
+        "alt": "Necta Starfood s osvětlenými patry a bočním polepem",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/necta-starfood/prihradky.webp",
+        "alt": "Detail výdejních přihrádek automatu Necta Starfood",
+        "width": 899,
+        "height": 1599,
+        "rights": "cleared"
+      }
+    ],
     "status": "published",
     "order": 9
   },

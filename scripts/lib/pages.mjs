@@ -175,6 +175,7 @@ export function home(c) {
       </div>
       <a class="text-link" href="${c.url('automaty/')}">Všechny kategorie ${ARROW}</a>
     </div>
+    <p><a class="text-link" href="${c.url('realizace/')}">Fotky instalací a realizací ${ARROW}</a></p>
     ${machines.length > 0 && html`${listingNotice(machines)}${catalogue(c, machines, { headingLevel: 3, label: 'Zveřejněné automaty', categories: true })}`}
   </div>
 </section>
@@ -286,6 +287,29 @@ function insideLook(c) {
   </div>
   </div>
 </section>`;
+}
+
+export function realizations(c, groups) {
+  return {
+    title: 'Realizace',
+    description: 'Fotografie instalací, polepů a prodejních automatů v provozu.',
+    body: html`<div class="page-head"><div class="wrap">
+      ${breadcrumbs(c, [['realizace/', 'Realizace']])}
+      <h1>Realizace</h1>
+      <p class="lead">Prohlédněte si instalace automatů, příklady polepů a sestavy z různých provozů.</p>
+    </div></div>
+    ${groups.map((group) => html`<section class="section section-tight" aria-labelledby="${esc(group.id)}">
+      <div class="wrap">
+        <h2 id="${esc(group.id)}">${esc(group.title)}</h2>
+        <ul class="realization-grid">
+          ${group.images.map((img) => html`<li><figure>
+            <a href="${mediaUrl(c, img.src)}"><img src="${mediaUrl(c, img.src)}" alt="${esc(img.alt)}" width="${img.width}" height="${img.height}" loading="lazy" decoding="async"></a>
+            <figcaption>${esc(img.alt)}</figcaption>
+          </figure></li>`)}
+        </ul>
+      </div>
+    </section>`)}`,
+  };
 }
 
 export function categoriesIndex(c) {

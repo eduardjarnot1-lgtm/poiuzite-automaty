@@ -30,6 +30,7 @@ export const emailLink = (c, cls = '') =>
 export const NAV = [
   ['automaty/', 'Nabídka automatů', ['automaty/']],
   ['repasovane-automaty/', 'Repase a servis', ['repasovane-automaty/', 'servis/', 'nahradni-dily/']],
+  ['realizace/', 'Realizace', ['realizace/']],
   ['o-nas/', 'O nás', ['o-nas/']],
   ['kontakt/', 'Kontakt', ['kontakt/']],
 ];
