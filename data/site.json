@@ -64,6 +64,26 @@
   },
   "home": {
     "heroProduct": "rhea-lazio",
-    "categoryPhotos": {}
+    "categoryPhotos": {},
+    "heroPhotos": [
+      {
+        "src": "assets/products/realizace/sestavy/spiralove.webp",
+        "alt": "Spirálové automaty na občerstvení a nápoje s platebními terminály",
+        "width": 1500,
+        "height": 1125
+      },
+      {
+        "src": "assets/products/realizace/karuselove/vejcomat.webp",
+        "alt": "Karuselový automat s polepem Vejcomat",
+        "width": 1200,
+        "height": 1600
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/osvetleni.webp",
+        "alt": "Osvětlený automat Necta Starfood naplněný zbožím",
+        "width": 900,
+        "height": 1600
+      }
+    ]
   }
 }

@@ -1180,3 +1180,111 @@ html:has(body.is-home) { scroll-padding-top: var(--s2); }
 .realization-grid a { display: block; background: var(--bg-well); border-radius: var(--radius-lg); }
 .realization-grid img { display: block; width: 100%; height: clamp(230px, 32vw, 345px); object-fit: contain; }
 .realization-grid figcaption { margin-top: var(--s2); color: var(--muted); }
+
+/* ================================================================
+   Visual refresh (2026-11-18): real photos lead.
+   - homepage hero: a mosaic of three installation photos instead of one small product shot
+   - product photos sit framed on a soft sage "studio" well, larger, with no caption under own photos
+   - phones: compact horizontal cards, filters in two columns
+   - realizations: photos fill uniform tiles (no white letterbox), landscape shots span wider
+   ================================================================ */
+:root { --well-studio: linear-gradient(180deg, #f3f6f2 0%, #e6ede7 100%); }
+
+/* hero mosaic */
+.hero-mosaic {
+  display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 12px; height: clamp(380px, 36vw, 520px); margin: 0; position: relative;
+}
+.hero-tile { position: relative; overflow: hidden; border-radius: var(--radius-lg); background: #dfe7e0; box-shadow: 0 1px 2px rgba(24,45,39,.06), 0 18px 40px -22px rgba(24,45,39,.45); }
+.hero-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-tile-1 { grid-row: 1 / 3; }
+.hero-tile-1 img { object-position: 62% 50%; }
+.hero-tile-2 img { object-position: 50% 40%; }
+.hero-tile-3 img { object-position: 50% 45%; }
+.hero-mosaic figcaption {
+  position: absolute; left: 14px; bottom: 14px; margin: 0;
+}
+.hero-mosaic figcaption a {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px;
+  background: rgba(250, 251, 247, .94); border: 1px solid rgba(255,255,255,.7); border-radius: 999px;
+  font-family: var(--font-display); font-size: var(--fs-small); font-weight: 600; color: var(--ink); text-decoration: none;
+  box-shadow: 0 6px 18px -10px rgba(24,45,39,.5);
+}
+.hero-mosaic figcaption a:hover { color: var(--accent); }
+.hero-mosaic figcaption .icon { width: 16px; height: 16px; }
+@media (max-width: 899px) {
+  .hero-mosaic { height: clamp(300px, 70vw, 440px); max-width: 640px; }
+}
+@media (max-width: 599px) {
+  .hero-mosaic { height: 280px; gap: 8px; }
+  .hero-tile { border-radius: 14px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-mosaic { height: 240px; }
+}
+
+/* hero facts: small pills instead of a hairline list */
+.hero-points { gap: 8px; border-top: 0; padding-top: 0; }
+.hero-points li { min-height: 34px; padding: 0 12px 0 10px; background: rgba(250,251,247,.75); border: 1px solid var(--line); border-radius: 999px; font-weight: 500; color: var(--ink); }
+
+/* product photos: framed on a studio well */
+.card-media { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; padding: 22px; background: var(--well-studio); border-bottom: 1px solid var(--line-soft); overflow: hidden; }
+.card-media img {
+  position: static; inset: auto; width: auto; height: auto; max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 10px; box-shadow: 0 1px 2px rgba(24,45,39,.08), 0 14px 28px -16px rgba(24,45,39,.45);
+  transition: transform var(--t-panel) var(--ease);
+}
+.card:hover .card-media img { transform: scale(1.025); }
+.card-media img[src$="placeholder-automat.svg"] { box-shadow: none; border-radius: 0; width: 70%; height: 70%; }
+.has-missing-photo .card-media, .card-media:has(img[src$="placeholder-automat.svg"]) { background: var(--well-studio); }
+.card-body { padding: 18px 20px 20px; }
+.card-badges { margin-bottom: 8px; }
+
+/* product detail: same studio well */
+.gallery-main { background: var(--well-studio); display: flex; align-items: center; justify-content: center; padding: var(--pad); overflow: hidden; }
+.gallery-main img { position: static; inset: auto; width: auto; height: auto; max-width: 100%; max-height: 100%; border-radius: 12px; box-shadow: 0 1px 2px rgba(24,45,39,.08), 0 22px 40px -22px rgba(24,45,39,.5); }
+.gallery-main img[src$="placeholder-automat.svg"] { box-shadow: none; border-radius: 0; width: 60%; height: 60%; }
+.gallery-thumbs a { background: var(--well-studio); }
+.gallery-thumbs img { border-radius: 4px; }
+
+/* realizations: uniform, filled tiles */
+.realization-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); grid-auto-flow: dense; }
+.realization-grid li.is-wide { grid-column: span 2; }
+.realization-grid li.is-pano { grid-column: 1 / -1; }
+.realization-grid a { position: relative; overflow: hidden; border-radius: var(--radius-lg); background: #dfe7e0; box-shadow: 0 1px 2px rgba(24,45,39,.06), 0 14px 30px -20px rgba(24,45,39,.45); }
+.realization-grid img { height: clamp(240px, 26vw, 380px); object-fit: cover; transition: transform .5s var(--ease); }
+.realization-grid li.is-pano img { height: clamp(200px, 24vw, 360px); }
+.realization-grid a:hover img { transform: scale(1.03); }
+.realization-grid figcaption { margin-top: 10px; font-size: var(--fs-small); line-height: 1.45; }
+@media (max-width: 899px) { .realization-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 599px) {
+  .realization-grid { gap: var(--s2) 12px; }
+  .realization-grid img { height: 220px; }
+  .realization-grid li.is-wide, .realization-grid li.is-pano { grid-column: 1 / -1; }
+  .realization-grid li.is-pano img { height: 160px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card:hover .card-media img, .realization-grid a:hover img { transform: none; }
+}
+
+/* phones: compact horizontal product cards, filters in two columns */
+@media (max-width: 599px) {
+  .card { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: stretch; }
+  .card:hover { transform: none; }
+  .card-media { grid-row: 1 / span 3; aspect-ratio: auto; min-height: 100%; padding: 12px 10px; border-bottom: 0; border-right: 1px solid var(--line-soft); }
+  .card-media img { border-radius: 6px; }
+  .card-note { grid-column: 2; min-height: 0; padding: 8px 14px 0; border: 0; }
+  .card-body { grid-column: 2; padding: 12px 14px 14px; }
+  .card-badges { margin-bottom: 6px; }
+  .card-maker { margin-bottom: 2px; }
+  .card-title { font-size: 1.125rem; margin-bottom: 4px; }
+  .card-summary { margin-bottom: 10px; font-size: var(--fs-small); line-height: 1.45; }
+  .card-specs { margin-bottom: 10px; font-size: var(--fs-caption); }
+  .card-specs div { padding: 4px 0; }
+  .card-foot { padding-top: 10px; gap: 6px 12px; }
+  .catalogue > .cat-tools:has(.tool ~ .tool) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px; }
+  .cat-tools:has(.tool ~ .tool) .tool { min-width: 0; }
+  .cat-tools:has(.tool ~ .tool) .tool-search { grid-column: 1 / -1; }
+  .cat-tools:has(.tool ~ .tool) .tool select { width: 100%; min-width: 0; }
+  .cat-tools:has(.tool ~ .tool) > .btn, .cat-tools:has(.tool ~ .tool) > button { grid-column: 1 / -1; justify-self: start; }
+}

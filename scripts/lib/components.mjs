@@ -248,7 +248,7 @@ export function productCard(c, p, { headingLevel = 3, order = 0 } = {}) {
   const price = effectivePrice(p, nowOf(c));
   return html`<li class="card" data-id="${esc(p.id)}" data-order="${order}" data-heading="${headingLevel}" data-name="${esc(p.name.toLowerCase())}" data-category="${esc(p.category)}" data-manufacturer="${esc(p.manufacturer || '')}" data-condition="${esc(p.condition || '')}" data-type="${esc(p.type || '')}" data-availability="${esc(p.availability || '')}" data-price="${price ?? ''}" data-sale="${sale(p, nowOf(c)) ? '1' : ''}" data-date="${esc(p.dateAdded || '')}" data-search="${esc(search)}">
   <a class="card-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p)}</a>
-  ${img?.illustrative ? photoNote(p, img, 'card-note') : html`<p class="card-note">${img ? 'Fotografie automatu' : 'Fotografie bude doplněna'}</p>`}
+  ${img?.illustrative ? photoNote(p, img, 'card-note') : ''}
   <div class="card-body">
     <div class="card-badges">${conditionBadge(c, p)}</div>
     ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
