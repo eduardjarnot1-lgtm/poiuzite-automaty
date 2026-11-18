@@ -1438,8 +1438,8 @@ body.has-backdrop { background: #f3f7f5; }
 .nav-sub-related a:hover { background: #222826; color: #fff; }
 @media (max-width: 960px) { .js .nav-sub-related a { margin-top: 4px; } }
 .footer-related { margin-top: 12px; padding-top: 0; border-top: 0; }
-.footer-related a {
-  display: inline-flex; flex-direction: column; gap: 2px; min-width: 190px; padding: 12px 16px;
+.footer-related a, .site-footer .footer-related a {
+  display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; gap: 2px; min-width: 190px; padding: 12px 16px;
   background: #171b1a; color: #f4f6f2; border-radius: var(--radius); text-decoration: none;
   box-shadow: 0 10px 24px -16px rgba(10, 14, 13, .6);
 }
