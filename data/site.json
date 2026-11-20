@@ -1,44 +1,96 @@
 {
   "name": "Použité automaty",
   "logoText": "použité automaty",
-  "tagline": "Použité, repasované a renovované prodejní automaty pro firmy a provozovatele.",
+  "tagline": "Prodej repasovaných automatů, servis a náhradní díly.",
   "baseUrl": "",
   "contact": {
-    "phone": null,
-    "email": null,
-    "address": null,
+    "phone": "+420 773 881 333",
+    "email": "info@stravovaciautomaty.cz",
+    "address": "Kaštanová 489/34, 620 00 Brno",
     "hours": null,
     "companyId": null
+  },
+  "operator": {
+    "_note": "Údaje provozovatele pro patičku, obchodní podmínky a zásady ochrany osobních údajů. null = zatím nedodáno; na webu se zobrazí jako zřetelně označená mezera. Telefon, e-mail, adresa a jméno provozovatele převzaty 2026-11-18 z bistro24.eu (stejný provozovatel, potvrdil Eduard). IČO tam uvedené není.",
+    "legalName": "Ing. Jan Petr",
+    "legalForm": null,
+    "registeredOffice": "Kaštanová 489/34, 620 00 Brno",
+    "register": null,
+    "vatPayer": null,
+    "vatId": null,
+    "complaintsAddress": null,
+    "privacyContact": null
+  },
+  "business": {
+    "_note": "customers: \"b2b\", \"b2c\" nebo \"both\". onlineOrdering/onlinePayment zůstávají false, dokud web neumí závaznou objednávku ani platbu. processClaimsConfirmed: true až provozovatel potvrdí, že každý automat před prodejem kontroluje, čistí, opravuje a testuje (texty na úvodní stránce a v Repase a servis).",
+    "customers": null,
+    "onlineOrdering": false,
+    "onlinePayment": false,
+    "contractFormation": null,
+    "delivery": null,
+    "installation": null,
+    "warrantyBeyondLaw": "Na automaty po kompletní repasi poskytujeme záruku 12 měsíců.",
+    "usedGoodsDefectPeriodMonths": null,
+    "voluntaryReturns": null,
+    "processClaimsConfirmed": true
+  },
+  "privacy": {
+    "_note": "Zpracovatelé a doby uchování. Hostingem a formuláři je Netlify podle netlify.toml; potvrďte, že živý web běží na Netlify.",
+    "hosting": "Netlify, Inc.",
+    "hostingConfirmed": false,
+    "emailProvider": null,
+    "enquiryRetention": null
+  },
+  "legal": {
+    "_note": "status: \"draft\" (stránky nesou upozornění a noindex) nebo \"final\" (až po doplnění údajů a právní kontrole). reviewedBy/updated vyplní provozovatel.",
+    "status": "draft",
+    "updated": null,
+    "reviewedBy": null
   },
   "forms": {
     "endpoint": ""
   },
   "catalogue": {
-    "searchMinProducts": 8,
+    "searchMinProducts": 4,
     "currency": "CZK",
     "pricesIncludeVat": false
   },
   "conditions": {
-    "pouzity": {
-      "label": "Použitý",
-      "description": "Automat v původním stavu, před prodejem zkontrolovaný.",
-      "verified": false
-    },
     "repasovany": {
-      "label": "Repasovaný",
-      "description": "Automat vyčištěný, zkontrolovaný a podle potřeby opravený, s vyměněnými opotřebenými díly.",
-      "verified": false
-    },
-    "renovovany": {
-      "label": "Plně renovovaný",
-      "description": "Automat rozebraný a obnovený včetně vnějších dílů, s otestovanou funkčností před předáním.",
-      "verified": false
+      "label": "Po kompletní repasi",
+      "description": "Automat je po kompletní repasi vyčištěný a odzkoušený. Poskytujeme záruku 12 měsíců.",
+      "verified": true
     }
   },
   "home": {
-    "heroProduct": "atlantis-select",
-    "categoryPhotos": {
-      "instantni-kavove-automaty": "necta-brio-alternativni-provedeni"
-    }
+    "heroProduct": "rhea-lazio",
+    "categoryPhotos": {},
+    "heroPhotos": [
+      {
+        "src": "assets/products/realizace/sestavy/spiralove.webp",
+        "alt": "Spirálové automaty na občerstvení a nápoje s platebními terminály",
+        "width": 1500,
+        "height": 1125
+      },
+      {
+        "src": "assets/products/realizace/karuselove/vejcomat.webp",
+        "alt": "Karuselový automat s polepem Vejcomat",
+        "width": 1200,
+        "height": 1600
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/osvetleni.webp",
+        "alt": "Osvětlený automat Necta Starfood naplněný zbožím",
+        "width": 900,
+        "height": 1600
+      }
+    ]
+  },
+  "related": {
+    "_note": "Bistro 24: nové stravovací automaty a výdejní boxové systémy od stejného majitele (potvrzeno 2026-11-18). Odkazy ověřené 2026-11-18.",
+    "name": "Bistro 24",
+    "url": "https://bistro24.eu/",
+    "machinesUrl": "https://bistro24.eu/",
+    "domain": "bistro24.eu"
   }
 }
