@@ -761,7 +761,6 @@ export function about(c) {
       <h2>Co děláme</h2>
       <ul class="ticks">
         <li>Prodej použitých a repasovaných prodejních automatů</li>
-        <li>Specializace na automaty na instantní kávu a teplé nápoje</li>
         <li>Náhradní díly a příslušenství</li>
         <li>Opravy, servis a údržba</li>
       </ul>
