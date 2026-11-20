@@ -235,6 +235,18 @@
       </section>`;
     }
 
+    // Optional pointer to Bistro 24 (same owner) for chilled food/drinks and snacks only: it does not
+    // change the result and carries nothing over (plain link, no answers in the URL).
+    function relatedCard() {
+      const r = data.related;
+      if (!r || !['cold', 'snack', 'combo'].includes(answers.offer)) return '';
+      return `<aside class="g-related" aria-labelledby="g-related-title">
+          <h3 id="g-related-title">Chcete prozkoumat i nové řešení?</h3>
+          <p>Další nabídku stravovacích automatů a výdejních systémů najdete na ${esc(r.name)}.</p>
+          <a class="g-related-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Podívat se na ${esc(r.name)} <span aria-hidden="true">↗</span><span class="visually-hidden"> (otevře se v nové kartě)</span></a>
+        </aside>`;
+    }
+
     function renderResult() {
       const r = G.evaluate({ products: data.products, categories: data.categories, order: data.order }, answers);
       answers = r.answers;
@@ -256,7 +268,7 @@
         <h2 class="g-step-title" tabindex="-1">Výsledek podle vašich odpovědí</h2>
         <p class="g-intro">Nejde o technické schválení ani rezervaci. Je to směr výběru a přehled toho, co je potřeba potvrdit.</p>
         <div class="g-result-grid">
-          <div class="g-result-main">${main}
+          <div class="g-result-main">${main}${relatedCard()}
             <section class="g-block g-block-open" aria-labelledby="g-clarify">
               <h3 id="g-clarify">Co je potřeba potvrdit</h3>
               <ul>${r.clarify.map(li).join('')}</ul>
