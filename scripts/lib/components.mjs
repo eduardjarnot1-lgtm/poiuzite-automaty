@@ -234,10 +234,12 @@ export function productImage(c, p, { index = 0, eager = false, sizes = '(max-wid
 const specValue = (v) => (v == null || v === '' ? ph('doplní se') : esc(v));
 export const filledSpecs = (p) => p.specs.filter((s) => s.value != null && s.value !== '');
 
-// Small credit line for photos that show a similar model rather than the unit for sale.
+// Small credit line for photos that show a similar model rather than the unit for sale
+// (img.note overrides the wording, e.g. for a manufacturer's brochure picture).
+export const photoNoteText = (img) => (img?.illustrative ? img.note || 'Ilustrační foto podobného modelu' : '');
 export const photoNote = (p, img = p.images[0], cls = 'photo-note') =>
   img?.illustrative &&
-  html`<p class="${cls}">Ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
+  html`<p class="${cls}"${cls === 'photo-note' ? ' data-gallery-note' : ''}>${esc(img.note || 'Ilustrační foto podobného modelu')}${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
 
 /* A published machine: same image well, name, one-line description, price (or "Cena na dotaz")
    and the detail link on every card, with the actions aligned along the bottom. The line under the

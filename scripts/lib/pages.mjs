@@ -2,7 +2,7 @@
 import { esc, html, ph, plural } from './util.mjs';
 import {
   ARROW, CHECK, INFO, NEW_TAB, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
-  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf, relatedPromo,
+  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, photoNoteText, mediaUrl, ctaBand, priceSlot, nowOf, relatedPromo,
 } from './components.mjs';
 import { isListed, recommended, sale, effectivePrice, discountState, SORTS } from './catalog.mjs';
 import * as guideRules from './guide.mjs';
@@ -31,7 +31,7 @@ const catIcon = (slug) => `<svg class="cat-icon" viewBox="0 0 24 24" fill="none"
 // One short line above every listing: published machines are not a stock confirmation, and
 // reference photos show similar models.
 const listingNotice = (list) => {
-  const illustrative = list.some((p) => p.images.some((i) => i.illustrative));
+  const illustrative = list.some((p) => p.images[0]?.illustrative);
   return html`<div class="notice" role="note">${INFO}<p><strong>Aktuální nabídka.</strong> Stav, cenu a dostupnost konkrétního kusu vám potvrdíme v odpovědi na poptávku.${illustrative ? ' Fotografie jsou ilustrační a ukazují podobné modely.' : ''}</p></div>`;
 };
 
@@ -435,10 +435,10 @@ export function product(c, p) {
   <div class="wrap product-top">
     <div class="gallery" data-gallery>
       <figure class="gallery-main">${productImage(c, p, { eager: true, sizes: '(max-width: 900px) 100vw, 680px' })}</figure>
-      ${p.images.length ? photoNote(p) : html`<p class="photo-note">Fotografie tohoto automatu bude doplněna.</p>`}
+      ${p.images.length ? (photoNote(p) || (p.images.some((i) => i.illustrative) ? html`<p class="photo-note" data-gallery-note hidden></p>` : '')) : html`<p class="photo-note">Fotografie tohoto automatu bude doplněna.</p>`}
       ${p.video && html`<p class="product-video"><a class="text-link" href="${esc(p.video)}" rel="noopener nofollow" target="_blank">Video automatu<span class="visually-hidden"> (otevře se v novém okně)</span>${ARROW}</a></p>`}
       ${p.images.length > 1 && html`<ul class="gallery-thumbs" aria-label="Další fotografie">
-        ${p.images.map((img, i) => html`<li><a href="${mediaUrl(c, img.src)}" data-full="${mediaUrl(c, img.src)}" data-alt="${esc(img.alt || p.name)}"${i === 0 ? ' aria-current="true"' : ''}>
+        ${p.images.map((img, i) => html`<li><a href="${mediaUrl(c, img.src)}" data-full="${mediaUrl(c, img.src)}" data-alt="${esc(img.alt || p.name)}" data-note="${esc(photoNoteText(img))}"${i === 0 ? ' aria-current="true"' : ''}>
           <img src="${mediaUrl(c, img.thumb || img.src)}" alt="${esc(`Fotografie ${i + 1}: ${img.alt || p.name}`)}" width="120" height="90" loading="lazy" decoding="async"></a></li>`)}
       </ul>`}
     </div>

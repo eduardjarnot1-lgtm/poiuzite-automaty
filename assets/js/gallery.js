@@ -8,6 +8,8 @@
       main.removeAttribute('srcset');
       main.src = a.dataset.full;
       main.alt = a.dataset.alt;
+      const note = g.querySelector('[data-gallery-note]');
+      if (note && !note.querySelector('a')) { note.textContent = a.dataset.note || ''; note.hidden = !a.dataset.note; }
       links.forEach((l) => l.toggleAttribute('aria-current', l === a));
       if (a.hasAttribute('aria-current')) a.setAttribute('aria-current', 'true');
     }));

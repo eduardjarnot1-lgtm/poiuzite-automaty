@@ -456,7 +456,24 @@
     "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/aht/celem.webp",
+        "alt": "AHT – automat na mražené jídlo s dvanácti přihrádkami a čtečkou karet, pohled zepředu",
+        "width": 768,
+        "height": 1024,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/aht/prospekt.webp",
+        "alt": "AHT – sestava automatu na mražená jídla s mikrovlnnou troubou a příborníkem z prospektu výrobce",
+        "width": 425,
+        "height": 480,
+        "rights": "unverified",
+        "illustrative": true,
+        "note": "Obrázek z prospektu výrobce, konkrétní sestava se může lišit"
+      }
+    ],
     "status": "published",
     "order": 10
   },
@@ -477,7 +494,15 @@
     "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/fastcorp/celem.webp",
+        "alt": "Fastcorp – červený automat na mražené jídlo s prosklenými dvířky, klávesnicí a čtečkou karet",
+        "width": 757,
+        "height": 1600,
+        "rights": "cleared"
+      }
+    ],
     "status": "published",
     "order": 11
   }
