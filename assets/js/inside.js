@@ -12,6 +12,8 @@
 // Without JS the video keeps its native controls and the full description is in the page.
 // Native scrolling only: no wheel interception, no scroll snapping.
 (() => {
+  // translations on German and Slovak pages (assets/js/i18n/<lang>.js); Czech as written
+  const T = (s) => (window.PAi18n ? window.PAi18n.t(s) : s);
   const section = document.querySelector('[data-inside]');
   const video = section?.querySelector('video');
   if (!video) return;
@@ -57,7 +59,7 @@
       nextBtn.disabled = i === steps.length - 1;
     }
     // announced only when a step button was used, never on scroll frames
-    if (announce) live.textContent = `Krok ${i + 1} z ${steps.length}: ${steps[i].title}`;
+    if (announce) live.textContent = `${T(`Krok ${i + 1} z ${steps.length}`)}: ${steps[i].title}`;
   }
   const setBar = (t) => section.style.setProperty('--inside-p', Math.min(1, Math.max(0, t / duration)).toFixed(4));
 

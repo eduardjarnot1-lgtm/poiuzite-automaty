@@ -6,8 +6,9 @@
 // While a page is open, prices switch by themselves when a discount starts or ends.
 // This is not authentication and publishes nothing: other visitors keep seeing the built data.
 import seed from './seed.js';
-import { html, esc, linker, typeset } from './lib/util.js';
-import { header, productCard, priceSlot, conditionBadge } from './lib/components.js';
+import { html, esc, linker } from './lib/util.js';
+import { header, productCard, priceSlot, conditionBadge, finish } from './lib/components.js';
+import { setLang, langPrefix, isShared, tt, stripMarks } from './lib/i18n.js';
 import * as pages from './lib/pages.js';
 import { isVisible, nextBoundary, statusOf } from './lib/catalog.js';
 import { createLocalStore, isStoredPhoto, KEY } from './store.js';
@@ -17,7 +18,12 @@ const PREVIEW_KEY = 'pouzite-automaty:prototyp:nahled';
 const PREVIEW_PATH = 'automaty/nahled/';
 
 const route = JSON.parse(document.getElementById('proto-route').textContent);
-const url = linker(route.path, route.absolute, route.explicitIndex);
+// German and Slovak pages: the same templates, translated with the dictionary the page loaded
+// (assets/js/i18n/<lang>.js); links stay in the page's language.
+const lang = route.lang || 'cs';
+setLang(lang, lang === 'cs' ? null : window.PAi18n?.dict);
+const rawUrl = linker(route.path, route.absolute, route.explicitIndex);
+const url = (target = '') => rawUrl(isShared(target) ? target : langPrefix(lang) + target);
 const seedById = new Map(seed.products.map((p) => [p.id, p]));
 
 // Machines whose page was built keep their URL; added ones (or ones moved to another category or
@@ -45,7 +51,8 @@ const context = (state, photos, extra = {}) => ({
   products: state.products.filter((p) => !p.deletedAt).map((p) => withPath(withPhotos(p, photos))),
   order: state.order,
   catOrder: state.catOrder,
-  page: route,
+  page: { ...route, path: route.path.slice(langPrefix(lang).length) },
+  lang,
   url,
   absUrl: null,
   now: Date.now(),
@@ -56,7 +63,7 @@ const context = (state, photos, extra = {}) => ({
 
 function updateNav(c) {
   const t = document.createElement('template');
-  t.innerHTML = header(c);
+  t.innerHTML = finish(header(c));
   const fresh = t.content.getElementById('nav-sub');
   const current = document.getElementById('nav-sub');
   if (fresh && current) current.innerHTML = fresh.innerHTML;
@@ -122,8 +129,8 @@ function renderCustomer(state, photos) {
     }
   }
   if (!result) return [];
-  document.title = `${result.title} | ${c.site.name}`;
-  document.getElementById('obsah').innerHTML = typeset(`\n${banner}${result.body}\n`);
+  document.title = stripMarks(`${tt(result.title)} | ${c.site.name}`);
+  document.getElementById('obsah').innerHTML = finish(`\n${banner}${result.body}\n`);
   return (result.scripts || []).map((s) => url(s));
 }
 
@@ -160,7 +167,7 @@ function refreshPrices(state, photos) {
     const p = byId.get(card.dataset.id);
     if (!p) continue;
     const t = document.createElement('template');
-    t.innerHTML = productCard(c, p, { headingLevel: Number(card.dataset.heading) || 3, order: Number(card.dataset.order) || 0 });
+    t.innerHTML = finish(productCard(c, p, { headingLevel: Number(card.dataset.heading) || 3, order: Number(card.dataset.order) || 0 }));
     const fresh = t.content.firstElementChild;
     fresh.hidden = card.hidden;
     card.replaceWith(fresh);
@@ -168,9 +175,9 @@ function refreshPrices(state, photos) {
   const slot = document.querySelector('.price-box [data-price-slot]');
   const p = slot && byId.get(slot.dataset.priceSlot);
   if (p) {
-    slot.outerHTML = priceSlot(c, p, 'detail');
+    slot.outerHTML = finish(priceSlot(c, p, 'detail'));
     const badges = document.querySelector('.product-summary .card-badges');
-    if (badges && p.availability !== 'Prodáno') badges.innerHTML = conditionBadge(c, p);
+    if (badges && p.availability !== 'Prodáno') badges.innerHTML = finish(conditionBadge(c, p));
   }
   document.dispatchEvent(new CustomEvent('catalogue:refresh'));
 }

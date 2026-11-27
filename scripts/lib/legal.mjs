@@ -5,26 +5,31 @@
 // missing it shows as a marked gap, and while legal.status is "draft" every page carries a draft
 // notice and is kept out of search engines. Wording was checked against the sources listed in
 // LEGAL-AUDIT.md on 2026-11-06; it is not legal advice and needs review by a Czech lawyer.
-import { esc, html, ph } from './util.mjs';
+import { esc, kesc, html, ph } from './util.mjs';
+import { getLang } from './i18n.mjs';
 import { breadcrumbs, emailLink, phoneLink, INFO, LEGAL_NAV, isDraft } from './components.mjs';
 const op = (c) => c.site.operator || {};
 const biz = (c) => c.site.business || {};
-const val = (v, gap) => (v ? esc(v) : ph(gap));
+const val = (v, gap) => (v ? kesc(v) : ph(gap));
 
 // The operator's identity, as far as it is known. Used in the footer and on every legal page.
 export function operatorFacts(c, { cls = 'legal-facts' } = {}) {
   const o = op(c);
   const ct = c.site.contact;
   return html`<dl class="${cls}">
-    <div><dt>Provozovatel</dt><dd>${val(o.legalName, 'obchodní firma nebo jméno a příjmení doplníme')}${o.legalForm ? `, ${esc(o.legalForm)}` : ''}</dd></div>
+    <div><dt>Provozovatel</dt><dd>${val(o.legalName, 'obchodní firma nebo jméno a příjmení doplníme')}${o.legalForm ? `, ${kesc(o.legalForm)}` : ''}</dd></div>
     <div><dt>Sídlo / místo podnikání</dt><dd>${val(o.registeredOffice, 'adresu doplníme')}</dd></div>
     <div><dt>IČO</dt><dd>${val(ct.companyId, 'doplníme')}</dd></div>
-    <div><dt>DIČ</dt><dd>${o.vatPayer === false ? 'Neplátce DPH' : o.vatId ? esc(o.vatId) : ph('doplníme, nebo uvedeme „neplátce DPH“')}</dd></div>
+    <div><dt>DIČ</dt><dd>${o.vatPayer === false ? 'Neplátce DPH' : o.vatId ? kesc(o.vatId) : ph('doplníme, nebo uvedeme „neplátce DPH“')}</dd></div>
     <div><dt>Zápis v rejstříku</dt><dd>${val(o.register, 'např. obchodní rejstřík vedený …, oddíl …, vložka …, nebo živnostenský rejstřík')}</dd></div>
     <div><dt>E-mail</dt><dd>${emailLink(c)}</dd></div>
     <div><dt>Telefon</dt><dd>${phoneLink(c)}</dd></div>
   </dl>`;
 }
+
+// German and Slovak pages: a faithful translation of the Czech text, for information. It is not
+// adapted to German, Austrian or Slovak law and has not been reviewed by a lawyer.
+const translationNotice = (c) => getLang() !== 'cs' && html`<div class="notice" role="note">${INFO}<p><strong>Překlad pro informaci.</strong> Tato stránka je překladem českého textu a zatím neprošla právní kontrolou. Text vychází z českého práva a smlouvy uzavíráme v češtině. ${c.langHref?.('cs') ? html`<a href="${c.langHref('cs')}" lang="cs" hreflang="cs">Česká verze</a>` : ''}</p></div>`;
 
 const draftNotice = (c) => isDraft(c) && html`<div class="notice notice-draft" role="note">${INFO}<p><strong>Pracovní verze.</strong> Tento text zatím není platný. Čeká na doplnění údajů o provozovateli (zvýrazněná místa) a na kontrolu právníkem. Do té doby se řídíme platnými právními předpisy a podmínkami, na kterých se s vámi výslovně dohodneme.</p></div>`;
 
@@ -64,6 +69,7 @@ function legalPage(c, { path, title, h1, description, lead, toc, body }) {
 <section class="section section-tight">
   <div class="wrap legal">
     ${draftNotice(c)}
+    ${translationNotice(c)}
     <nav class="legal-toc" aria-label="Obsah stránky">
       <h2 class="legal-toc-title">Obsah</h2>
       <ol>${toc.map(([id, t]) => html`<li><a href="#${id}">${esc(t)}</a></li>`)}</ol>
@@ -193,7 +199,7 @@ ${sec('vady', 'Reklamace vad', html`
 ${sec('jak-reklamovat', 'Jak reklamaci uplatnit', html`
 <p>Napište nám, o který automat jde, kdy jste ho převzali, jak se vada projevuje a co požadujete. Pomohou fotografie nebo video.</p>
 ${operatorFacts(c)}
-<p>Adresa pro reklamace a vrácení: ${where ? esc(where) : ph('doplníme, pokud se liší od sídla')}</p>
+<p>Adresa pro reklamace a vrácení: ${where ? kesc(where) : ph('doplníme, pokud se liší od sídla')}</p>
 <p>Automat je velký a těžký. Než ho kamkoli posíláte, domluvte se s námi, zda vadu posoudíme na místě, nebo jak automat převezmeme.</p>`)}
 ${sec('dobrovolne', 'Dobrovolné vrácení', html`
 <p>${b.voluntaryReturns ? esc(b.voluntaryReturns) : 'Nad rámec zákona nenabízíme vrácení automatu bez udání důvodu. Pokud se na něčem takovém dohodneme, uvedeme podmínky v nabídce nebo ve smlouvě.'}</p>`)}
@@ -204,7 +210,7 @@ ${sec('formular', 'Vzorový formulář pro odstoupení od smlouvy', html`
 <p>${ph('Znění vzoru ověří právník podle aktuálně platného předpisu.')}</p>
 <div class="legal-form">
 <p><strong>Oznámení o odstoupení od smlouvy</strong></p>
-<p>Adresát: ${o.legalName ? esc(o.legalName) : ph('název provozovatele')}, ${where ? esc(where) : ph('adresa')}, ${c.site.contact.email ? esc(c.site.contact.email) : ph('e-mail')}</p>
+<p>Adresát: ${o.legalName ? kesc(o.legalName) : ph('název provozovatele')}, ${where ? kesc(where) : ph('adresa')}, ${c.site.contact.email ? kesc(c.site.contact.email) : ph('e-mail')}</p>
 <p>Oznamuji, že tímto odstupuji od smlouvy o nákupu tohoto zboží: …</p>
 <p>Datum uzavření smlouvy / datum převzetí: …</p>
 <p>Jméno a příjmení spotřebitele: …</p>
@@ -236,10 +242,10 @@ export function privacy(c) {
 ${sec('spravce', 'Kdo údaje zpracovává', html`
 <p>Správcem osobních údajů je provozovatel webu:</p>
 ${operatorFacts(c)}
-<p>S otázkami k osobním údajům nám napište na ${o.privacyContact ? esc(o.privacyContact) : c.site.contact.email ? esc(c.site.contact.email) : ph('kontaktní e-mail doplníme')}. Pověřence pro ochranu osobních údajů jsme nejmenovali.</p>`)}
+<p>S otázkami k osobním údajům nám napište na ${o.privacyContact ? kesc(o.privacyContact) : c.site.contact.email ? kesc(c.site.contact.email) : ph('kontaktní e-mail doplníme')}. Pověřence pro ochranu osobních údajů jsme nejmenovali.</p>`)}
 ${sec('poptavky', 'Poptávky z formuláře, e-mailem a telefonem', html`
 <dl class="legal-facts">
-  ${row('Jaké údaje', 'Jméno a příjmení, e-mail, text zprávy a stránka nebo automat, ze kterého poptávku posíláte. Nepovinně firma a telefon. U e-mailu a telefonu to, co nám sami sdělíte.')}
+  ${row('Jaké údaje', 'Jméno a příjmení, e-mail, text zprávy, stránka nebo automat, ze kterého poptávku posíláte, a jazyk této stránky. Nepovinně firma a telefon. U e-mailu a telefonu to, co nám sami sdělíte.')}
   ${row('Proč', 'Abychom vám mohli odpovědět, připravit nabídku a domluvit další postup.')}
   ${row('Právní základ', 'Jednání o smlouvě na vaši žádost (čl. 6 odst. 1 písm. b) GDPR). Píšete-li za firmu, náš oprávněný zájem vyřídit poptávku firmy (čl. 6 odst. 1 písm. f) GDPR).')}
   ${row('Je to povinné?', 'Jméno, e-mail a zprávu potřebujeme, abychom mohli odpovědět. Firmu a telefon vyplňovat nemusíte.')}
@@ -299,31 +305,33 @@ export function cookies(c) {
     toc,
     body: html`
 ${sec('shrnuti', 'Shrnutí', html`
-<p>Cookies a podobné technologie (například localStorage) ukládají údaje ve vašem prohlížeči. Zákon vyžaduje souhlas návštěvníka, pokud nejde o uložení nezbytné pro službu, o kterou návštěvník výslovně požádal. Náš web do vašeho prohlížeče ukládá jen odpovědi z průvodce výběrem automatu, a to až když průvodce sami použijete a jen do zavření karty. Jde o uložení nezbytné pro funkci, kterou jste si vyžádali, proto lištu se souhlasem nezobrazujeme.</p>`)}
+<p>Cookies a podobné technologie (například localStorage) ukládají údaje ve vašem prohlížeči. Zákon vyžaduje souhlas návštěvníka, pokud nejde o uložení nezbytné pro službu, o kterou návštěvník výslovně požádal. Náš web do vašeho prohlížeče ukládá jen odpovědi z průvodce výběrem automatu (až když průvodce sami použijete, a jen do zavření karty) a jazyk webu, který sami zvolíte v přepínači jazyků. Při přepnutí jazyka se na okamžik uloží i to, co máte rozepsané ve formuláři, aby se to přeneslo na stránku v novém jazyce. Jde o uložení nezbytné pro funkce, které jste si vyžádali, proto lištu se souhlasem nezobrazujeme.</p>`)}
 ${sec('web', 'Co web ukládá', html`
 <div class="table-wrap" role="region" tabindex="0" aria-label="Tabulka: cookies a úložiště na webu"><table class="legal-table">
   <caption class="visually-hidden">Cookies a úložiště na webu</caption>
   <thead><tr><th scope="col">Položka</th><th scope="col">Poskytovatel</th><th scope="col">Účel</th><th scope="col">Doba</th><th scope="col">Souhlas</th></tr></thead>
   <tbody>
     <tr><td>Žádné cookies</td><td>–</td><td>Web nenastavuje žádné cookies.</td><td>–</td><td>Není potřeba</td></tr>
-    <tr><td>pouzite-automaty:pruvodce (sessionStorage)</td><td>Náš web</td><td>Zapamatuje vybrané odpovědi v průvodci výběrem automatu, abyste je neztratili při otevření detailu automatu. Neobsahuje kontaktní údaje ani text, který napíšete.</td><td>Do zavření karty nebo do stisknutí „Začít znovu“</td><td>Není potřeba (nezbytné pro vyžádanou funkci)</td></tr>
-    <tr><td>Žádné localStorage ani IndexedDB</td><td>–</td><td>Jinak web nic neukládá. Formulář nic neukládá do prohlížeče, údaje se odešlou jen po stisknutí tlačítka.</td><td>–</td><td>Není potřeba</td></tr>
+    <tr><td translate="no">pouzite-automaty:pruvodce (sessionStorage)</td><td>Náš web</td><td>Zapamatuje vybrané odpovědi v průvodci výběrem automatu, abyste je neztratili při otevření detailu automatu. Neobsahuje kontaktní údaje ani text, který napíšete.</td><td>Do zavření karty nebo do stisknutí „Začít znovu“</td><td>Není potřeba (nezbytné pro vyžádanou funkci)</td></tr>
+    <tr><td translate="no">pa-lang (localStorage)</td><td>Náš web</td><td>Zapamatuje jazyk webu, který jste sami zvolili v přepínači jazyků (jen kód jazyka, například „de“). Použije se jen tehdy, když přijdete na českou úvodní stránku z jiného webu nebo ze záložky. Odkaz na konkrétní jazykovou verzi má vždy přednost.</td><td>Do smazání v prohlížeči nebo do další volby jazyka</td><td>Není potřeba (nezbytné pro vyžádanou funkci)</td></tr>
+    <tr><td translate="no">pa-lang-carry (sessionStorage)</td><td>Náš web</td><td>Při přepnutí jazyka přenese na stejnou stránku v novém jazyce to, co máte rozepsané ve formuláři. Nová stránka údaje hned načte a smaže. Nic se tím neodesílá.</td><td>Jen okamžik přepnutí, nejdéle do zavření karty</td><td>Není potřeba (nezbytné pro vyžádanou funkci)</td></tr>
+    <tr><td>Žádné IndexedDB</td><td>–</td><td>Jinak web nic neukládá. Formulář se odešle jen po stisknutí tlačítka.</td><td>–</td><td>Není potřeba</td></tr>
   </tbody>
 </table></div>
 <p>Prohlížeč si může běžně uložit stažené soubory webu do mezipaměti (cache), aby se stránky příště načetly rychleji. To řídí váš prohlížeč a nejde o sledování.</p>`)}
 ${sec('tretistrany', 'Obsah třetích stran', html`
 <p>Web nenačítá písma, videa, mapy ani jiný obsah ze serverů třetích stran. Písma Manrope a Source Sans 3 (licence SIL Open Font License) i všechna videa jsou uložena přímo na našem webu. Odkazy na zdroje ilustračních fotografií vedou na cizí weby a ty mohou používat vlastní cookies, až když na odkaz kliknete.</p>`)}
 ${sec('hosting', 'Hosting', html`
-<p>Web provozujeme u ${esc(c.site.privacy?.hosting || 'Netlify, Inc.')}. ${ph('Po spuštění webu ověříme v prohlížeči, že hosting nenastavuje žádné cookies, a výsledek sem doplníme.')}</p>`)}
+<p>Web provozujeme u ${kesc(c.site.privacy?.hosting || 'Netlify, Inc.')}${/\.$/.test(c.site.privacy?.hosting || 'Netlify, Inc.') ? '' : '.'} ${ph('Po spuštění webu ověříme v prohlížeči, že hosting nenastavuje žádné cookies, a výsledek sem doplníme.')}</p>`)}
 ${c.proto && sec('nahled', 'Tento náhled webu', html`
 <p>Tato verze je pracovní náhled se zkušební správou nabídky. Jen v náhledu se v prohlížeči ukládají tyto položky, a to jen když správu nabídky použijete:</p>
 <div class="table-wrap" role="region" tabindex="0" aria-label="Tabulka: úložiště v pracovním náhledu"><table class="legal-table">
   <caption class="visually-hidden">Úložiště v pracovním náhledu</caption>
   <thead><tr><th scope="col">Položka</th><th scope="col">Typ</th><th scope="col">Účel</th><th scope="col">Doba</th></tr></thead>
   <tbody>
-    <tr><td>pouzite-automaty:prototyp:v2</td><td>localStorage</td><td>Změny katalogu uložené ve správě nabídky</td><td>Do smazání ve správě nebo v prohlížeči</td></tr>
-    <tr><td>pouzite-automaty-prototyp</td><td>IndexedDB</td><td>Fotografie nahrané ve správě nabídky</td><td>Do smazání</td></tr>
-    <tr><td>Náhled rozpracovaného automatu, poslední stránka</td><td>localStorage, sessionStorage</td><td>Náhled formuláře a návrat ze správy</td><td>Do smazání / do zavření karty</td></tr>
+    <tr><td translate="no">pouzite-automaty:prototyp:v2</td><td translate="no">localStorage</td><td>Změny katalogu uložené ve správě nabídky</td><td>Do smazání ve správě nebo v prohlížeči</td></tr>
+    <tr><td translate="no">pouzite-automaty-prototyp</td><td translate="no">IndexedDB</td><td>Fotografie nahrané ve správě nabídky</td><td>Do smazání</td></tr>
+    <tr><td>Náhled rozpracovaného automatu, poslední stránka</td><td translate="no">localStorage, sessionStorage</td><td>Náhled formuláře a návrat ze správy</td><td>Do smazání / do zavření karty</td></tr>
   </tbody>
 </table></div>
 <p>Jde o uložení nezbytné pro funkci, kterou sami používáte, a nic z toho se neodesílá. Na živém webu se tyto položky nepoužívají.</p>`)}

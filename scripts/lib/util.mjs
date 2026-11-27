@@ -1,7 +1,10 @@
 // Small helpers shared by the templates.
+import { keep } from './i18n.mjs';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
+// Escaped data that stays as it is in every language (names, models, contacts): see i18n.mjs.
+export const kesc = (v) => keep(esc(v));
 
 // Tagged template that drops null/false/undefined and joins arrays, so templates can use
 // `${cond && html`...`}` and `${list.map(...)}` without extra plumbing. Values are NOT escaped:

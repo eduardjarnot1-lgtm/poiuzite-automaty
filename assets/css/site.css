@@ -180,6 +180,25 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 }
 .nav-mobile-only { display: none; }
 .header-cta { flex: none; }
+
+/* language switch: codes in the header (full names for assistive technology), full names in the
+   mobile menu. The current language is filled. */
+.lang-switch { flex: none; }
+.lang-switch ul { display: flex; gap: 2px; margin: 0; padding: 3px; list-style: none; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, .6); }
+.lang-switch a, .lang-switch .lang-off {
+  display: inline-grid; place-items: center; min-width: 36px; min-height: 32px; padding: 0 8px; border-radius: 999px;
+  color: var(--muted); font-family: var(--font-display); font-size: var(--fs-caption); font-weight: 600; letter-spacing: .04em; text-decoration: none;
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+.lang-switch a:hover { color: var(--ink); background: rgba(24, 45, 39, .06); }
+.lang-switch a[aria-current] { color: var(--on-accent); background: var(--accent); }
+.lang-switch .lang-off { opacity: .45; cursor: not-allowed; }
+@media (pointer: coarse) { .lang-switch a, .lang-switch .lang-off { min-width: 40px; min-height: 38px; } }
+.nav-lang { margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+.lang-switch-full ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: var(--radius); }
+.lang-switch-full a, .lang-switch-full .lang-off { min-height: 44px; padding: 0 6px; border-radius: calc(var(--radius) - 3px); font-size: .9375rem; letter-spacing: 0; }
+.lang-note { margin: var(--s1) 0 0; padding: 8px 12px; border-left: 3px solid var(--line-strong); color: var(--muted); font-size: var(--fs-small); }
+.lang-alt { margin-top: var(--s4); color: var(--muted); font-size: var(--fs-small); }
 .header-cta.btn-sm { min-height: 40px; padding: 0 16px; }
 
 /* "Nabídka automatů" submenu with the machine categories */
@@ -215,6 +234,21 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 .nav-toggle[aria-expanded="true"] .nav-toggle-bars::before { transform: translateY(6px) rotate(45deg); }
 .nav-toggle[aria-expanded="true"] .nav-toggle-bars::after { transform: translateY(-6px) rotate(-45deg); }
 
+/* Between the mobile menu and wide screens the header row gets tight, more so in German and
+   Slovak: the logo keeps only its mark (the link keeps its full name for assistive technology),
+   and in the narrowest part of the range the enquiry button gives way in the longer languages
+   (every page and the "Kontakt" link still lead to the enquiry form). Nothing is shrunk or cut. */
+@media (min-width: 961px) and (max-width: 1279px) {
+  .header-inner { gap: var(--s2); }
+  .logo .logo-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .nav-list > li > a { padding: 0 10px; }
+}
+@media (min-width: 1280px) and (max-width: 1359px) {
+  html[lang="de"] .logo .logo-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@media (min-width: 961px) and (max-width: 1099px) { html[lang="sk"] .header-cta { display: none; } }
+@media (min-width: 961px) and (max-width: 1199px) { html[lang="de"] .header-cta { display: none; } }
+@media (min-width: 961px) { .nav-list > li > a, .header-cta { white-space: nowrap; -webkit-hyphens: manual; hyphens: manual; } }
 @media (max-width: 960px) {
   .header-inner { gap: var(--s2); flex-wrap: wrap; }
   .header-cta { margin-left: auto; }
@@ -237,6 +271,7 @@ body:has(.scrub) .site-header { position: relative; }   /* the scroll-driven sec
 }
 @media (max-width: 479px) {
   .js .header-cta { display: none; }   /* the menu panel carries the enquiry button instead */
+  .js .header-inner > .lang-switch { display: none; }   /* and the language switch, with full names */
   .js .nav-toggle { margin-left: auto; }
 }
 
@@ -1467,3 +1502,9 @@ body.has-backdrop { background: #f3f7f5; }
 
 /* long e-mail addresses wrap instead of pushing the page sideways (large text sizes, narrow phones) */
 a[href^="mailto:"] { overflow-wrap: anywhere; min-width: 0; }
+
+/* German and Slovak: long compound words ("Generalüberholung", "Geschäftsbedingungen") are
+   hyphenated where the browser has a dictionary and otherwise wrap inside the word, so a narrow
+   phone never clips or scrolls sideways. The type size stays the same. */
+html:lang(de), html:lang(sk) { overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; }
+html:lang(de) :is(input, textarea, select, code, .lang-switch, .logo, .btn) { -webkit-hyphens: manual; hyphens: manual; }

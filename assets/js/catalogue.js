@@ -5,6 +5,8 @@
 // that applies now, "Cena na dotaz" last in both directions, ties in the recommended order.
 // The admin prototype fires "catalogue:refresh" when a discount starts or ends on an open page.
 (() => {
+  // translations on German and Slovak pages (assets/js/i18n/<lang>.js); Czech as written
+  const T = (s) => (window.PAi18n ? window.PAi18n.t(s) : s);
   const root = document.querySelector('[data-catalogue]');
   const tools = root?.querySelector('[data-cat-tools]');
   if (!tools) return;
@@ -16,7 +18,7 @@
   const KEYS = { q: 'hledat', category: 'druh', manufacturer: 'vyrobce', condition: 'stav', type: 'typ', availability: 'dostupnost', pmin: 'cena-od', pmax: 'cena-do', sale: 'sleva' };
   const DEFAULT_SORT = 'doporucene';
   const word = (n) => (n === 1 ? 'automat' : n >= 2 && n <= 4 ? 'automaty' : 'automatů');
-  const collator = new Intl.Collator('cs');
+  const collator = new Intl.Collator(document.documentElement.lang || 'cs');
   const value = (el) => (el.type === 'checkbox' ? (el.checked ? el.value : '') : el.value.trim());
 
   // restore from the address bar
@@ -69,7 +71,7 @@
     if (sorted.some((card, i) => card !== cards[i])) list.append(...sorted);
 
     const active = filters.some((el) => value(el));
-    status.textContent = active ? `Zobrazeno ${shown} z ${cards.length} ${word(cards.length)}` : `${cards.length} ${word(cards.length)}`;
+    status.textContent = T(active ? `Zobrazeno ${shown} z ${cards.length} ${word(cards.length)}` : `${cards.length} ${word(cards.length)}`);
     empty.hidden = shown > 0;
 
     const p = new URLSearchParams(location.search);

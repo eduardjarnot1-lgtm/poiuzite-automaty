@@ -1,4 +1,6 @@
 (() => {
+  // translations on German and Slovak pages (assets/js/i18n/<lang>.js); Czech as written
+  const T = (s) => (window.PAi18n ? window.PAi18n.t(s) : s);
   const hero = document.getElementById('hero');
   const label = document.getElementById('sceneLabel');
   const btnB = document.getElementById('btnBefore');
@@ -12,9 +14,9 @@
     hero.classList.add('animating');
     btnB.setAttribute('aria-pressed', String(next === 'before'));
     btnA.setAttribute('aria-pressed', String(next === 'after'));
-    label.textContent = next === 'after'
+    label.textContent = T(next === 'after'
       ? 'Ilustrace: tytéž tři prodejní automaty po opravě.'
-      : 'Ilustrace: tři prodejní automaty v dílně před opravou.';
+      : 'Ilustrace: tři prodejní automaty v dílně před opravou.');
     clearTimeout(animTimer);
     animTimer = setTimeout(() => hero.classList.remove('animating'), 1600);
   }

@@ -15,6 +15,17 @@
 //   in the catalogue's own order, never as a ranked shortlist.
 import { effectivePrice, isListed } from './catalog.mjs';
 
+// Language: the texts below are Czech. On German and Slovak pages the guide script installs a
+// translator (useTranslator), so messages, the result and the summary come out in that language,
+// built from the stable answer values. What the visitor typed is never translated: it is marked
+// with K() and passes through as it is.
+let tr = (s) => s;
+let K = (s) => s;
+export function useTranslator(fn) {
+  tr = fn || ((s) => s);
+  K = fn ? (s) => `\u2063${s}\u2064` : (s) => s;
+}
+
 /* ---------- options ---------- */
 
 export const OFFER = [
@@ -95,8 +106,8 @@ export function parseBudget(text) {
 // Validation of one step; returns { field: message } for anything that stops "Pokračovat".
 export function stepErrors(stepId, a) {
   const e = {};
-  if (REQUIRED[stepId] && !a[REQUIRED[stepId]]) e[REQUIRED[stepId]] = 'Vyberte prosím jednu možnost. Pokud si nejste jistí, zvolte „Zatím nevím“.';
-  if (stepId === 'rozpocet' && a.budget === 'max' && parseBudget(a.budgetMax) == null) e.budgetMax = 'Zadejte částku v korunách, například 80 000. Nebo zvolte „Nemám zatím stanovený rozpočet“.';
+  if (REQUIRED[stepId] && !a[REQUIRED[stepId]]) e[REQUIRED[stepId]] = tr('Vyberte prosím jednu možnost. Pokud si nejste jistí, zvolte „Zatím nevím“.');
+  if (stepId === 'rozpocet' && a.budget === 'max' && parseBudget(a.budgetMax) == null) e.budgetMax = tr('Zadejte částku v korunách, například 80 000. Nebo zvolte „Nemám zatím stanovený rozpočet“.');
   return e;
 }
 
@@ -139,6 +150,7 @@ export function targetCategories(a) {
 export const budgetMax = (a) => (a.budget === 'max' ? parseBudget(a.budgetMax) : null);
 export const requestedPayments = (a) => (a.mode !== 'paid' ? [] : a.payment === 'coins' ? ['coins'] : a.payment === 'card' ? ['card'] : a.payment === 'both' ? ['coins', 'card'] : []);
 const PAY_WORD = { coins: 'platba mincemi', card: 'platba kartou' };
+const payWords = (keys) => tr(keys.map((k) => PAY_WORD[k]).join(' a '));
 
 // One machine against the answers.
 export function assess(p, a, now = Date.now()) {
@@ -148,28 +160,28 @@ export function assess(p, a, now = Date.now()) {
   const conflicts = [];
   const price = effectivePrice(p, now);
   const max = budgetMax(a);
-  if (price == null) unknown.push(max != null ? 'Cena je na dotaz, proto ji zatím nejde porovnat s vaším rozpočtem.' : 'Cena je na dotaz.');
-  else if (max != null && price > max) conflicts.push('Aktuální cena je vyšší než váš rozpočet.');
-  else if (max != null) confirmed.push('Aktuální cena je v rámci vašeho rozpočtu.');
+  if (price == null) unknown.push(tr(max != null ? 'Cena je na dotaz, proto ji zatím nejde porovnat s vaším rozpočtem.' : 'Cena je na dotaz.'));
+  else if (max != null && price > max) conflicts.push(tr('Aktuální cena je vyšší než váš rozpočet.'));
+  else if (max != null) confirmed.push(tr('Aktuální cena je v rámci vašeho rozpočtu.'));
 
   const need = requestedPayments(a);
   const pay = paymentsOf(p);
   if (need.length) {
-    if (!pay) requested.push(`Požadujete: ${need.map((k) => PAY_WORD[k]).join(' a ')}. U tohoto automatu to zatím není ověřené.`);
+    if (!pay) requested.push(tr(`Požadujete: ${K(payWords(need))}. U tohoto automatu to zatím není ověřené.`));
     else {
       const missing = need.filter((k) => !pay[k]);
-      if (missing.length) conflicts.push(`Podle údajů automatu: ${pay.text}. Chybí ${missing.map((k) => PAY_WORD[k]).join(' a ')}.`);
-      else confirmed.push(`Platební systém podle údajů automatu: ${pay.text}.`);
+      if (missing.length) conflicts.push(tr(`Podle údajů automatu: ${K(tr(pay.text))}. Chybí ${K(payWords(missing))}.`));
+      else confirmed.push(tr(`Platební systém podle údajů automatu: ${K(tr(pay.text))}.`));
     }
   }
-  if (a.mode === 'free') requested.push('Výdej zdarma: nastavení ověříme u konkrétního automatu.');
+  if (a.mode === 'free') requested.push(tr('Výdej zdarma: nastavení ověříme u konkrétního automatu.'));
 
   const r = recorded(p);
-  unknown.push(r.capacity ? `Kapacita podle údajů automatu: ${r.capacity}. Porovnáme ji s vaším provozem.` : 'Kapacita automatu zatím není uvedená.');
-  unknown.push(r.dimensions ? `Rozměry podle údajů automatu: ${r.dimensions}.` : 'Rozměry automatu zatím nejsou uvedené.');
-  if (a.water === 'yes' || a.water === 'no') unknown.push(r.water ? `Připojení vody podle údajů automatu: ${r.water}.` : 'Zda automat potřebuje přípojku vody, zatím není uvedeno.');
-  if (a.placement === 'outdoor') requested.push('Umístění venku: musí ho snést konkrétní automat, ověříme to.');
-  if (!p.availability) unknown.push('Dostupnost a stav konkrétního kusu potvrdíme.');
+  unknown.push(r.capacity ? tr(`Kapacita podle údajů automatu: ${K(tr(r.capacity))}. Porovnáme ji s vaším provozem.`) : tr('Kapacita automatu zatím není uvedená.'));
+  unknown.push(r.dimensions ? tr(`Rozměry podle údajů automatu: ${K(tr(r.dimensions))}.`) : tr('Rozměry automatu zatím nejsou uvedené.'));
+  if (a.water === 'yes' || a.water === 'no') unknown.push(r.water ? tr(`Připojení vody podle údajů automatu: ${K(tr(r.water))}.`) : tr('Zda automat potřebuje přípojku vody, zatím není uvedeno.'));
+  if (a.placement === 'outdoor') requested.push(tr('Umístění venku: musí ho snést konkrétní automat, ověříme to.'));
+  if (!p.availability) unknown.push(tr('Dostupnost a stav konkrétního kusu potvrdíme.'));
   return { price, confirmed, requested, unknown, conflicts };
 }
 
@@ -209,7 +221,7 @@ export function evaluate({ products, categories, order = [] }, answers, now = Da
     comparable,
     shortlist,
     groups: max != null
-      ? [{ id: 'budget', title: 'V rámci rozpočtu', items: shortlist.filter((x) => x.price != null) }, { id: 'price', title: 'Cena na dotaz – k ověření', items: shortlist.filter((x) => x.price == null) }].filter((g) => g.items.length)
+      ? [{ id: 'budget', title: tr('V rámci rozpočtu'), items: shortlist.filter((x) => x.price != null) }, { id: 'price', title: tr('Cena na dotaz – k ověření'), items: shortlist.filter((x) => x.price == null) }].filter((g) => g.items.length)
       : shortlist.length ? [{ id: 'all', title: '', items: shortlist }] : [],
     examples,
     total: fits.length,
@@ -228,29 +240,32 @@ export function clarifications(a) {
   if (a.mode === 'paid' && (!a.payment || a.payment === 'help')) out.push('jaké placení zvolit');
   if (!a.budget) out.push('přibližný rozpočet');
   out.push('kapacita, rozměry, technické připojení, stav, cena a dostupnost konkrétního automatu');
-  return out;
+  return out.map(tr);
 }
 
 /* ---------- the summary ---------- */
 
 const fmtCzk = (n) => `${new Intl.NumberFormat('cs-CZ').format(n)} Kč bez DPH`;
+// [step id, label, value]: labels and option texts in the current language, free text as typed.
 export function answerLines(answers) {
   const a = clean(answers);
   const lines = [];
-  if (a.offer) lines.push(['nabidka', 'Co má automat nabízet', label(OFFER, a.offer) + (a.coffee ? ` – ${label(COFFEE, a.coffee).toLowerCase()}` : '')]);
-  if (a.place) lines.push(['misto', 'Místo', label(PLACE, a.place) + (a.placeOther ? `: ${a.placeOther}` : '')]);
-  if (a.people) lines.push(['misto', 'Počet lidí', label(PEOPLE, a.people)]);
-  if (a.usage) lines.push(['misto', 'Odhad využití', label(USAGE[usageScale(a.offer)], a.usage)]);
-  if (a.mode) lines.push(['vydej', 'Výdej', label(MODE, a.mode)]);
-  if (a.payment) lines.push(['vydej', 'Požadované placení', label(PAYMENT, a.payment)]);
-  if (a.budget === 'max' && budgetMax(a) != null) lines.push(['rozpocet', 'Rozpočet', `nejvýše ${fmtCzk(budgetMax(a))}`]);
-  if (a.budget === 'none') lines.push(['rozpocet', 'Rozpočet', 'zatím nestanovený']);
-  if (a.placement) lines.push(['doplneni', 'Umístění', label(PLACEMENT, a.placement)]);
-  if (a.space) lines.push(['doplneni', 'Prostor pro automat', a.space]);
-  if (a.water) lines.push(['doplneni', 'Přípojka vody', label(WATER, a.water)]);
-  if (a.when) lines.push(['doplneni', 'Kdy automat potřebujete', label(WHEN, a.when)]);
-  if (a.region) lines.push(['doplneni', 'Oblast dodání', a.region]);
-  if (a.other) lines.push(['doplneni', 'Další požadavky', a.other]);
+  const L = (list, v) => tr(label(list, v));
+  const line = (step, k, v) => lines.push([step, tr(k), v]);
+  if (a.offer) line('nabidka', 'Co má automat nabízet', a.coffee ? tr(`${label(OFFER, a.offer)} – ${label(COFFEE, a.coffee).toLowerCase()}`) : L(OFFER, a.offer));
+  if (a.place) line('misto', 'Místo', L(PLACE, a.place) + (a.placeOther ? `: ${K(a.placeOther)}` : ''));
+  if (a.people) line('misto', 'Počet lidí', L(PEOPLE, a.people));
+  if (a.usage) line('misto', 'Odhad využití', L(USAGE[usageScale(a.offer)], a.usage));
+  if (a.mode) line('vydej', 'Výdej', L(MODE, a.mode));
+  if (a.payment) line('vydej', 'Požadované placení', L(PAYMENT, a.payment));
+  if (a.budget === 'max' && budgetMax(a) != null) line('rozpocet', 'Rozpočet', tr(`nejvýše ${fmtCzk(budgetMax(a))}`));
+  if (a.budget === 'none') line('rozpocet', 'Rozpočet', tr('zatím nestanovený'));
+  if (a.placement) line('doplneni', 'Umístění', L(PLACEMENT, a.placement));
+  if (a.space) line('doplneni', 'Prostor pro automat', K(a.space));
+  if (a.water) line('doplneni', 'Přípojka vody', L(WATER, a.water));
+  if (a.when) line('doplneni', 'Kdy automat potřebujete', L(WHEN, a.when));
+  if (a.region) line('doplneni', 'Oblast dodání', K(a.region));
+  if (a.other) line('doplneni', 'Další požadavky', K(a.other));
   return lines;
 }
 
@@ -258,11 +273,11 @@ export function answerLines(answers) {
 // when the visitor ticked them.
 export function summaryText(answers, result, { products = [] } = {}) {
   const a = clean(answers, products.length ? products : null);
-  const out = ['Požadavky z průvodce výběrem automatu', ''];
+  const out = [tr('Požadavky z průvodce výběrem automatu'), ''];
   for (const [, k, v] of answerLines(a)) out.push(`${k}: ${v}`);
-  if (result?.categories?.length && result.targets.length) out.push('', `Kategorie: ${result.categories.map((c) => `${c.name}${c.published ? '' : ' (na dotaz)'}`).join(', ')}`);
+  if (result?.categories?.length && result.targets.length) out.push('', `${tr('Kategorie')}: ${result.categories.map((c) => `${tr(c.name)}${c.published ? '' : ` (${tr('na dotaz')})`}`).join(', ')}`);
   const chosen = (a.selected || []).map((id) => products.find((p) => p.id === id)).filter(Boolean);
-  if (chosen.length) out.push(`Vybrané automaty: ${chosen.map((p) => `${p.name} (${p.id})`).join(', ')}`);
-  if (result?.clarify?.length) out.push('', 'Potřebuji poradit nebo ověřit:', ...result.clarify.map((x) => `- ${x}`));
-  return out.join('\n');
+  if (chosen.length) out.push(`${tr('Vybrané automaty')}: ${chosen.map((p) => `${p.name} (${p.id})`).join(', ')}`);
+  if (result?.clarify?.length) out.push('', tr('Potřebuji poradit nebo ověřit:'), ...result.clarify.map((x) => `- ${x}`));
+  return out.join('\n').replace(/[\u2063\u2064]/g, '');
 }

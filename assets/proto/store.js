@@ -283,6 +283,11 @@ export function validateBackup(text, seed) {
       if (!img || typeof img.src !== 'string') { errors.push(`${where}: fotografie bez souboru.`); continue; }
       if (isStoredPhoto(img.src) && !media[img.src]) missingPhotos++;
     }
+    if (p.i18n != null) {
+      const bad = typeof p.i18n !== 'object' || Object.entries(p.i18n).some(([l, t]) => !['de', 'sk'].includes(l) || !t || typeof t !== 'object'
+        || typeof t.summary !== 'string' || (t.description != null && (!Array.isArray(t.description) || t.description.some((x) => typeof x !== 'string'))));
+      if (bad) errors.push(`${where}: překlady popisu mají neplatný formát.`);
+    }
     const d = p.discount;
     if (d != null && (typeof d !== 'object' || !['percent', 'amount', 'price'].includes(d.method) || (d.start && Number.isNaN(Date.parse(d.start))) || (d.end && Number.isNaN(Date.parse(d.end))))) {
       errors.push(`${where}: sleva má neplatný formát.`);

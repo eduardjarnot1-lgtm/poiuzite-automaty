@@ -1,5 +1,8 @@
 // Site-wide behaviour: mobile menu, category submenu, enquiry forms.
 (() => {
+  // translations on German and Slovak pages (assets/js/i18n/<lang>.js); Czech as written
+  const T = (s) => (window.PAi18n ? window.PAi18n.t(s) : s);
+  const H = (s) => (window.PAi18n ? window.PAi18n.html(s) : s);
   /* ---------- mobile menu ---------- */
   const toggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('site-nav');
@@ -39,15 +42,15 @@
      Validates with clear Czech messages, then sends without a page reload: to Netlify Forms
      (data-netlify) or to the endpoint in the form's action. Without JS the browser posts normally. */
   const MSG = {
-    valueMissing: 'Vyplňte prosím toto pole.',
-    typeMismatch: 'Zadejte e-mail ve tvaru jmeno@firma.cz.',
-    patternMismatch: 'Zadejte telefonní číslo, alespoň 9 číslic.',
-    tooLong: 'Text je příliš dlouhý.',
+    valueMissing: T('Vyplňte prosím toto pole.'),
+    typeMismatch: T('Zadejte e-mail ve tvaru jmeno@firma.cz.'),
+    patternMismatch: T('Zadejte telefonní číslo, alespoň 9 číslic.'),
+    tooLong: T('Text je příliš dlouhý.'),
   };
   const messageFor = (el) => {
     const v = el.validity;
     for (const k of Object.keys(MSG)) if (v[k]) return MSG[k];
-    return v.valid ? '' : 'Zkontrolujte prosím toto pole.';
+    return v.valid ? '' : T('Zkontrolujte prosím toto pole.');
   };
   function showError(el) {
     const id = el.id + '-error';
@@ -92,7 +95,7 @@
         box.className = 'form-success';
         box.tabIndex = -1;
         box.setAttribute('role', 'status');
-        box.innerHTML = form.dataset.successHtml || '<h3>Děkujeme, zprávu jsme přijali.</h3><p>Ozveme se vám co nejdříve.</p>';
+        box.innerHTML = H(form.dataset.successHtml || '<h3>Děkujeme, zprávu jsme přijali.</h3><p>Ozveme se vám co nejdříve.</p>');
         form.replaceChildren(box);
         box.focus();
       };
@@ -101,14 +104,14 @@
       // the enquiry was sent.
       if (form.hasAttribute('data-preview')) {
         status.className = 'form-status is-error';
-        status.textContent = 'Formulář je vyplněný správně, ale v pracovním náhledu se neodesílá. Zpráva nikam neodešla.';
+        status.textContent = T('Formulář je vyplněný správně, ale v pracovním náhledu se neodesílá. Zpráva nikam neodešla.');
         status.focus();
         return;
       }
 
       button.disabled = true;
       const label = button.textContent;
-      button.textContent = 'Odesílám…';
+      button.textContent = T('Odesílám…');
       try {
         const netlify = form.hasAttribute('data-netlify');
         const res = await fetch(form.action, netlify
@@ -118,7 +121,7 @@
         done();
       } catch {
         status.className = 'form-status is-error';
-        status.textContent = 'Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo nás kontaktujte telefonicky či e-mailem.';
+        status.textContent = T('Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo nás kontaktujte telefonicky či e-mailem.');
         status.focus();
         button.disabled = false;
         button.textContent = label;

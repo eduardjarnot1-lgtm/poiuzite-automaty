@@ -5,7 +5,7 @@
 // the Netlify build never passes it.
 // --offline makes a copy that opens straight from disk (e.g. a zip sent by e-mail): explicit
 // index links, forms that say they do not send, and one video format instead of two.
-import { readFile, writeFile, mkdir, rm, cp } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm, cp, readdir } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { linker } from './lib/util.mjs';
@@ -15,6 +15,7 @@ import { isVisible } from './lib/catalog.mjs';
 import { proto, adminPage, previewPage, ADMIN_PATH, PREVIEW_PATH } from './lib/prototype.mjs';
 import * as legal from './lib/legal.mjs';
 import { releaseBlockers } from './lib/release.mjs';
+import { LANGS, setLang, langPrefix, isShared, sourceHash } from './lib/i18n.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name, fallback) => {
@@ -37,6 +38,26 @@ const categories = await load('categories.json');
 const products = await load('products.json');
 const realizations = JSON.parse(await readFile(join(root, 'data', 'realizations.json'), 'utf8'));
 
+// Dictionaries for the language versions: i18n/<lang>/*.json, keyed by the Czech text (see
+// scripts/lib/i18n.mjs). legal.json is used only by the build; the rest also goes to the browser.
+export async function loadDictionaries(dir = join(root, 'i18n')) {
+  const dicts = {};
+  for (const lang of LANGS.filter((l) => l !== 'cs')) {
+    dicts[lang] = { all: Object.create(null), client: Object.create(null) };
+    const files = (await readdir(join(dir, lang)).catch(() => [])).filter((f) => f.endsWith('.json')).sort();
+    for (const f of files) {
+      const entries = JSON.parse(await readFile(join(dir, lang, f), 'utf8'));
+      for (const [k, v] of Object.entries(entries)) {
+        if (k.startsWith('//')) continue;
+        dicts[lang].all[k] = v;
+        if (f !== 'legal.json') dicts[lang].client[k] = v;
+      }
+    }
+  }
+  return dicts;
+}
+const dicts = await loadDictionaries();
+
 /* ---------- validate the data so mistakes fail the build, not the visitor ---------- */
 const errors = [];
 const slugRe = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -55,6 +76,10 @@ for (const p of products) {
   if (seen.has(key) || seen.has(p.id)) errors.push(`${where}: duplicate id or slug`);
   seen.add(key); seen.add(p.id);
   p.description ??= []; p.specs ??= []; p.features ??= []; p.paymentSystems ??= []; p.images ??= [];
+  for (const [lang, t] of Object.entries(p.i18n || {})) {
+    if (!LANGS.includes(lang) || lang === 'cs') errors.push(`${where}: i18n.${lang}: unknown language`);
+    else if (t.summary && t.sourceHash !== sourceHash(p)) console.warn(`${where}: ${lang} translation is older than the Czech text: shown in Czech until it is reviewed`);
+  }
 }
 if (errors.length) {
   console.error('Data errors:\n  ' + errors.join('\n  '));
@@ -101,12 +126,38 @@ const routes = [
   ] : []),
 ];
 
+// Every page exists in each language under its prefix (de/, sk/) with the same, Czech, address
+// below it: products and categories keep their stable ids and slugs. Only the 404 page and the
+// internal admin prototype are Czech-only.
+const inLang = (route, lang) => lang === 'cs' || !(route.absolute || route.kind === 'admin');
+const missing = Object.fromEntries(LANGS.map((l) => [l, new Map()]));
 await rm(out, { recursive: true, force: true });
-for (const route of routes) {
-  const c = { site, categories, products, page: route, url: linker(route.path, route.absolute, explicitIndex), absUrl, explicitIndex, formPreview: prototype || offline, ...(prototype && { proto }) };
-  const file = join(out, route.file || join(route.path, 'index.html'));
-  await mkdir(dirname(file), { recursive: true });
-  await writeFile(file, layout(c, route.render(c)));
+for (const lang of LANGS) {
+  setLang(lang, dicts[lang]?.all, (key) => missing[lang].set(key, (missing[lang].get(key) || 0) + 1));
+  for (const route of routes.filter((r) => inLang(r, lang))) {
+    const pagePath = langPrefix(lang) + route.path;
+    const raw = linker(pagePath, route.absolute, explicitIndex);
+    const url = (target = '') => raw(isShared(target) ? target : langPrefix(lang) + target);
+    const c = {
+      site, categories, products, page: route, url, absUrl, explicitIndex, formPreview: prototype || offline, ...(prototype && { proto }),
+      lang, pagePath,
+      langPath: (l) => langPrefix(l) + route.path,
+      langHref: (l) => (inLang(route, l) ? raw(langPrefix(l) + route.path) : null),
+      headScript: lang === 'cs' && route.path === '' && !prototype ? preferenceScript(raw) : '',
+    };
+    const file = join(out, langPrefix(lang), route.file || join(route.path, 'index.html'));
+    await mkdir(dirname(file), { recursive: true });
+    await writeFile(file, layout(c, route.render(c)));
+  }
+}
+setLang('cs');
+
+// A visitor who explicitly chose German or Slovak and comes back to the bare Czech homepage from
+// another site lands on their language. Any explicit address (a link, a bookmark, a /de/ page,
+// a Czech page other than the homepage) is shown as it is. No IP or browser-language guessing.
+function preferenceScript(raw) {
+  const to = Object.fromEntries(LANGS.filter((l) => l !== 'cs').map((l) => [l, raw(langPrefix(l))]));
+  return `<script>try{var l=localStorage.getItem('pa-lang'),t=${JSON.stringify(to)}[l],r=document.referrer;if(t&&!location.search&&!location.hash&&(!r||new URL(r).origin!==location.origin))location.replace(t)}catch(e){}</script>\n`;
 }
 
 for (const dir of ['css', 'js', 'img', 'video', 'products', 'fonts']) {
@@ -124,6 +175,29 @@ for (const f of ['catalog', 'guide']) {
   const src = await readFile(join(root, 'scripts', 'lib', `${f}.mjs`), 'utf8');
   await writeFile(join(out, 'assets', 'js', 'lib', `${f}.js`), src.replace(/from '\.\/(\w+)\.mjs'/g, "from './$1.js'"));
   bundle.push(src.replace(/^import .*$/gm, '').replace(/^export (const|function|let) /gm, '$1 '));
+}
+// The translations the page scripts need, as one classic script per language (window.PAi18n).
+{
+  const src = (await readFile(join(root, 'scripts', 'lib', 'i18n.mjs'), 'utf8')).replace(/^import .*$/gm, '').replace(/^export (const|function|let|async function) /gm, '$1 ');
+  await mkdir(join(out, 'assets', 'js', 'i18n'), { recursive: true });
+  for (const [lang, d] of Object.entries(dicts)) {
+    await writeFile(join(out, 'assets', 'js', 'i18n', `${lang}.js`), `// Generated by scripts/build.mjs from scripts/lib/i18n.mjs and i18n/${lang}/*.json (legal texts excluded).
+(() => {
+${src}
+const dict = Object.assign(Object.create(null), ${JSON.stringify(d.client)});
+setLang(${JSON.stringify(lang)}, dict);
+// missing: texts the page asked for that have no translation (shown in Czech), for the checks
+const missing = new Set();
+const t = (s) => {
+  if (s == null) return s;
+  const v = lookupText(String(s), dict);
+  if (v == null) missing.add(stripMarks(String(s)));
+  return stripMarks(v ?? String(s));
+};
+window.PAi18n = { lang: ${JSON.stringify(lang)}, dict, missing, t, html: (s) => translateHtml(s, dict, { report: (k) => missing.add(k) }) };
+})();
+`);
+  }
 }
 const guideSrc = await readFile(join(root, 'scripts', 'lib', 'guide.mjs'), 'utf8');
 const guideNames = [...guideSrc.matchAll(/^export (?:const|function|let) (\w+)/gm)].map((m) => m[1]);
@@ -161,7 +235,7 @@ if (offline) {
 if (prototype) {
   const dir = join(out, 'assets', 'proto');
   await mkdir(join(dir, 'lib'), { recursive: true });
-  for (const f of ['util', 'catalog', 'components', 'pages', 'guide']) {
+  for (const f of ['util', 'catalog', 'components', 'pages', 'guide', 'i18n']) {
     const src = await readFile(join(root, 'scripts', 'lib', `${f}.mjs`), 'utf8');
     await writeFile(join(dir, 'lib', `${f}.js`), src.replace(/from '\.\/(\w+)\.mjs'/g, "from './$1.js'"));
   }
@@ -169,14 +243,20 @@ if (prototype) {
   for (const f of ['proto.js', 'admin.js', 'store.js', 'proto.css']) await cp(join(root, 'assets', 'proto', f), join(dir, f));
 }
 
-const indexed = routes.filter((r) => !r.noindex);
+const indexed = LANGS.flatMap((l) => routes.filter((r) => !r.noindex && inLang(r, l)).map((r) => langPrefix(l) + r.path));
 if (absUrl) {
   await writeFile(join(out, 'sitemap.xml'),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexed.map((r) => `  <url><loc>${absUrl(r.path)}</loc></url>`).join('\n')}\n</urlset>\n`);
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexed.map((path) => `  <url><loc>${absUrl(path)}</loc></url>`).join('\n')}\n</urlset>\n`);
 }
 await writeFile(join(out, 'robots.txt'), prototype ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\n${absUrl ? `Sitemap: ${absUrl('sitemap.xml')}\n` : ''}`);
 
+if (process.argv.includes('--i18n-report')) {
+  await writeFile(arg('i18n-report', 'i18n-missing.json'), JSON.stringify(Object.fromEntries(Object.entries(missing).map(([l, m]) => [l, [...m.keys()]])), null, 1));
+}
+for (const [lang, keys] of Object.entries(missing)) {
+  if (keys.size) console.warn(`${lang}: ${keys.size} text(s) without a translation, shown in Czech (node scripts/i18n-check.mjs lists them)`);
+}
 if (hiddenPhotos) console.log(`${hiddenPhotos} photo(s) without cleared usage rights left out (use --show-unverified-assets for private previews).`);
 if (blockers.length) console.warn(`Release blockers (${blockers.length}), see LEGAL-AUDIT.md:\n  - ${blockers.join('\n  - ')}`);
 if (blockers.length && process.argv.includes('--strict')) process.exit(2);
-console.log(`Built ${routes.length} pages into ${out}${absUrl ? ` for ${base}` : ' (no baseUrl: canonical links and sitemap skipped)'}`);
+console.log(`Built ${LANGS.reduce((n, l) => n + routes.filter((r) => inLang(r, l)).length, 0)} pages (${LANGS.join(', ')}) into ${out}${absUrl ? ` for ${base}` : ' (no baseUrl: canonical links and sitemap skipped)'}`);

@@ -18,6 +18,13 @@
   });
 
   function start(G) {
+    // German and Slovak pages: texts from the rules come translated and marked, so the page's
+    // own translation pass (H) leaves them alone; Czech pages use the texts as written.
+    const I = window.PAi18n;
+    const T = (s) => (I ? I.t(s) : s);
+    const H = (s) => (I ? I.html(s) : s);
+    const plain = (s) => String(s).replace(/[\u2063\u2064]/g, '');
+    if (I && G.useTranslator) G.useTranslator((s) => `\u2063${I.t(s)}\u2064`);
     const data = JSON.parse(document.getElementById('guide-data').textContent);
     const panel = root.querySelector('[data-guide-panel]');
     const form = root.querySelector('[data-guide-form]');
@@ -35,7 +42,7 @@
     const machineField = enquiryForm.querySelector('input[name="automat"]');
     const toolStatus = root.querySelector('[data-guide-tool-status]');
     // after a real send (public site only): no promise of a call-back or of when we answer
-    enquiryForm.dataset.successHtml = '<h3>Děkujeme, poptávku jsme přijali.</h3><p>Odpověď pošleme na e-mail, který jste uvedli.</p>';
+    enquiryForm.dataset.successHtml = H('<h3>Děkujeme, poptávku jsme přijali.</h3><p>Odpověď pošleme na e-mail, který jste uvedli.</p>');
     const STORE = 'pouzite-automaty:pruvodce';
     const CHOICES = ['offer', 'coffee', 'place', 'people', 'usage', 'usageScale', 'mode', 'payment', 'budget', 'budgetMax', 'placement', 'water', 'when', 'selected'];
     const N = G.STEPS.length;
@@ -110,7 +117,7 @@
       for (const [k, msg] of Object.entries(errs)) {
         const p = document.getElementById(`g-${k}-error`);
         if (!p) continue;
-        p.textContent = msg;
+        p.textContent = plain(msg);
         p.hidden = false;
         const group = p.closest('fieldset');
         const input = group ? group.querySelector('input') : document.getElementById(`g-${k}`);
@@ -159,22 +166,22 @@
       if (isStep) {
         const last = view.i === N - 1;
         backBtn.hidden = view.i === 0;
-        nextBtn.textContent = last ? 'Zobrazit výsledek' : 'Pokračovat';
-        count.textContent = `Krok ${view.i + 1} z ${N}`;
+        nextBtn.textContent = T(last ? 'Zobrazit výsledek' : 'Pokračovat');
+        count.textContent = T(`Krok ${view.i + 1} z ${N}`);
         bar.style.width = `${((view.i + 1) / (N + 1)) * 100}%`;
-        live.textContent = `Krok ${view.i + 1} z ${N}`;
+        live.textContent = T(`Krok ${view.i + 1} z ${N}`);
         heading = stepsEls[view.i].querySelector('.g-step-title');
       } else if (view.type === 'result') {
         renderResult();
-        count.textContent = 'Výsledek';
+        count.textContent = T('Výsledek');
         bar.style.width = '100%';
-        live.textContent = 'Výsledek podle vašich odpovědí';
+        live.textContent = T('Výsledek podle vašich odpovědí');
         heading = resultEl.querySelector('h2');
       } else {
         prepareEnquiry();
-        count.textContent = 'Nezávazná poptávka';
+        count.textContent = T('Nezávazná poptávka');
         bar.style.width = '100%';
-        live.textContent = 'Nezávazná poptávka';
+        live.textContent = T('Nezávazná poptávka');
         heading = enquiryEl.querySelector('h2');
         heading.tabIndex = -1;
       }
@@ -198,15 +205,16 @@
       if (x.showUnknown && x.unknown.length) notes.push(`<div class="g-facts"><p class="g-facts-title">K ověření</p><ul>${x.unknown.map(li).join('')}</ul></div>`);
       const extra = document.createElement('div');
       extra.className = 'g-card-extra';
-      extra.innerHTML = notes.join('') + (checkable ? `<label class="g-pick"><input type="checkbox" data-guide-pick value="${esc(x.product.id)}"${(answers.selected || []).includes(x.product.id) ? ' checked' : ''}> Zahrnout do poptávky</label>` : '');
+      extra.innerHTML = H(notes.join('') + (checkable ? `<label class="g-pick"><input type="checkbox" data-guide-pick value="${esc(x.product.id)}"${(answers.selected || []).includes(x.product.id) ? ' checked' : ''}> Zahrnout do poptávky</label>` : ''));
       item.querySelector('.card-foot')?.before(extra);
       if (label) {
         const tag = document.createElement('p');
         tag.className = 'g-card-label';
-        tag.textContent = label;
+        tag.textContent = T(label);
         item.querySelector('.card-body')?.prepend(tag);
       }
       item.classList.add('g-card');
+      if (I) item.setAttribute('data-i18n-done', '');   // already in the page's language
       return item.outerHTML;
     }
 
@@ -264,7 +272,7 @@
           ? `<div class="g-compare"><p><strong>Instantní káva:</strong> ${esc(G.COFFEE[0][2])}</p><p><strong>Zrnková káva:</strong> ${esc(G.COFFEE[1][2])}</p><p class="g-note">Který druh se hodí pro váš provoz, s vámi probereme v nabídce.</p></div>` : '';
         main = coffeeNote + r.categories.map((cat, i) => categoryBlock(cat, r, i)).join('');
       }
-      resultEl.innerHTML = `
+      resultEl.innerHTML = H(`
         <h2 class="g-step-title" tabindex="-1">Výsledek podle vašich odpovědí</h2>
         <p class="g-intro">Nejde o technické schválení ani rezervaci. Je to směr výběru a přehled toho, co je potřeba potvrdit.</p>
         <div class="g-result-grid">
@@ -289,7 +297,7 @@
             <button class="btn btn-ghost" type="button" data-guide-download>Stáhnout jako text</button>
           </div>
           <p class="g-tool-status" role="status" data-guide-result-status></p>
-        </div>`;
+        </div>`);
     }
 
     /* ---------- enquiry ---------- */
@@ -300,29 +308,34 @@
       generated = fresh;
       const chosen = (answers.selected || []).map((id) => data.products.find((p) => p.id === id)).filter(Boolean);
       if (machineField) machineField.value = chosen.map((p) => `${p.name} (${p.id})`).join(', ');
+      markGenerated();
     }
+    // A summary the visitor has not edited is written again in the new language after a language
+    // switch (assets/js/lang.js does not carry fields marked data-generated); an edited one is kept.
+    const markGenerated = () => { message.dataset.generated = message.value === generated ? '1' : ''; };
+    message.addEventListener('input', markGenerated);
     const textNow = () => (view.type === 'enquiry' && message.value.trim() ? message.value : summary());
     async function copy(statusEl) {
       const text = textNow();
       try {
         await navigator.clipboard.writeText(text);
-        statusEl.textContent = 'Shrnutí je zkopírované do schránky.';
+        statusEl.textContent = T('Shrnutí je zkopírované do schránky.');
       } catch (e) {
         const ta = document.createElement('textarea');
         ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
         document.body.append(ta); ta.select();
         const ok = document.execCommand?.('copy');
         ta.remove();
-        statusEl.textContent = ok ? 'Shrnutí je zkopírované do schránky.' : 'Kopírování se nepodařilo. Stáhněte si shrnutí jako text.';
+        statusEl.textContent = T(ok ? 'Shrnutí je zkopírované do schránky.' : 'Kopírování se nepodařilo. Stáhněte si shrnutí jako text.');
       }
     }
     function download(statusEl) {
       const url = URL.createObjectURL(new Blob([textNow()], { type: 'text/plain;charset=utf-8' }));
       const a = document.createElement('a');
-      a.href = url; a.download = 'pozadavky-na-automat.txt';
+      a.href = url; a.download = T('pozadavky-na-automat.txt');
       document.body.append(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      statusEl.textContent = 'Shrnutí se stahuje jako textový soubor.';
+      statusEl.textContent = T('Shrnutí se stahuje jako textový soubor.');
     }
 
     /* ---------- events ---------- */
@@ -368,6 +381,7 @@
     if (saved?.answers) answers = G.clean(saved.answers, data.products);
     write(answers);
     sync();
+    window.PALang?.restore(form);   // typed answers carried over a language switch
     panel.hidden = false;
     const fromHash = parseHash(location.hash);
     const resume = fromHash || (saved?.view && parseHash(`#${saved.view}`)) || { type: 'step', i: 0 };

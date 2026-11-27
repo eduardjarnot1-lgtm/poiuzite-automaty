@@ -10,7 +10,7 @@ export const PREVIEW_PATH = 'automaty/nahled/';
 // Which page this is, so assets/proto/proto.js can render it again from the stored catalogue.
 function routeInfo(c) {
   const r = c.page;
-  return { path: r.path, section: r.section, absolute: Boolean(r.absolute), explicitIndex: c.explicitIndex, kind: r.kind || 'other', id: r.id || null, category: r.category || null };
+  return { path: c.pagePath ?? r.path, lang: c.lang || 'cs', section: r.section, absolute: Boolean(r.absolute), explicitIndex: c.explicitIndex, kind: r.kind || 'other', id: r.id || null, category: r.category || null };
 }
 
 export const proto = {
