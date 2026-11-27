@@ -48,7 +48,27 @@
       }
     ],
     "status": "published",
-    "order": 1
+    "order": 1,
+    "i18n": {
+      "de": {
+        "summary": "Kompakter Tischautomat für Instantgetränke. Die Becher werden von Hand eingesetzt.",
+        "description": [
+          "Kompakter Tischautomat für Instantgetränke. Die Becher werden von Hand eingesetzt.",
+          "Der Münzprüfer gibt kein Wechselgeld zurück."
+        ],
+        "sourceHash": "e239f003",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Kompaktný stolový automat na instantné nápoje. Poháre sa vkladajú ručne.",
+        "description": [
+          "Kompaktný stolový automat na instantné nápoje. Poháre sa vkladajú ručne.",
+          "Mincovník nevydáva výdavok."
+        ],
+        "sourceHash": "e239f003",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "rhea-xm",
@@ -94,7 +114,27 @@
       }
     ],
     "status": "published",
-    "order": 2
+    "order": 2,
+    "i18n": {
+      "de": {
+        "summary": "Tischautomat mit Becherausgabe. Er kann auf einen Unterschrank gestellt und mit Kanister und Pumpe betrieben werden.",
+        "description": [
+          "Tischautomat mit Becherausgabe. Er kann auf einen Unterschrank gestellt und mit Kanister und Pumpe betrieben werden.",
+          "Der Münzprüfer gibt Wechselgeld zurück."
+        ],
+        "sourceHash": "f6d9b9f4",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Stolový automat s výdajom pohárov. Dá sa postaviť na podstavec a prevádzkovať s kanistrom a čerpadlom.",
+        "description": [
+          "Stolový automat s výdajom pohárov. Dá sa postaviť na podstavec a prevádzkovať s kanistrom a čerpadlom.",
+          "Mincovník vydáva výdavok."
+        ],
+        "sourceHash": "f6d9b9f4",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "rhea-sagoma",
@@ -140,7 +180,27 @@
       }
     ],
     "status": "published",
-    "order": 3
+    "order": 3,
+    "i18n": {
+      "de": {
+        "summary": "Automat für Instantgetränke mit anpassbarem Programm. Kann mit einem Kanister betrieben werden.",
+        "description": [
+          "Automat für Instantgetränke mit anpassbarem Programm. Kann mit einem Kanister betrieben werden.",
+          "Der Münzprüfer gibt Wechselgeld zurück."
+        ],
+        "sourceHash": "a9b69f30",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Automat na instantné nápoje s možnosťou úpravy programu. Môže fungovať s kanistrom.",
+        "description": [
+          "Automat na instantné nápoje s možnosťou úpravy programu. Môže fungovať s kanistrom.",
+          "Mincovník vydáva výdavok."
+        ],
+        "sourceHash": "a9b69f30",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "rhea-lazio",
@@ -186,7 +246,27 @@
       }
     ],
     "status": "published",
-    "order": 4
+    "order": 4,
+    "i18n": {
+      "de": {
+        "summary": "Automat für Instantgetränke mit Becherausgabe.",
+        "description": [
+          "Automat für Instantgetränke mit Becherausgabe.",
+          "Der Münzprüfer gibt Wechselgeld zurück."
+        ],
+        "sourceHash": "7c2250d8",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Automat na instantné nápoje s výdajom pohárov.",
+        "description": [
+          "Automat na instantné nápoje s výdajom pohárov.",
+          "Mincovník vydáva výdavok."
+        ],
+        "sourceHash": "7c2250d8",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "necta-brio",
@@ -232,7 +312,27 @@
       }
     ],
     "status": "published",
-    "order": 5
+    "order": 5,
+    "i18n": {
+      "de": {
+        "summary": "Kompakter Automat mit Becherausgabe. Er kann auf einen Tisch oder einen Unterschrank gestellt werden.",
+        "description": [
+          "Kompakter Automat mit Becherausgabe. Er kann auf einen Tisch oder einen Unterschrank gestellt werden.",
+          "Der Münzprüfer gibt Wechselgeld zurück."
+        ],
+        "sourceHash": "b26ac2c8",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Kompaktný automat s výdajom pohárov. Dá sa umiestniť na stôl alebo podstavec.",
+        "description": [
+          "Kompaktný automat s výdajom pohárov. Dá sa umiestniť na stôl alebo podstavec.",
+          "Mincovník vydáva výdavok."
+        ],
+        "sourceHash": "b26ac2c8",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "necta-astro",
@@ -288,7 +388,27 @@
       }
     ],
     "status": "published",
-    "order": 6
+    "order": 6,
+    "i18n": {
+      "de": {
+        "summary": "Automat für Heißgetränke mit Becherausgabe. Die angebotene Ausführung kann Getränke aus Instant- und aus Bohnenkaffee zubereiten.",
+        "description": [
+          "Automat für Heißgetränke mit Becherausgabe. Die angebotene Ausführung kann Getränke aus Instant- und aus Bohnenkaffee zubereiten.",
+          "Der Münzprüfer gibt Wechselgeld zurück."
+        ],
+        "sourceHash": "9a58c33e",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Automat na teplé nápoje s výdajom pohárov. Vyhotovenie z ponuky dokáže pripravovať nápoje z instantnej aj zrnkovej kávy.",
+        "description": [
+          "Automat na teplé nápoje s výdajom pohárov. Vyhotovenie z ponuky dokáže pripravovať nápoje z instantnej aj zrnkovej kávy.",
+          "Mincovník vydáva výdavok."
+        ],
+        "sourceHash": "9a58c33e",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "rhea-x2",
@@ -324,7 +444,25 @@
       }
     ],
     "status": "published",
-    "order": 7
+    "order": 7,
+    "i18n": {
+      "de": {
+        "summary": "Automat für Getränke aus Bohnenkaffee.",
+        "description": [
+          "Automat für Getränke aus Bohnenkaffee."
+        ],
+        "sourceHash": "3e20e54d",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Automat na nápoje zo zrnkovej kávy.",
+        "description": [
+          "Automat na nápoje zo zrnkovej kávy."
+        ],
+        "sourceHash": "3e20e54d",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "damian-eta-beta",
@@ -393,7 +531,25 @@
       }
     ],
     "status": "published",
-    "order": 8
+    "order": 8,
+    "i18n": {
+      "de": {
+        "summary": "Spiralautomat mit sechs Verkaufsebenen für verpackte Snacks und Getränke.",
+        "description": [
+          "Spiralautomat mit sechs Verkaufsebenen für verpackte Snacks und Getränke."
+        ],
+        "sourceHash": "d95b43ed",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Špirálový automat so šiestimi predajnými poschodiami na balené občerstvenie a nápoje.",
+        "description": [
+          "Špirálový automat so šiestimi predajnými poschodiami na balené občerstvenie a nápoje."
+        ],
+        "sourceHash": "d95b43ed",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "necta-starfood",
@@ -437,7 +593,27 @@
       }
     ],
     "status": "published",
-    "order": 9
+    "order": 9,
+    "i18n": {
+      "de": {
+        "summary": "Karussellautomat mit drehbaren Ebenen und einzelnen Ausgabefächern.",
+        "description": [
+          "Karussellautomat mit drehbaren Ebenen und einzelnen Ausgabefächern.",
+          "Die Fotos zeigen die Ausführung für die Marke Mäso od tatka. Folierung und Ausstattung des konkreten Geräts bestätigen wir auf Anfrage."
+        ],
+        "sourceHash": "f0bb9293",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Karuselový automat s otočnými poschodiami a jednotlivými výdajnými priehradkami.",
+        "description": [
+          "Karuselový automat s otočnými poschodiami a jednotlivými výdajnými priehradkami.",
+          "Fotografie ukazujú vyhotovenie pre značku Mäso od tatka. Polep a výbavu konkrétneho kusu potvrdíme na požiadanie."
+        ],
+        "sourceHash": "f0bb9293",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "aht",
@@ -456,9 +632,44 @@
     "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/aht/celem.webp",
+        "alt": "AHT – automat na mražené jídlo s dvanácti přihrádkami a čtečkou karet, pohled zepředu",
+        "width": 768,
+        "height": 1024,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/aht/prospekt.webp",
+        "alt": "AHT – sestava automatu na mražená jídla s mikrovlnnou troubou a příborníkem z prospektu výrobce",
+        "width": 425,
+        "height": 480,
+        "rights": "unverified",
+        "illustrative": true,
+        "note": "Obrázek z prospektu výrobce, konkrétní sestava se může lišit"
+      }
+    ],
     "status": "published",
-    "order": 10
+    "order": 10,
+    "i18n": {
+      "de": {
+        "summary": "Verkaufsautomat für Tiefkühlware der Marke AHT. Das konkrete Modell und die Konfiguration nennen wir auf Anfrage.",
+        "description": [
+          "Verkaufsautomat für Tiefkühlware der Marke AHT. Das konkrete Modell und die Konfiguration nennen wir auf Anfrage."
+        ],
+        "sourceHash": "441183f5",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Predajný automat na mrazený tovar značky AHT. Konkrétny model a konfiguráciu upresníme na požiadanie.",
+        "description": [
+          "Predajný automat na mrazený tovar značky AHT. Konkrétny model a konfiguráciu upresníme na požiadanie."
+        ],
+        "sourceHash": "441183f5",
+        "reviewed": false
+      }
+    }
   },
   {
     "id": "fastcorp",
@@ -477,8 +688,34 @@
     "warranty": "12 měsíců",
     "price": null,
     "availability": null,
-    "images": [],
+    "images": [
+      {
+        "src": "assets/products/fastcorp/celem.webp",
+        "alt": "Fastcorp – červený automat na mražené jídlo s prosklenými dvířky, klávesnicí a čtečkou karet",
+        "width": 757,
+        "height": 1600,
+        "rights": "cleared"
+      }
+    ],
     "status": "published",
-    "order": 11
+    "order": 11,
+    "i18n": {
+      "de": {
+        "summary": "Verkaufsautomat für Tiefkühlware der Marke Fastcorp. Das konkrete Modell und die Konfiguration nennen wir auf Anfrage.",
+        "description": [
+          "Verkaufsautomat für Tiefkühlware der Marke Fastcorp. Das konkrete Modell und die Konfiguration nennen wir auf Anfrage."
+        ],
+        "sourceHash": "903a0381",
+        "reviewed": false
+      },
+      "sk": {
+        "summary": "Predajný automat na mrazený tovar značky Fastcorp. Konkrétny model a konfiguráciu upresníme na požiadanie.",
+        "description": [
+          "Predajný automat na mrazený tovar značky Fastcorp. Konkrétny model a konfiguráciu upresníme na požiadanie."
+        ],
+        "sourceHash": "903a0381",
+        "reviewed": false
+      }
+    }
   }
 ]

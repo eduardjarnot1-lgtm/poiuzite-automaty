@@ -1,11 +1,12 @@
 // One function per page type. Each returns { title, description, body, ... } for layout().
-import { esc, html, ph, plural } from './util.mjs';
+import { esc, kesc, html, ph, plural } from './util.mjs';
 import {
-  ARROW, CHECK, INFO, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
-  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, mediaUrl, ctaBand, priceSlot, nowOf,
+  ARROW, CHECK, INFO, NEW_TAB, SERVICE_NAV, breadcrumbs, productCard, productPath, productImage, priceText, makerLine,
+  conditionBadge, filledSpecs, enquiryForm, phoneLink, emailLink, photoNote, photoNoteText, mediaUrl, ctaBand, priceSlot, nowOf, relatedPromo, summaryHtml, summaryPlain, czechOnlyNote,
 } from './components.mjs';
 import { isListed, recommended, sale, effectivePrice, discountState, SORTS } from './catalog.mjs';
 import * as guideRules from './guide.mjs';
+import { keep, tx, tt, getLang, productText } from './i18n.mjs';
 
 // Listings show published machines that are not sold (drafts, hidden, deleted and sold ones never
 // appear), in the recommended order: featured first, then the order saved in the admin, then
@@ -31,7 +32,7 @@ const catIcon = (slug) => `<svg class="cat-icon" viewBox="0 0 24 24" fill="none"
 // One short line above every listing: published machines are not a stock confirmation, and
 // reference photos show similar models.
 const listingNotice = (list) => {
-  const illustrative = list.some((p) => p.images.some((i) => i.illustrative));
+  const illustrative = list.some((p) => p.images[0]?.illustrative);
   return html`<div class="notice" role="note">${INFO}<p><strong>Aktuální nabídka.</strong> Stav, cenu a dostupnost konkrétního kusu vám potvrdíme v odpovědi na poptávku.${illustrative ? ' Fotografie jsou ilustrační a ukazují podobné modely.' : ''}</p></div>`;
 };
 
@@ -99,7 +100,7 @@ function catalogue(c, list, { headingLevel = 2, label = 'Automaty', categories =
   ${list.length > 1 && html`<form class="cat-tools" hidden data-cat-tools role="search" aria-label="Filtrovat a řadit automaty">
     ${search && html`<div class="tool tool-search"><label for="f-q">Hledat</label><input id="f-q" type="search" name="q" data-filter="q" placeholder="Název, výrobce, model"></div>`}
     ${cats.length > 1 && select('category', 'Druh automatu', cats.map((cat) => [cat.slug, cat.name]))}
-    ${makers.length > 1 && select('manufacturer', 'Výrobce', makers.map((m) => [m, m]))}
+    ${makers.length > 1 && select('manufacturer', 'Výrobce', makers.map((m) => [m, keep(m)]))}
     ${conds.length > 1 && select('condition', 'Stav', conds.map((k) => [k, c.site.conditions[k].label]))}
     ${types.length > 1 && select('type', 'Typ automatu', types.map((t) => [t, t]))}
     ${avail.length > 1 && select('availability', 'Dostupnost', avail.map((a) => [a, a]))}
@@ -133,13 +134,13 @@ export function home(c) {
   const shown = c.products.filter(isListed);
   const hero = shown.find((p) => p.id === c.site.home?.heroProduct) || shown.find((p) => p.images[0]);
   const img = hero?.images[0];
+  const heroPhotos = c.site.home?.heroPhotos || [];
   return {
     title: `${c.site.name} | Použité a repasované prodejní automaty`,
     description: 'Prodej nápojových, spirálových, karuselových a dalších automatů po kompletní repasi s roční zárukou.',
-    head: img ? html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">\n` : '',
+    head: heroPhotos.length >= 3 ? html`<link rel="preload" as="image" href="${mediaUrl(c, heroPhotos[0].src)}">\n` : img ? html`<link rel="preload" as="image" href="${mediaUrl(c, img.src)}">\n` : '',
     bodyClass: 'is-home',
     body: html`
-<div class="home-backdrop" aria-hidden="true"></div>
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-text">
@@ -156,9 +157,12 @@ export function home(c) {
         <li>${CHECK}Servis a náhradní díly</li>
       </ul>
     </div>
-    ${img && html`<figure class="hero-media">
+    ${heroPhotos.length >= 3 ? html`<figure class="hero-mosaic">
+      ${heroPhotos.slice(0, 3).map((ph, i) => html`<div class="hero-tile hero-tile-${i + 1}"><img src="${mediaUrl(c, ph.src)}" alt="${esc(ph.alt)}" width="${ph.width}" height="${ph.height}"${i === 0 ? ' fetchpriority="high"' : ' loading="lazy"'} decoding="async"></div>`)}
+      <figcaption><a href="${c.url('realizace/')}">Fotky z našich realizací ${ARROW}</a></figcaption>
+    </figure>` : img && html`<figure class="hero-media">
       <div class="hero-well"><img src="${mediaUrl(c, img.src)}" data-fallback="${c.url('assets/img/placeholder-automat.svg')}" alt="${esc(img.alt || hero.name)}" width="${img.width || 800}" height="${img.height || 800}" fetchpriority="high" decoding="async"></div>
-      <figcaption>${esc(hero.name)}${img.illustrative ? html` · ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}` : ''}</figcaption>
+      <figcaption>${kesc(hero.name)}${img.illustrative ? html` · ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}` : ''}</figcaption>
     </figure>`}
   </div>
 </section>
@@ -172,10 +176,11 @@ export function home(c) {
       </div>
       <a class="text-link" href="${c.url('automaty/')}">Všechny kategorie ${ARROW}</a>
     </div>
-    <p><a class="text-link" href="${c.url('realizace/')}">Fotky instalací a realizací ${ARROW}</a></p>
     ${machines.length > 0 && html`${listingNotice(machines)}${catalogue(c, machines, { headingLevel: 3, label: 'Zveřejněné automaty', categories: true })}`}
   </div>
 </section>
+
+${relatedPromo(c)}
 
 ${onRequest.length > 0 && html`<section class="section section-alt" id="na-dotaz" aria-labelledby="ask-title">
   <div class="wrap">
@@ -299,7 +304,7 @@ export function realizations(c, groups) {
       <div class="wrap">
         <h2 id="${esc(group.id)}">${esc(group.title)}</h2>
         <ul class="realization-grid">
-          ${group.images.map((img) => html`<li><figure>
+          ${group.images.map((img) => html`<li class="${img.width / img.height > 2 ? 'is-pano' : img.width > img.height ? 'is-wide' : ''}"><figure>
             <a href="${mediaUrl(c, img.src)}"><img src="${mediaUrl(c, img.src)}" alt="${esc(img.alt)}" width="${img.width}" height="${img.height}" loading="lazy" decoding="async"></a>
             <figcaption>${esc(img.alt)}</figcaption>
           </figure></li>`)}
@@ -397,6 +402,7 @@ export function product(c, p) {
   const maker = makerLine(p);
   const filled = filledSpecs(p);
   const missing = p.specs.filter((s) => !filled.includes(s)).map((s) => s.label);
+  const desc = productText(p, 'description');
   const ld = c.absUrl && !p.placeholder && {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -419,31 +425,32 @@ export function product(c, p) {
   ].filter(([, v]) => v);
 
   return {
-    title: [p.name, maker].filter(Boolean).join(' – '),
-    description: (p.placeholder ? 'Vzorová položka katalogu. ' : '') + `${p.name}${maker ? ` (${maker})` : ''}: ${p.summary} Technické parametry, stav a poptávka.`.slice(0, 300),
+    title: [keep(p.name), keep(maker)].filter(Boolean).join(' – '),
+    description: (p.placeholder ? 'Vzorová položka katalogu. ' : '') + `${keep(p.name)}${maker ? ` (${keep(maker)})` : ''}: ${summaryPlain(p)} Technické parametry, stav a poptávka.`,
     scripts: p.images.length > 1 ? ['assets/js/gallery.js'] : [],
     ogImage: p.images[0]?.src,
     body: html`
 <div class="wrap product-crumbs">
-  ${breadcrumbs(c, [['automaty/', 'Nabídka automatů'], [`automaty/${cat.slug}/`, cat.name], [productPath(p), p.name]])}
+  ${breadcrumbs(c, [['automaty/', 'Nabídka automatů'], [`automaty/${cat.slug}/`, cat.name], [productPath(p), keep(p.name)]])}
 </div>
 <article class="product">
   <div class="wrap product-top">
     <div class="gallery" data-gallery>
       <figure class="gallery-main">${productImage(c, p, { eager: true, sizes: '(max-width: 900px) 100vw, 680px' })}</figure>
-      ${p.images.length ? photoNote(p) : html`<p class="photo-note">Fotografie tohoto automatu bude doplněna.</p>`}
+      ${p.images.length ? (photoNote(p) || (p.images.some((i) => i.illustrative) ? html`<p class="photo-note" data-gallery-note hidden></p>` : '')) : html`<p class="photo-note">Fotografie tohoto automatu bude doplněna.</p>`}
       ${p.video && html`<p class="product-video"><a class="text-link" href="${esc(p.video)}" rel="noopener nofollow" target="_blank">Video automatu<span class="visually-hidden"> (otevře se v novém okně)</span>${ARROW}</a></p>`}
       ${p.images.length > 1 && html`<ul class="gallery-thumbs" aria-label="Další fotografie">
-        ${p.images.map((img, i) => html`<li><a href="${mediaUrl(c, img.src)}" data-full="${mediaUrl(c, img.src)}" data-alt="${esc(img.alt || p.name)}"${i === 0 ? ' aria-current="true"' : ''}>
-          <img src="${mediaUrl(c, img.thumb || img.src)}" alt="${esc(`Fotografie ${i + 1}: ${img.alt || p.name}`)}" width="120" height="90" loading="lazy" decoding="async"></a></li>`)}
+        ${p.images.map((img, i) => html`<li><a href="${mediaUrl(c, img.src)}" data-full="${mediaUrl(c, img.src)}" data-alt="${esc(img.alt ? tx(img.alt) : keep(p.name))}" data-note="${esc(photoNoteText(img))}"${i === 0 ? ' aria-current="true"' : ''}>
+          <img src="${mediaUrl(c, img.thumb || img.src)}" alt="${esc(`Fotografie ${i + 1}: ${img.alt ? tx(img.alt) : keep(p.name)}`)}" width="120" height="90" loading="lazy" decoding="async"></a></li>`)}
       </ul>`}
     </div>
     <div class="product-summary">
       <div class="card-badges">${sold ? '<span class="badge badge-sold">Prodáno</span>' : conditionBadge(c, p)}</div>
-      ${maker && html`<p class="product-maker">${esc(maker)}</p>`}
-      <h1>${esc(p.name)}</h1>
+      ${maker && html`<p class="product-maker">${kesc(maker)}</p>`}
+      <h1>${kesc(p.name)}</h1>
       ${sold && html`<div class="notice notice-sold" role="note">${INFO}<p><strong>Tento automat je už prodaný.</strong> ${related.length ? 'Podobné automaty najdete níže na této stránce, ' : ''}celou nabídku najdete v kategorii <a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a>.</p></div>`}
-      <p class="product-lead">${esc(p.summary)}</p>
+      <p class="product-lead">${summaryHtml(p)}</p>
+      ${desc.fallback && czechOnlyNote()}
       <dl class="facts">${facts.map(([k, v]) => html`<div><dt>${k}</dt><dd>${v}</dd></div>`)}</dl>
       <div class="price-box">
         ${priceSlot(c, p, 'detail')}
@@ -465,19 +472,21 @@ export function product(c, p) {
   <div class="wrap product-details">
     <section class="detail-box detail-box-wide" aria-labelledby="popis">
       <h2 id="popis">Popis</h2>
-      ${p.description.map((t) => html`<p>${esc(t)}</p>`)}
+      ${desc.fallback
+        ? html`<div lang="cs">${desc.value.map((t) => html`<p>${esc(t)}</p>`)}</div>`
+        : desc.value.map((t) => html`<p>${desc.lang === 'cs' ? esc(t) : kesc(t)}</p>`)}
     </section>
     <section class="detail-box" aria-labelledby="parametry">
       <h2 id="parametry">Technické parametry</h2>
       ${(p.manufacturer || p.model || filled.length > 0) && html`<table class="spec-table">
-        <caption class="visually-hidden">Technické parametry: ${esc(p.name)}</caption>
+        <caption class="visually-hidden">Technické parametry: ${kesc(p.name)}</caption>
         <tbody>
-          ${p.manufacturer && html`<tr><th scope="row">Výrobce</th><td>${esc(p.manufacturer)}</td></tr>`}
-          ${p.model && html`<tr><th scope="row">Model</th><td>${esc(p.model)}</td></tr>`}
+          ${p.manufacturer && html`<tr><th scope="row">Výrobce</th><td>${kesc(p.manufacturer)}</td></tr>`}
+          ${p.model && html`<tr><th scope="row">Model</th><td>${kesc(p.model)}</td></tr>`}
           ${filled.map((s) => html`<tr><th scope="row">${esc(s.label)}</th><td>${esc(s.value)}</td></tr>`)}
         </tbody>
       </table>`}
-      ${missing.length > 0 && html`<p class="spec-missing"><strong>${filled.length ? 'Zatím neuvedeno' : 'Parametry zatím nejsou zveřejněné'}:</strong> ${esc(missing.join(', ').toLowerCase())}. Pokud je potřebujete znát, uveďte to v poptávce.</p>`}
+      ${missing.length > 0 && html`<p class="spec-missing"><strong>${filled.length ? 'Zatím neuvedeno' : 'Parametry zatím nejsou zveřejněné'}:</strong> ${kesc(missing.map((l) => (getLang() === 'de' ? tt(l) : tt(l).toLowerCase())).join(', '))}. Pokud je potřebujete znát, uveďte to v poptávce.</p>`}
     </section>
     <section class="detail-box" aria-labelledby="stav">
       <h2 id="stav">Stav a repase</h2>
@@ -757,7 +766,6 @@ export function about(c) {
       <h2>Co děláme</h2>
       <ul class="ticks">
         <li>Prodej použitých a repasovaných prodejních automatů</li>
-        <li>Specializace na automaty na instantní kávu a teplé nápoje</li>
         <li>Náhradní díly a příslušenství</li>
         <li>Opravy, servis a údržba</li>
       </ul>
@@ -767,9 +775,9 @@ export function about(c) {
     <aside class="side-box">
       <h2>Firemní údaje</h2>
       <dl class="facts">
-        <div><dt>Název</dt><dd>${esc(c.site.name)}</dd></div>
-        <div><dt>IČO</dt><dd>${c.site.contact.companyId ? esc(c.site.contact.companyId) : ph('doplní se')}</dd></div>
-        <div><dt>Adresa</dt><dd>${c.site.contact.address ? esc(c.site.contact.address) : ph('doplní se')}</dd></div>
+        <div><dt>Název</dt><dd>${kesc(c.site.name)}</dd></div>
+        <div><dt>IČO</dt><dd>${c.site.contact.companyId ? kesc(c.site.contact.companyId) : ph('doplní se')}</dd></div>
+        <div><dt>Adresa</dt><dd>${c.site.contact.address ? kesc(c.site.contact.address) : ph('doplní se')}</dd></div>
       </dl>
       <a class="btn btn-primary btn-block" href="${c.url('kontakt/')}">Kontakt</a>
     </aside>
@@ -797,7 +805,7 @@ export function contact(c) {
     <ul class="contact-grid">
       <li class="contact-card"><h2>Telefon</h2>${phoneLink(c, 'contact-big')}</li>
       <li class="contact-card"><h2>E-mail</h2>${emailLink(c, 'contact-big')}</li>
-      <li class="contact-card"><h2>Adresa</h2><p>${ct.address ? esc(ct.address) : ph('Adresa doplníme')}</p>
+      <li class="contact-card"><h2>Adresa</h2><p>${ct.address ? kesc(ct.address) : ph('Adresa doplníme')}</p>
         <p class="muted">${ct.hours ? esc(ct.hours) : ph('Otevírací doba doplníme')}</p></li>
     </ul>
   </div>
@@ -826,10 +834,11 @@ export function notFound(c) {
     title: 'Stránka nenalezena',
     description: 'Požadovaná stránka neexistuje.',
     body: html`
-<section class="section"><div class="wrap narrow center">
+<section class="section" data-not-found><div class="wrap narrow center">
   <h1>Stránku jsme nenašli</h1>
   <p class="lead">Odkaz je možná zastaralý nebo automat už není v nabídce.</p>
   <p class="center-actions"><a class="btn btn-primary" href="${c.url('automaty/')}">Prohlédnout automaty</a> <a class="btn btn-ghost" href="${c.url('kontakt/')}">Kontaktujte nás</a></p>
+  <p class="lang-alt"><a href="${c.url('de/')}" lang="de" hreflang="de">Seite nicht gefunden: zur deutschen Startseite</a><br><a href="${c.url('sk/')}" lang="sk" hreflang="sk">Stránka sa nenašla: na slovenskú úvodnú stránku</a></p>
 </div></section>`,
   };
 }
@@ -871,6 +880,7 @@ export function guide(c) {
   const data = {
     categories: c.categories.map(({ slug, name, short }) => ({ slug, name, short, url: c.url(`automaty/${slug}/`) })),
     order: listed.map((p) => p.id),
+    related: c.site.related ? { name: c.site.related.name, url: c.site.related.machinesUrl } : null,
     products: listed.map((p) => ({
       id: p.id, name: p.name, category: p.category, status: p.status, deletedAt: p.deletedAt, placeholder: p.placeholder,
       availability: p.availability, price: p.price, discount: p.discount, specs: p.specs, paymentSystems: p.paymentSystems,
@@ -885,11 +895,18 @@ export function guide(c) {
     ${breadcrumbs(c, [[GUIDE_PATH, 'Poradit s výběrem']])}
     <h1>Pomůžeme vám vybrat automat</h1>
     <p class="lead">Odpovězte na několik jednoduchých otázek. Ukážeme vám vhodný směr výběru a připravíme přehled požadavků. Bez telefonování a bez zadávání kontaktu před zobrazením výsledku.</p>
+    ${c.site.related && html`<div class="guide-kind" role="group" aria-labelledby="guide-kind-title">
+      <p class="guide-kind-title" id="guide-kind-title">Hledáte použitý, nebo nový automat?</p>
+      <div class="guide-kind-options">
+        <a class="guide-kind-opt" href="#pruvodce"><strong>Použitý nebo repasovaný</strong><span>Pokračujte krátkými otázkami níže.</span></a>
+        <a class="guide-kind-opt guide-kind-new" href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><strong>Nový automat <span aria-hidden="true">↗</span></strong><span>Stravovací automaty a výdejní boxy na ${esc(c.site.related.name)}.</span>${NEW_TAB}</a>
+      </div>
+    </div>`}
     <p class="guide-alt"><a class="text-link" href="${c.url('kontakt/')}#formular">Vím, co potřebuji — napsat zprávu ${ARROW}</a></p>
   </div>
 </div>
 
-<section class="section section-tight guide" aria-label="Průvodce výběrem automatu" data-guide>
+<section class="section section-tight guide" id="pruvodce" aria-label="Průvodce výběrem automatu" data-guide>
   <div class="wrap">
     <noscript><div class="notice" role="note">${INFO}<p>Průvodce potřebuje zapnutý JavaScript. Své požadavky nám můžete napsat přímo v <a href="${c.url('kontakt/')}#formular">kontaktním formuláři</a>.</p></div></noscript>
     <div class="guide-panel" data-guide-panel hidden>

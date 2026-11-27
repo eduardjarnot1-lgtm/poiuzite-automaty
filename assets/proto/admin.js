@@ -10,6 +10,7 @@ import {
   isListed, isVisible, statusOf, pragueToUtc, utcToPrague, formatPrague, scheduleSentence, recommended,
 } from './lib/catalog.js';
 import { AVAILABILITY, MAX_PRICE, photoRefs, isStoredPhoto } from './store.js';
+import { sourceHash, translationState } from './lib/i18n.js';
 
 const STATUS_LABEL = { published: 'Zveřejněno', draft: 'Koncept', hidden: 'Skryto' };
 const STATUS_HINT = {
@@ -38,6 +39,17 @@ const today = () => utcToPrague(new Date().toISOString()).date;
 const slugify = (s) =>
   String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'automat';
 const lines = (t) => String(t || '').split('\n').map((x) => x.trim()).filter(Boolean);
+// German and Slovak texts of a product. The Czech text is the source; a translation is shown to
+// customers only while it matches the Czech text it was made from (sourceHash). When the Czech
+// text changes, the translation waits for a check ("Čeká na kontrolu") and the page shows Czech.
+const TR_LANGS = [['de', 'Němčina', 'Deutsch'], ['sk', 'Slovenština', 'Slovenčina']];
+const TR_STATE = {
+  current: ['Aktuální', 'Zákazníci v této jazykové verzi vidí tento překlad.'],
+  stale: ['Čeká na kontrolu', 'Český text se po překladu změnil. Dokud překlad nezkontrolujete, zákazníci uvidí český popis s poznámkou, že je jen v češtině.'],
+  missing: ['Chybí', 'Zákazníci v této jazykové verzi uvidí český popis s poznámkou, že je jen v češtině.'],
+};
+const trBadges = (p) => TR_LANGS.map(([l]) => [l, translationState(p, l)]).filter(([, st]) => st !== 'current')
+  .map(([l, st]) => html`<span class="pa-pill pa-pill-tr-${st}" title="${esc(TR_STATE[st][1])}">${l.toUpperCase()}: ${TR_STATE[st][0].toLowerCase()}</span>`).join('');
 const paragraphs = (t) => String(t || '').split(/\n\s*\n/).map((x) => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
 const trimOrNull = (v) => (String(v ?? '').trim() ? String(v).trim() : null);
 
@@ -218,6 +230,7 @@ export async function startAdmin(root, env) {
   <td class="pa-c-status" data-label="Zveřejnění">
     <span class="pa-pill pa-pill-${st}">${STATUS_LABEL[st]}</span>
     ${p.featured ? html`<span class="pa-pill pa-pill-featured">Doporučený</span>` : ''}
+    ${trBadges(p)}
   </td>
   <td class="pa-c-date" data-label="Upraveno">${p.updatedAt ? esc(formatPrague(p.updatedAt, { time: false })) : html`<span class="pa-muted">původní data</span>`}</td>
   <td class="pa-c-actions">
@@ -405,6 +418,67 @@ export async function startAdmin(root, env) {
   const area = (id, name, value, { rows = 4, max = 4000, hint } = {}) =>
     html`<textarea id="${id}" name="${name}" rows="${rows}" maxlength="${max}"${hint ? html` aria-describedby="${id}-hint"` : ''}>${esc(value ?? '')}</textarea>`;
 
+  function translationFields(p) {
+    const open = TR_LANGS.some(([l]) => translationState(p, l) !== 'current');
+    return html`<details class="pa-more pa-tr"${open ? ' open' : ''}>
+      <summary>Překlady popisu (němčina, slovenština)</summary>
+      <p class="pa-hint">Překládá se jen krátký a podrobný popis; ostatní texty webu jsou přeložené zvlášť. Název, výrobce, model a údaje v tabulce se nepřekládají. Překlad pište sami nebo ho nechte zkontrolovat rodilým mluvčím, web ho nikam neposílá.</p>
+      ${TR_LANGS.map(([l, cs, native]) => {
+        const t = p.i18n?.[l] || {};
+        const st = translationState(p, l);
+        return html`<fieldset class="pa-tr-lang" data-tr="${l}">
+        <legend>${cs} <span lang="${l}">(${native})</span> <span class="pa-pill pa-pill-tr-${st}" data-tr-state>${TR_STATE[st][0]}</span></legend>
+        <p class="pa-hint" data-tr-note>${TR_STATE[st][1]}</p>
+        <div class="form-grid">
+          <div class="field field-wide"><label for="pf-tr-${l}-summary">Krátký popis – ${cs.toLowerCase()}</label>
+            <input id="pf-tr-${l}-summary" name="tr-${l}-summary" type="text" lang="${l}" value="${esc(t.summary ?? '')}" maxlength="260" autocomplete="off"></div>
+          <div class="field field-wide"><label for="pf-tr-${l}-description">Podrobný popis – ${cs.toLowerCase()}</label>
+            <p class="pa-hint" id="pf-tr-${l}-description-hint">Odstavce oddělte prázdným řádkem, stejně jako v češtině.</p>
+            <textarea id="pf-tr-${l}-description" name="tr-${l}-description" lang="${l}" rows="4" maxlength="4000" aria-describedby="pf-tr-${l}-description-hint">${esc((t.description || []).join('\n\n'))}</textarea></div>
+        </div>
+        <label class="pa-check"><input type="checkbox" name="tr-${l}-ok"${st === 'current' ? ' checked' : ''}> Překlad odpovídá současnému českému popisu</label>
+        <p class="pa-error" id="pf-tr-${l}-summary-error" hidden></p>
+      </fieldset>`;
+      }).join('')}
+    </details>`;
+  }
+
+  // Keeps the translation boxes honest while typing: editing the Czech text unticks "matches",
+  // editing a translation ticks it (the editor has just looked at it). Nothing is overwritten.
+  function trInput(target) {
+    const els = form.el.elements;
+    const czech = target.name === 'summary' || target.name === 'description';
+    const m = /^tr-(de|sk)-(summary|description)$/.exec(target.name);
+    if (czech) for (const [l] of TR_LANGS) { if (els[`tr-${l}-summary`].value.trim()) els[`tr-${l}-ok`].checked = false; }
+    if (m) els[`tr-${m[1]}-ok`].checked = Boolean(els[`tr-${m[1]}-summary`].value.trim());
+    for (const [l] of TR_LANGS) {
+      const has = els[`tr-${l}-summary`].value.trim();
+      const st = !has ? 'missing' : els[`tr-${l}-ok`].checked ? 'current' : 'stale';
+      const box = form.el.querySelector(`[data-tr="${l}"]`);
+      const pill = box.querySelector('[data-tr-state]');
+      pill.className = `pa-pill pa-pill-tr-${st}`;
+      pill.textContent = TR_STATE[st][0];
+      box.querySelector('[data-tr-note]').textContent = TR_STATE[st][1];
+    }
+  }
+
+  // The i18n object to save. A translation keeps the fingerprint of the Czech text it was checked
+  // against; ticking "matches" stores the fingerprint of the Czech text being saved now.
+  function readTranslations(p, els, errors) {
+    const out = {};
+    const hash = sourceHash(p);
+    for (const [l, cs] of TR_LANGS) {
+      const summary = els[`tr-${l}-summary`].value.trim();
+      const description = paragraphs(els[`tr-${l}-description`].value);
+      if (!summary && !description.length) continue;
+      if (!summary) { errors.push([`pf-tr-${l}-summary`, `${cs}: doplňte i krátký popis, jinak se překlad nezobrazí.`]); continue; }
+      const ok = els[`tr-${l}-ok`].checked;
+      const prev = form.base.i18n?.[l];
+      out[l] = { summary, description, sourceHash: ok ? hash : (prev?.sourceHash ?? null), reviewed: ok ? true : Boolean(prev?.reviewed) };
+    }
+    return Object.keys(out).length ? out : undefined;
+  }
+
   function openForm(id, { publish = false } = {}) {
     const original = id ? byId(id) : null;
     if (id && !original) { renderList(); return; }
@@ -472,6 +546,7 @@ export async function startAdmin(root, env) {
         ${field('pf-notes', 'Interní poznámky', area('pf-notes', 'notes', p.notes, { rows: 3, hint: true }), { wide: true, hint: 'Jen pro vás. Na webu se nikdy nezobrazí.' })}
       </div>
     </details>
+    ${translationFields(p)}
   </section>
 
   <section class="pa-section" id="pf-s-price" aria-labelledby="pf-h-price">
@@ -778,6 +853,8 @@ export async function startAdmin(root, env) {
       status,
       updatedAt: now,
     };
+    p.i18n = readTranslations(p, form.el.elements, errors);
+    if (!p.i18n) delete p.i18n;
     if (!name) errors.unshift(['pf-name', 'Doplňte název automatu.']);
     if (mode === 'publish') {
       for (const [id, msg] of publishProblems(p)) if (!errors.some((e) => e[0] === id)) errors.push([id, msg]);
@@ -980,6 +1057,7 @@ export async function startAdmin(root, env) {
         if (k === 'creditLabel') img.credit = { ...(img.credit || {}), label: e.target.value.trim() };
         if (k === 'creditUrl') img.credit = { ...(img.credit || {}), url: e.target.value.trim() };
       }
+      if (/^(summary|description|tr-)/.test(e.target.name || '')) trInput(e.target);
       markDirty();
       updateForm();
     });

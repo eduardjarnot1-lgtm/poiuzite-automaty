@@ -30,8 +30,12 @@ for (const file of files) {
 
   const title = src.match(/<title>([^<]*)<\/title>/)?.[1];
   if (!title) report('missing <title>');
-  else if (titles.has(title)) report(`title duplicates ${titles.get(title)}`);
-  else titles.set(title, page);
+  else {
+    // titles are unique within one language version (a machine name reads the same in all three)
+    const key = `${/^(de|sk)\//.exec(page.replace(/\\/g, '/'))?.[1] || 'cs'}:${title}`;
+    if (titles.has(key)) report(`title duplicates ${titles.get(key)}`);
+    else titles.set(key, page);
+  }
   if (!/<meta name="description" content="[^"]{20,}">/.test(src)) report('missing or short meta description');
   const h1s = src.match(/<h1[\s>]/g)?.length || 0;
   if (h1s !== 1) report(`${h1s} <h1> elements`);

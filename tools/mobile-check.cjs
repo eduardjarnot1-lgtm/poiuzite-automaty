@@ -110,7 +110,7 @@ for (const [dname, dev] of [['iPhone 13 (emul.)', devices['iPhone 13']], ['Pixel
   await ctx.close(); }
 // large text
 { const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, isMobile: true }); const p = await ctx.newPage(); const bad = [];
-  for (const u of ['index.html', 'kontakt/index.html', 'pruvodce-vyberem/index.html', 'automaty/instantni-kavove-automaty/atlantis-select/index.html', 'cookies/index.html', 'sprava-nabidky/index.html']) {
+  for (const u of ['index.html', 'kontakt/index.html', 'pruvodce-vyberem/index.html', 'automaty/instantni-kavove-automaty/rhea-xm/index.html', 'cookies/index.html', 'sprava-nabidky/index.html']) {
     await p.goto(B + u); await p.addStyleTag({ content: 'html{font-size:150% !important}' }); await p.waitForTimeout(200);
     const o = await noOverflow(p); if (o > 0) bad.push(`${u}:${o}`); }
   ok('150% text size: no sideways scroll', bad.length === 0, bad.join(' ')); await ctx.close(); }

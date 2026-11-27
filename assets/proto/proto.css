@@ -354,3 +354,11 @@ body:has(.proto-switch) .site-footer { padding-bottom: 56px; }
 }
 /* the guide keeps Back and Continue at the bottom of the screen, so the switch steps aside there */
 @media (max-width: 599px) { body:has(.guide-nav) .proto-switch { display: none; } }
+
+/* translations of a product description (admin) */
+.pa-pill-tr-stale { background: var(--ph-bg); border-color: var(--ph-line); color: var(--ph-ink); }
+.pa-pill-tr-missing { background: var(--bg-well); border-color: var(--line-strong); color: var(--ink-soft); }
+.pa-pill-tr-current { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-hover); }
+.pa-tr-lang { margin: var(--s2) 0 0; padding: 12px 16px 4px; border: 1px solid var(--line); border-radius: var(--radius-sm); min-width: 0; }
+.pa-tr-lang legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 6px; font-weight: 600; }
+.pa-c-status .pa-pill { margin: 2px 2px 0 0; }

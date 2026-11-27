@@ -1,27 +1,30 @@
 // Reusable page parts: layout, header, footer, breadcrumbs, product cards, enquiry form.
-import { esc, html, ph, czk, typeset } from './util.mjs';
+import { esc, kesc, html, ph, czk, typeset } from './util.mjs';
 import { sale, effectivePrice, isListed, formatPrague, utcToPrague } from './catalog.mjs';
+import { keep, tx, getLang, productText, translateHtml, currentDict, currentReport, LANGS, LANG_NAMES, OG_LOCALE } from './i18n.mjs';
 
 const INFO = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>';
 export const CHECK = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 export { INFO };
 const LEAF = '<path d="M27 4C14 4 5 10 5 20c0 3 1 5.5 2.5 7.5C9 18 15 13 22 10 16 14 11 19 9 28.5 11 29.5 13 30 15 30c9 0 14-8 12-26z" fill="currentColor"/>';
+export const EXT = '<svg class="icon icon-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 16 16 8M9 8h7v7"/></svg>';
+export const NEW_TAB = '<span class="visually-hidden"> (otevře se v nové kartě)</span>';
 export const ARROW = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const PHONE = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
 const MAIL = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>';
 
-export const logo = (c) => html`<a class="logo" href="${c.url('')}" aria-label="${esc(c.site.name)}, úvodní stránka">
-  <svg viewBox="0 0 32 32" aria-hidden="true">${LEAF}</svg>${esc(c.site.logoText)}</a>`;
+export const logo = (c) => html`<a class="logo" href="${c.url('')}" aria-label="${kesc(c.site.name)}, úvodní stránka">
+  <svg viewBox="0 0 32 32" aria-hidden="true">${LEAF}</svg><span class="logo-text" lang="cs" translate="no">${esc(c.site.logoText)}</span></a>`;
 
 /* ---------- contact details: links when set, marked gaps when not ---------- */
 const telHref = (p) => 'tel:' + p.replace(/[^\d+]/g, '');
 export const phoneLink = (c, cls = '') =>
   c.site.contact.phone
-    ? html`<a class="${cls}" href="${telHref(c.site.contact.phone)}">${PHONE}${esc(c.site.contact.phone)}</a>`
+    ? html`<a class="${cls}" href="${telHref(c.site.contact.phone)}">${PHONE}${kesc(c.site.contact.phone)}</a>`
     : html`<span class="${cls}">${PHONE}${ph('Telefon doplníme')}</span>`;
 export const emailLink = (c, cls = '') =>
   c.site.contact.email
-    ? html`<a class="${cls}" href="mailto:${esc(c.site.contact.email)}">${MAIL}${esc(c.site.contact.email)}</a>`
+    ? html`<a class="${cls}" href="mailto:${esc(c.site.contact.email)}">${MAIL}${kesc(c.site.contact.email)}</a>`
     : html`<span class="${cls}">${MAIL}${ph('E-mail doplníme')}</span>`;
 
 /* ---------- header ----------
@@ -55,6 +58,25 @@ const published = (c, slug) => {
   return c.products.filter((p) => slugs.has(p.category) && !p.placeholder && isListed(p)).length;
 };
 
+/* ---------- language switch ----------
+   Native names (Čeština, Deutsch, Slovenčina); the header shows the codes with the full name for
+   assistive technology, the mobile menu the full names. Each link leads to the same page in the
+   other language; assets/js/lang.js adds the filters, the position on the page and form values. */
+export function langSwitch(c, { full = false } = {}) {
+  const cur = getLang();
+  // the 404 page links to the German and Slovak homepages in its text instead
+  if (c.page?.path === '404') return '';
+  return html`<nav class="lang-switch${full ? ' lang-switch-full' : ''}" aria-label="Jazyk webu">
+  <ul>${LANGS.map((l) => {
+    const href = c.langHref ? c.langHref(l) : null;
+    const label = full ? html`<span>${LANG_NAMES[l]}</span>` : html`<span aria-hidden="true">${l.toUpperCase()}</span><span class="visually-hidden">${LANG_NAMES[l]}</span>`;
+    if (l === cur) return html`<li><a href="${href || '#'}" lang="${l}" hreflang="${l}" aria-current="true" data-lang="${l}">${label}</a></li>`;
+    if (!href) return html`<li><span class="lang-off" lang="${l}" title="${LANG_NAMES[l]}: tato stránka je jen v češtině">${label}</span></li>`;
+    return html`<li><a href="${href}" lang="${l}" hreflang="${l}" data-lang="${l}">${label}</a></li>`;
+  })}</ul>
+</nav>`;
+}
+
 export function header(c) {
   const home = c.page.path === '';
   return html`<header class="site-header">
@@ -80,12 +102,15 @@ export function header(c) {
               return html`<li${cat.parent ? ' class="nav-sub-child"' : ''}><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)} <small>${n ? `${n} v nabídce` : 'na dotaz'}</small></a></li>`;
             })}
             <li class="nav-sub-all"><a href="${c.url('automaty/')}">Celá nabídka automatů</a></li>
+            ${c.site.related && html`<li class="nav-sub-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><span>Nové automaty <small>${esc(c.site.related.name)}</small></span><span aria-hidden="true">↗</span>${NEW_TAB}</a></li>`}
           </ul>
         </li>`;
         })}
         <li class="nav-mobile-only"><a class="btn btn-primary" href="${c.url('kontakt/')}#formular">Poptat automat</a></li>
+        ${c.page?.path === '404' ? '' : html`<li class="nav-mobile-only nav-lang">${langSwitch(c, { full: true })}</li>`}
       </ul>
     </nav>
+    ${langSwitch(c)}
     <a class="btn btn-primary btn-sm header-cta" href="${c.url('kontakt/')}#formular">Poptat automat</a>
   </div>
 </header>`;
@@ -99,10 +124,12 @@ export function footer(c) {
     <div class="footer-brand">
       ${logo(c)}
       <p>${esc(c.site.tagline)}</p>
+      ${c.site.related && html`<p class="footer-related"><a href="${esc(c.site.related.machinesUrl)}" target="_blank" rel="noopener noreferrer"><span class="footer-related-label">Nové automaty</span><span class="footer-related-name">${esc(c.site.related.name)} <span aria-hidden="true">↗</span></span>${NEW_TAB}</a></p>`}
     </div>
     <nav aria-label="Druhy automatů">
       <h2 class="footer-title">Nabídka automatů</h2>
-      <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}</ul>
+      <ul>${c.categories.map((cat) => html`<li><a href="${c.url(`automaty/${cat.slug}/`)}">${esc(cat.name)}</a></li>`)}
+</ul>
     </nav>
     <nav aria-label="Služby a firma">
       <h2 class="footer-title">Služby a firma</h2>
@@ -117,14 +144,14 @@ export function footer(c) {
       <ul class="footer-contact">
         <li>${phoneLink(c)}</li>
         <li>${emailLink(c)}</li>
-        <li>${ct.address ? esc(ct.address) : ph('Adresa doplníme')}</li>
-        ${ct.companyId && html`<li>IČO: ${esc(ct.companyId)}</li>`}
+        <li>${ct.address ? kesc(ct.address) : ph('Adresa doplníme')}</li>
+        ${ct.companyId && html`<li>IČO: ${kesc(ct.companyId)}</li>`}
       </ul>
     </div>
   </div>
   <div class="wrap footer-base">
     <nav aria-label="Právní informace"><ul class="footer-legal">${LEGAL_NAV.map(([path, label]) => html`<li><a href="${c.url(path)}">${label}</a></li>`)}</ul></nav>
-    <p class="footer-operator">© ${new Date().getFullYear()} ${esc(c.site.name)} · Provozovatel: ${c.site.operator?.legalName ? esc(c.site.operator.legalName) : ph('doplníme')}, IČO ${ct.companyId ? esc(ct.companyId) : ph('doplníme')}, sídlo ${c.site.operator?.registeredOffice ? esc(c.site.operator.registeredOffice) : ph('doplníme')}${c.site.operator?.register ? html`, ${esc(c.site.operator.register)}` : ''}</p>
+    <p class="footer-operator">© ${new Date().getFullYear()} ${kesc(c.site.name)} · Provozovatel: ${c.site.operator?.legalName ? kesc(c.site.operator.legalName) : ph('doplníme')}, IČO ${ct.companyId ? kesc(ct.companyId) : ph('doplníme')}, sídlo ${c.site.operator?.registeredOffice ? kesc(c.site.operator.registeredOffice) : ph('doplníme')}${c.site.operator?.register ? html`, ${kesc(c.site.operator.register)}` : ''}</p>
   </div>
 </footer>`;
 }
@@ -207,6 +234,18 @@ export const saleBadge = (c, p) => {
 
 export const makerLine = (p) => [p.manufacturer, p.model].filter(Boolean).join(' · ');
 
+// The product's one-line summary in the current language; the Czech text (lang="cs") while a
+// translation is missing or waits for review after the Czech text changed.
+export function summaryHtml(p) {
+  const t = productText(p, 'summary');
+  if (t.fallback) return html`<span lang="cs">${esc(t.value)}</span>`;
+  return t.lang === 'cs' ? esc(t.value) : kesc(t.value);
+}
+// Plain summary for meta descriptions and search, kept as it is.
+export const summaryPlain = (p) => keep(productText(p, 'summary').value || '');
+// Notice shown when the product text is Czech on a German or Slovak page.
+export const czechOnlyNote = () => html`<p class="lang-note" role="note">Popis je zatím k dispozici jen v češtině.</p>`;
+
 export function conditionBadge(c, p) {
   const cond = p.condition && c.site.conditions[p.condition];
   return html`${p.placeholder && '<span class="badge badge-ph">Vzorová položka</span>'}${p.featured && '<span class="badge badge-featured">Doporučujeme</span>'}${saleBadge(c, p)}${cond && html`<span class="badge badge-${esc(p.condition)}">${esc(cond.label)}</span>`}`;
@@ -223,16 +262,18 @@ export function productImage(c, p, { index = 0, eager = false, sizes = '(max-wid
   if (!img) {
     return html`<img src="${c.url('assets/img/placeholder-automat.svg')}" alt="Fotografie automatu bude doplněna" width="600" height="450" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
-  return html`<img src="${mediaUrl(c, img.src)}"${img.srcset?.length > 0 && html` srcset="${img.srcset.map((s) => `${mediaUrl(c, s.src)} ${s.w}w`).join(', ')}" sizes="${sizes}"`} data-fallback="${c.url('assets/img/placeholder-automat.svg')}" alt="${esc(img.alt || p.name)}" width="${img.width || 800}" height="${img.height || 600}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+  return html`<img src="${mediaUrl(c, img.src)}"${img.srcset?.length > 0 && html` srcset="${img.srcset.map((s) => `${mediaUrl(c, s.src)} ${s.w}w`).join(', ')}" sizes="${sizes}"`} data-fallback="${c.url('assets/img/placeholder-automat.svg')}" alt="${esc(img.alt ? tx(img.alt) : keep(p.name))}" width="${img.width || 800}" height="${img.height || 600}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
 
 const specValue = (v) => (v == null || v === '' ? ph('doplní se') : esc(v));
 export const filledSpecs = (p) => p.specs.filter((s) => s.value != null && s.value !== '');
 
-// Small credit line for photos that show a similar model rather than the unit for sale.
+// Small credit line for photos that show a similar model rather than the unit for sale
+// (img.note overrides the wording, e.g. for a manufacturer's brochure picture).
+export const photoNoteText = (img) => (img?.illustrative ? img.note || 'Ilustrační foto podobného modelu' : '');
 export const photoNote = (p, img = p.images[0], cls = 'photo-note') =>
   img?.illustrative &&
-  html`<p class="${cls}">Ilustrační foto podobného modelu${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
+  html`<p class="${cls}"${cls === 'photo-note' ? ' data-gallery-note' : ''}>${esc(img.note || 'Ilustrační foto podobného modelu')}${img.credit && html` · zdroj <a href="${esc(img.credit.url)}" rel="noopener nofollow" target="_blank">${esc(img.credit.label)}<span class="visually-hidden"> (otevře se v novém okně)</span></a>`}</p>`;
 
 /* A published machine: same image well, name, one-line description, price (or "Cena na dotaz")
    and the detail link on every card, with the actions aligned along the bottom. The line under the
@@ -242,23 +283,23 @@ export function productCard(c, p, { headingLevel = 3, order = 0 } = {}) {
   const h = `h${headingLevel}`;
   const img = p.images[0];
   const keySpecs = filledSpecs(p).filter((s) => s.key).slice(0, 3);
-  const search = [p.name, p.manufacturer, p.model, p.summary].filter(Boolean).join(' ').toLowerCase();
+  const search = [p.name, p.manufacturer, p.model, p.summary, productText(p, 'summary').value].filter(Boolean).join(' ').toLowerCase();
   // data-* feed the customer filters and sorting in assets/js/catalogue.js; data-price is the
   // price that applies now, data-order the recommended position (also the tie-break).
   const price = effectivePrice(p, nowOf(c));
   return html`<li class="card" data-id="${esc(p.id)}" data-order="${order}" data-heading="${headingLevel}" data-name="${esc(p.name.toLowerCase())}" data-category="${esc(p.category)}" data-manufacturer="${esc(p.manufacturer || '')}" data-condition="${esc(p.condition || '')}" data-type="${esc(p.type || '')}" data-availability="${esc(p.availability || '')}" data-price="${price ?? ''}" data-sale="${sale(p, nowOf(c)) ? '1' : ''}" data-date="${esc(p.dateAdded || '')}" data-search="${esc(search)}">
   <a class="card-media" href="${href}" tabindex="-1" aria-hidden="true">${productImage(c, p)}</a>
-  ${img?.illustrative ? photoNote(p, img, 'card-note') : html`<p class="card-note">${img ? 'Fotografie automatu' : 'Fotografie bude doplněna'}</p>`}
+  ${img?.illustrative ? photoNote(p, img, 'card-note') : ''}
   <div class="card-body">
     <div class="card-badges">${conditionBadge(c, p)}</div>
-    ${makerLine(p) && html`<p class="card-maker">${esc(makerLine(p))}</p>`}
-    <${h} class="card-title"><a href="${href}">${esc(p.name)}</a></${h}>
-    <p class="card-summary">${esc(p.summary)}</p>
+    ${makerLine(p) && html`<p class="card-maker">${kesc(makerLine(p))}</p>`}
+    <${h} class="card-title"><a href="${href}">${kesc(p.name)}</a></${h}>
+    <p class="card-summary">${summaryHtml(p)}</p>
     ${keySpecs.length > 0 && html`<dl class="card-specs">${keySpecs.map((s) => html`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}</dd></div>`)}</dl>`}
     ${p.availability && html`<p class="card-avail">${esc(p.availability)}</p>`}
     <div class="card-foot">
       ${priceSlot(c, p, 'card')}
-      <a class="text-link" href="${href}">Detail automatu${ARROW}<span class="visually-hidden">: ${esc(p.name)}</span></a>
+      <a class="text-link" href="${href}">Detail automatu${ARROW}<span class="visually-hidden">: ${kesc(p.name)}</span></a>
     </div>
   </div>
 </li>`;
@@ -291,9 +332,10 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
   <form class="form" name="poptavka" method="POST" ${attrs} data-enquiry${c.formPreview ? ' data-preview' : ''}>
     <input type="hidden" name="form-name" value="poptavka">
     <input type="hidden" name="typ" value="${esc(kind)}">
+    <input type="hidden" name="jazyk" value="${esc(getLang())}">
     <input type="hidden" name="automat" value="${product ? esc(`${product.name} (${product.id})`) : ''}">
     <p class="hp"><label>Nevyplňujte <input name="firma-web" tabindex="-1" autocomplete="off"></label></p>
-    ${product && html`<p class="form-about">Poptávka automatu: <strong>${esc(product.name)}</strong></p>`}
+    ${product && html`<p class="form-about">Poptávka automatu: <strong>${kesc(product.name)}</strong></p>`}
     <div class="form-grid">
       <div class="field">
         <label for="${f('jmeno')}">Jméno a příjmení ${nameRequired ? '<span class="req" aria-hidden="true">*</span>' : '<span class="opt">(nepovinné)</span>'}</label>
@@ -325,28 +367,44 @@ export function enquiryForm(c, { id = 'poptavka', title = 'Poptávka', intro, ki
 }
 
 /* ---------- the document ---------- */
+// Translates the finished page into the current language, then applies the no-break rules for
+// one-letter words (Czech and Slovak; German has none).
+export function finish(src) {
+  const lang = getLang();
+  const out = lang === 'cs' ? src : translateHtml(src, currentDict(), { report: currentReport() });
+  return lang === 'de' ? out : typeset(out);
+}
+
+
 export function layout(c, { title, description, body, head = '', scripts = [], bodyClass = '', ogImage }) {
-  const fullTitle = c.page.path === '' ? title : `${title} | ${c.site.name}`;
-  const canonical = c.absUrl && !c.page.noindex ? c.absUrl(c.page.path) : null;
+  const lang = getLang();
+  const fullTitle = c.page.path === '' ? title : `${title} | ${keep(c.site.name)}`;
+  const own = c.pagePath ?? c.page.path;
+  const canonical = c.absUrl && !c.page.noindex ? c.absUrl(own) : null;
+  // hreflang alternates only with a real production address (site.json baseUrl)
+  const alternates = canonical && c.langPath ? LANGS.map((l) => html`<link rel="alternate" hreflang="${l}" href="${c.absUrl(c.langPath(l))}">
+`).join('') + html`<link rel="alternate" hreflang="x-default" href="${c.absUrl(c.langPath('cs'))}">
+` : '';
   const og = ogImage && (/^https?:\/\//.test(ogImage) ? ogImage : c.absUrl ? c.absUrl(ogImage) : null);
-  return typeset(html`<!doctype html>
-<html lang="cs">
+  return finish(html`<!doctype html>
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
-${c.page.noindex && '<meta name="robots" content="noindex">\n'}${canonical && html`<link rel="canonical" href="${canonical}">\n`}<meta property="og:type" content="website">
+${c.page.noindex && '<meta name="robots" content="noindex">\n'}${canonical && html`<link rel="canonical" href="${canonical}">\n`}${alternates}<meta property="og:type" content="website">
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
-<meta property="og:locale" content="cs_CZ">
+<meta property="og:locale" content="${OG_LOCALE[lang]}">
 ${canonical && html`<meta property="og:url" content="${canonical}">\n`}${og && html`<meta property="og:image" content="${og}">\n`}<meta name="theme-color" content="${c.page.path === '' ? '#f3f7f5' : '#fbfcf9'}">
 <link rel="icon" href="${c.url('assets/img/favicon.svg')}" type="image/svg+xml">
 <link rel="stylesheet" href="${c.url('assets/fonts/fonts.css')}">
 <link rel="stylesheet" href="${c.url('assets/css/site.css')}">
-${head}<script>document.documentElement.classList.add('js')</script>${c.proto && '\n' + c.proto.head(c)}
+${head}${c.headScript || ''}<script>document.documentElement.classList.add('js')</script>${lang !== 'cs' && html`\n<script src="${c.url(`assets/js/i18n/${lang}.js`)}"></script>`}${c.proto && '\n' + c.proto.head(c)}
 </head>
-<body${bodyClass ? ` class="${bodyClass}"` : ''}>
+<body class="${['has-backdrop', bodyClass].filter(Boolean).join(' ')}">
+<div class="home-backdrop" aria-hidden="true"></div>
 <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
 ${header(c)}
 <main id="obsah" tabindex="-1">
@@ -355,9 +413,42 @@ ${body}
 ${footer(c)}
 ${c.proto
   // the prototype renders saved changes first, then loads the page scripts itself
-  ? c.proto.foot(c, ['assets/js/site.js', ...scripts].map((s) => c.url(s)))
+  ? c.proto.foot(c, ['assets/js/site.js', 'assets/js/lang.js', ...scripts].map((s) => c.url(s)))
   : html`<script src="${c.url('assets/js/site.js')}" defer></script>
+<script src="${c.url('assets/js/lang.js')}" defer></script>
 ${scripts.map((s) => html`<script src="${c.url(s)}" defer></script>\n`)}`}</body>
 </html>
 `);
+}
+
+// Bistro 24 (same owner): new machines. A quiet, typography-led window, no photos: Bistro 24's
+// images are manufacturer visualisations whose reuse rights are not established here.
+export function relatedPromo(c) {
+  const r = c.site.related;
+  if (!r) return '';
+  return html`<section class="section section-tight related-wrap" aria-labelledby="related-title">
+  <div class="wrap">
+    <div class="related">
+      <div class="related-text">
+        <p class="related-eyebrow">Další možnost od stejného majitele</p>
+        <h2 id="related-title">Hledáte raději nový automat?</h2>
+        <p class="related-lead">Na ${kesc(r.name)} najdete nabídku nových stravovacích automatů, AI řešení a výdejních boxových systémů. Prohlédněte si další možnosti pro svůj provoz.</p>
+        <div class="related-actions">
+          <a class="btn btn-lg related-cta" href="${esc(r.machinesUrl)}" target="_blank" rel="noopener noreferrer">Prohlédnout nové automaty ${EXT}${NEW_TAB}</a>
+          <a class="related-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Poznat ${kesc(r.name)}${NEW_TAB}</a>
+        </div>
+        <p class="related-dest">Pokračujete na ${kesc(r.domain)}</p>
+      </div>
+      <div class="related-showroom">
+        <p class="related-mark" aria-hidden="true"><span>Bistro</span> 24</p>
+        <ul class="related-list" aria-label="Co najdete na ${kesc(r.name)}">
+          <li>AI stravovací automaty s rozpoznáváním produktů</li>
+          <li>Chlazené automaty na potraviny</li>
+          <li>Výdejní boxové systémy</li>
+          <li>Prodej, pronájem a servis</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>`;
 }

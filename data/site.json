@@ -4,17 +4,17 @@
   "tagline": "Prodej repasovaných automatů, servis a náhradní díly.",
   "baseUrl": "",
   "contact": {
-    "phone": null,
-    "email": null,
-    "address": null,
+    "phone": "+420 773 881 333",
+    "email": "info@stravovaciautomaty.cz",
+    "address": "Kaštanová 489/34, 620 00 Brno",
     "hours": null,
     "companyId": null
   },
   "operator": {
-    "_note": "Údaje provozovatele pro patičku, obchodní podmínky a zásady ochrany osobních údajů. null = zatím nedodáno; na webu se zobrazí jako zřetelně označená mezera.",
-    "legalName": null,
+    "_note": "Údaje provozovatele pro patičku, obchodní podmínky a zásady ochrany osobních údajů. null = zatím nedodáno; na webu se zobrazí jako zřetelně označená mezera. Telefon, e-mail, adresa a jméno provozovatele převzaty 2026-11-18 z bistro24.eu (stejný provozovatel, potvrdil Eduard). IČO tam uvedené není.",
+    "legalName": "Ing. Jan Petr",
     "legalForm": null,
-    "registeredOffice": null,
+    "registeredOffice": "Kaštanová 489/34, 620 00 Brno",
     "register": null,
     "vatPayer": null,
     "vatId": null,
@@ -64,6 +64,33 @@
   },
   "home": {
     "heroProduct": "rhea-lazio",
-    "categoryPhotos": {}
+    "categoryPhotos": {},
+    "heroPhotos": [
+      {
+        "src": "assets/products/realizace/sestavy/spiralove.webp",
+        "alt": "Spirálové automaty na občerstvení a nápoje s platebními terminály",
+        "width": 1500,
+        "height": 1125
+      },
+      {
+        "src": "assets/products/realizace/karuselove/vejcomat.webp",
+        "alt": "Karuselový automat s polepem Vejcomat",
+        "width": 1200,
+        "height": 1600
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/osvetleni.webp",
+        "alt": "Osvětlený automat Necta Starfood naplněný zbožím",
+        "width": 900,
+        "height": 1600
+      }
+    ]
+  },
+  "related": {
+    "_note": "Bistro 24: nové stravovací automaty a výdejní boxové systémy od stejného majitele (potvrzeno 2026-11-18). Odkazy ověřené 2026-11-18.",
+    "name": "Bistro 24",
+    "url": "https://bistro24.eu/",
+    "machinesUrl": "https://bistro24.eu/",
+    "domain": "bistro24.eu"
   }
 }
