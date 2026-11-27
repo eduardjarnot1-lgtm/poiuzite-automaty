@@ -1,7 +1,10 @@
 // Small helpers shared by the templates.
+import { keep } from './i18n.mjs';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
+// Escaped data that stays as it is in every language (names, models, contacts): see i18n.mjs.
+export const kesc = (v) => keep(esc(v));
 
 // Tagged template that drops null/false/undefined and joins arrays, so templates can use
 // `${cond && html`...`}` and `${list.map(...)}` without extra plumbing. Values are NOT escaped:
@@ -27,7 +30,11 @@ export function linker(pagePath, absolute, explicitIndex = false) {
   const depth = pagePath.split('/').filter(Boolean).length;
   const up = '../'.repeat(depth);
   return (target = '') => {
-    if (explicitIndex && (target === '' || target.endsWith('/'))) target += 'index.html';
+    // A query or fragment stays after the index.html, e.g. automaty/nahled/?id=x.
+    const cut = target.search(/[?#]/);
+    let [path, rest] = cut > -1 ? [target.slice(0, cut), target.slice(cut)] : [target, ''];
+    if (explicitIndex && (path === '' || path.endsWith('/'))) path += 'index.html';
+    target = path + rest;
     return absolute ? '/' + target : up + target || './';
   };
 }
@@ -38,3 +45,19 @@ export const czk = (price, currency, inclVat) =>
 
 // Czech plural forms: 1 automat, 2–4 automaty, 5+ automatů.
 export const plural = (n, one, few, many) => (n === 1 ? one : n >= 2 && n <= 4 ? few : many);
+
+// Czech typography: a one-letter preposition or conjunction (a, i, k, o, s, u, v, z) never ends
+// a line. Joins it to the next word with a no-break space in text only: tags, attributes and the
+// contents of script, style, textarea and title stay untouched.
+const RAW = /^(script|style|textarea|title|pre|code)$/i;
+export function typeset(src) {
+  let raw = null;
+  return String(src).replace(/<(\/?)([a-zA-Z][\w-]*)[^>]*>|<|[^<]+/g, (m, close, name) => {
+    if (name) {
+      if (RAW.test(name)) raw = close ? null : name.toLowerCase();
+      return m;
+    }
+    if (raw || m === '<') return m;
+    return m.replace(/(?<=^|[\s („"])([aikosuvzAIKOSUVZ])[ \t\r\n]+(?=[^\s<])/g, '$1 ');
+  });
+}

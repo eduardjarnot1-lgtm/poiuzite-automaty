@@ -1,0 +1,139 @@
+[
+  {
+    "id": "maso-od-tatka",
+    "title": "Necta Starfood pro Mäso od tatka",
+    "images": [
+      {
+        "src": "assets/products/realizace/maso-od-tatka/polep-boku.webp",
+        "alt": "Nanášení polepu na bok automatu",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/polep-zad.webp",
+        "alt": "Polep na zadní straně automatu",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/informace.webp",
+        "alt": "Boční panel s nabídkou zboží a návodem k nákupu",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/instalace-detail.webp",
+        "alt": "Necta Starfood po instalaci v obchodním centru",
+        "width": 1200,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/instalace.webp",
+        "alt": "Pohled na automat u vstupu do provozovny",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/vstup.webp",
+        "alt": "Umístění automatu u vstupu do obchodního centra",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/maso-od-tatka/osvetleni.webp",
+        "alt": "Osvětlený automat naplněný zbožím",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      }
+    ]
+  },
+  {
+    "id": "karuselove",
+    "title": "Karuselové automaty v provozu",
+    "images": [
+      {
+        "src": "assets/products/realizace/karuselove/vejcomat.webp",
+        "alt": "Karuselový automat s polepem Vejcomat",
+        "width": 1200,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/karuselove/dezimat.webp",
+        "alt": "Karuselový automat s označením Dezimat",
+        "width": 585,
+        "height": 780,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/karuselove/ovoce.webp",
+        "alt": "Karuselový automat s motivem ovoce",
+        "width": 757,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/karuselove/naplnene-prihradky.webp",
+        "alt": "Osvětlené přihrádky se zbožím",
+        "width": 878,
+        "height": 1170,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/karuselove/mechanismus.webp",
+        "alt": "Vnitřní otočná patra karuselového automatu",
+        "width": 585,
+        "height": 780,
+        "rights": "cleared"
+      }
+    ]
+  },
+  {
+    "id": "sestavy",
+    "title": "Sestavy prodejních automatů",
+    "images": [
+      {
+        "src": "assets/products/realizace/sestavy/spiralove.webp",
+        "alt": "Spirálové automaty na občerstvení a nápoje s platebními terminály",
+        "width": 1500,
+        "height": 1125,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/sestavy/panorama.webp",
+        "alt": "Panorama místnosti s více prodejními automaty",
+        "width": 1290,
+        "height": 470,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/sestavy/tri-automaty.webp",
+        "alt": "Nápojový automat vedle dvou karuselových automatů",
+        "width": 780,
+        "height": 585,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/sestavy/dvojice.webp",
+        "alt": "Sestava karuselového a nápojového automatu Miofino",
+        "width": 757,
+        "height": 1600,
+        "rights": "cleared"
+      },
+      {
+        "src": "assets/products/realizace/sestavy/napojovy.webp",
+        "alt": "Nápojový automat s platebním terminálem vedle výdejníku vody",
+        "width": 900,
+        "height": 1600,
+        "rights": "cleared"
+      }
+    ]
+  }
+]
